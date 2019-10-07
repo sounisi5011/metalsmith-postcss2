@@ -76,10 +76,4 @@ test('should transform css files with postcssrc files', async t => {
         files['path/to/a.css'].contents.toString('utf8'),
         'a { color: black; color: black; color: black; color: black }',
     );
-
-    t.is(
-        files['frontmatter/a.css'].contents.toString('utf8'),
-        'a { color: black; color: black; color: black; color: black; color: black; color: black; color: black; color: black }',
-        'Use config file contents converted by Metalsmith',
-    );
 });
