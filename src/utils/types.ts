@@ -7,3 +7,7 @@
 export type isReadonlyOrWritableArray = (
     value: unknown,
 ) => value is unknown[] | ReadonlyArray<unknown>;
+
+export type PromiseType<T extends Promise<unknown>> = T extends Promise<infer U>
+    ? U
+    : never;

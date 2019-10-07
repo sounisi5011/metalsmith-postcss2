@@ -12,7 +12,7 @@ import {
     getMatchedFilenameList,
     getValidFiles,
 } from './utils/metalsmith';
-import { process } from './utils/postcss';
+import { loadConfig, process } from './utils/postcss';
 
 export = (
     opts:
@@ -28,7 +28,6 @@ export = (
         );
         const targetFiles = getValidFiles(files, matchedFilenameList);
 
-        const processor = postcss([...options.plugins]);
         await Promise.all(
             Object.entries(targetFiles).map(async ([filename, filedata]) => {
                 const newFilename = options.renamer(filename);
@@ -38,12 +37,21 @@ export = (
                     metalsmith.destination(),
                     newFilename,
                 );
-
-                const result = await process(processor, filedata.contents, {
-                    ...options.options,
-                    from,
-                    to,
+                const config = await loadConfig({
+                    options: options.options,
+                    sourceFilepath: from,
                 });
+                const plugins = config ? config.plugins : [...options.plugins];
+
+                const result = await process(
+                    postcss(plugins),
+                    filedata.contents,
+                    {
+                        ...(config ? config.options : options.options),
+                        from,
+                        to,
+                    },
+                );
                 if (!result) return;
 
                 delete files[filename];
