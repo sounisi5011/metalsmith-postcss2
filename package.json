@@ -84,10 +84,7 @@
     ]
   },
   "dependencies": {
-    "@types/debug": "4.1.5",
-    "@types/deep-freeze-strict": "1.1.0",
     "@types/metalsmith": "2.3.0",
-    "@types/postcss-load-config": "2.0.0",
     "debug": "4.1.1",
     "deep-freeze-strict": "1.1.1",
     "multimatch": "4.0.0",
@@ -97,7 +94,10 @@
   "devDependencies": {
     "@sounisi5011/check-peer-deps": "github:sounisi5011/check-peer-deps",
     "@types/cross-spawn": "6.0.1",
+    "@types/debug": "4.1.5",
+    "@types/deep-freeze-strict": "1.1.0",
     "@types/lodash.clonedeep": "4.5.6",
+    "@types/postcss-load-config": "2.0.0",
     "@typescript-eslint/eslint-plugin": "2.3.2",
     "@typescript-eslint/parser": "2.3.2",
     "ava": "2.4.0",
