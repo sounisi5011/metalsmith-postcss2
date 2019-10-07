@@ -77,3 +77,21 @@ test('should transform css files with postcssrc files', async t => {
         'a { color: black; color: black; color: black; color: black }',
     );
 });
+
+test('should generate source map files', async t => {
+    const metalsmith = Metalsmith(fixtures('basic'))
+        .source('src')
+        .use(
+            postcss({
+                plugins: [doubler],
+                options: {
+                    map: { inline: false },
+                },
+            }),
+        );
+    const files = await processAsync(metalsmith);
+
+    t.truthy(files['a.css.map']);
+    t.truthy(files['b.css.map']);
+    t.truthy(files['c.css.map']);
+});
