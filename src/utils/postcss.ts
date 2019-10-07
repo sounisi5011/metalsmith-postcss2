@@ -20,6 +20,7 @@ export async function loadConfig({
     /**
      * @see https://github.com/postcss/postcss-cli/blob/6.1.3/index.js#L166-L187
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ctx: any = {
         options,
         file: {
