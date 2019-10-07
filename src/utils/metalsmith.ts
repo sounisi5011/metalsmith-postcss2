@@ -76,18 +76,3 @@ export function createPlugin(
             .catch(error => done(error, files, metalsmith));
     };
 }
-
-export async function writeFilesAsync(
-    files: object,
-    dir?: string,
-): Promise<Metalsmith.Files> {
-    return new Promise((resolve, reject) => {
-        Metalsmith('.').write(files, dir, (error, files) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(files);
-            }
-        });
-    });
-}
