@@ -2,7 +2,14 @@ import path from 'path';
 import postcss from 'postcss';
 import postcssrc from 'postcss-load-config';
 
-import { PromiseType } from './types';
+/**
+ * @see https://github.com/DefinitelyTyped/DefinitelyTyped/blob/f396262330cd60f0483db8ebd7aa54e86cd254d6/types/postcss-load-config/index.d.ts#L35-L39
+ */
+export interface ConfigResult {
+    file: string;
+    options: postcss.ProcessOptions;
+    plugins: postcss.AcceptedPlugin[];
+}
 
 export function isCssSyntaxError(
     error: Error,
@@ -16,7 +23,7 @@ export async function loadConfig({
 }: {
     options: postcss.ProcessOptions;
     sourceFilepath: string;
-}): Promise<PromiseType<ReturnType<typeof postcssrc>> | null> {
+}): Promise<ConfigResult | null> {
     /**
      * @see https://github.com/postcss/postcss-cli/blob/6.1.3/index.js#L166-L187
      */
