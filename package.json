@@ -54,7 +54,7 @@
     "test:ava": "ava",
     "test:check-type-defs-pkgs": "node script/check-type-defs-pkgs.js ./dist/ build",
     "test:peer-deps": "check-peer-deps",
-    "test:readme": "npm run build:readme -- --test"
+    "test:readme": "run-s 'build:readme -- --test'"
   },
   "husky": {
     "hooks": {
@@ -63,7 +63,7 @@
   },
   "lint-staged": {
     "!(README.md)": [
-      "npm run build:readme",
+      "run-s build:readme --",
       "git add ./README.md"
     ],
     "!(package).json|*.{js,yaml,yml}": [
@@ -75,7 +75,7 @@
       "git add"
     ],
     "README.md": [
-      "npm run test:readme"
+      "run-s test:readme --"
     ],
     "package.json": [
       "prettier-package-json --write",
