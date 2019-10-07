@@ -41,7 +41,7 @@ export async function loadConfig({
     }
 }
 
-export async function process(
+export async function processCSS(
     processor: postcss.Processor,
     ...[css, opts]: Parameters<postcss.Processor['process']>
 ): Promise<postcss.Result | void> {
