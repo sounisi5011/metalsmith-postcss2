@@ -55,3 +55,31 @@ test('should transform css files with multiple processors', async t => {
         'c { color: cyan; color: cyan; color: cyan; color: cyan }',
     );
 });
+
+test('should transform css files with postcssrc files', async t => {
+    const metalsmith = Metalsmith(fixtures('postcssrc'))
+        .source('src')
+        .use(postcss());
+    const files = await processAsync(metalsmith);
+
+    t.is(
+        files['a.css'].contents.toString('utf8'),
+        'a { color: black; color: black }',
+    );
+
+    t.is(
+        files['path/a.css'].contents.toString('utf8'),
+        'a { color: black; color: black; color: black; color: black }',
+    );
+
+    t.is(
+        files['path/to/a.css'].contents.toString('utf8'),
+        'a { color: black; color: black; color: black; color: black }',
+    );
+
+    t.is(
+        files['frontmatter/a.css'].contents.toString('utf8'),
+        'a { color: black; color: black; color: black; color: black; color: black; color: black; color: black; color: black }',
+        'Use config file contents converted by Metalsmith',
+    );
+});

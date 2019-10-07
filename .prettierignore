@@ -1,0 +1,5 @@
+test/fixtures/postcssrc/src/frontmatter/**/postcssrc.json
+test/fixtures/postcssrc/src/frontmatter/**/postcssrc.yaml
+test/fixtures/postcssrc/src/frontmatter/**/postcssrc.yml
+test/fixtures/postcssrc/src/frontmatter/**/postcssrc.js
+test/fixtures/postcssrc/src/frontmatter/**/postcss.config.js
