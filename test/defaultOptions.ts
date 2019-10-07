@@ -44,10 +44,8 @@ test('defaultOptions cannot be changed', async t => {
                     'Child properties cannot be changed',
                 );
 
-                return {
-                    // disable PostCSS warning
-                    plugins: [doubler],
-                };
+                // disable PostCSS warning
+                return [doubler];
             }),
         );
     await processAsync(metalsmith);

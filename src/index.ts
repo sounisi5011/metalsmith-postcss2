@@ -1,11 +1,7 @@
 import Metalsmith from 'metalsmith';
 import postcss from 'postcss';
 
-import {
-    normalizeOptions,
-    OptionsGenerator,
-    OptionsInterface,
-} from './options';
+import { InputOptions, normalizeOptions } from './options';
 import {
     addFile,
     createPlugin,
@@ -14,12 +10,7 @@ import {
 } from './utils/metalsmith';
 import { loadConfig, process } from './utils/postcss';
 
-export = (
-    opts:
-        | Partial<OptionsInterface>
-        | OptionsInterface['plugins']
-        | OptionsGenerator = {},
-): Metalsmith.Plugin => {
+export = (opts: InputOptions = {}): Metalsmith.Plugin => {
     return createPlugin(async (files, metalsmith) => {
         const options = await normalizeOptions(files, metalsmith, opts);
         const matchedFilenameList = getMatchedFilenameList(

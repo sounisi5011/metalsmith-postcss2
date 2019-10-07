@@ -5,6 +5,14 @@ import postcss from 'postcss';
 
 import { isReadonlyOrWritableArray } from './utils/types';
 
+type OptionsGenerator<T> =
+    | T
+    | ((
+          files: Metalsmith.Files,
+          metalsmith: Metalsmith,
+          defaultOptions: OptionsInterface,
+      ) => T | Promise<T>);
+
 export interface OptionsInterface {
     readonly pattern: string | ReadonlyArray<string>;
     readonly plugins: ReadonlyArray<postcss.AcceptedPlugin>;
@@ -12,13 +20,9 @@ export interface OptionsInterface {
     readonly renamer: (filename: string) => string;
 }
 
-export interface OptionsGenerator {
-    (
-        files: Metalsmith.Files,
-        metalsmith: Metalsmith,
-        defaultOptions: OptionsInterface,
-    ): Partial<OptionsInterface> | Promise<Partial<OptionsInterface>>;
-}
+export type InputOptions = OptionsGenerator<
+    Partial<OptionsInterface> | OptionsInterface['plugins']
+>;
 
 const defaultOptions: OptionsInterface = deepFreeze({
     pattern: ['**/*.css'],
@@ -34,17 +38,17 @@ const defaultOptions: OptionsInterface = deepFreeze({
 export async function normalizeOptions(
     files: Metalsmith.Files,
     metalsmith: Metalsmith,
-    opts:
-        | Partial<OptionsInterface>
-        | OptionsInterface['plugins']
-        | OptionsGenerator,
+    opts: InputOptions,
 ): Promise<OptionsInterface> {
-    const partialOptions: Partial<OptionsInterface> =
-        typeof opts === 'function'
-            ? await opts(files, metalsmith, defaultOptions)
-            : (Array.isArray as isReadonlyOrWritableArray)(opts)
-            ? { plugins: opts }
-            : opts;
+    if (typeof opts === 'function') {
+        opts = await opts(files, metalsmith, defaultOptions);
+    }
+    const partialOptions: Partial<
+        OptionsInterface
+    > = (Array.isArray as isReadonlyOrWritableArray)(opts)
+        ? { plugins: opts }
+        : opts;
+
     return {
         ...defaultOptions,
         ...partialOptions,
