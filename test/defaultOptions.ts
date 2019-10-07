@@ -5,6 +5,7 @@ import path from 'path';
 
 import { ignoreTypeError } from './helpers';
 import { processAsync } from './helpers/metalsmith';
+import { doubler } from './helpers/postcss-plugins';
 import postcss = require('../src/index');
 
 const fixtures = path.join.bind(path, __dirname, 'fixtures');
@@ -35,7 +36,7 @@ test('defaultOptions cannot be changed', async t => {
                 );
 
                 ignoreTypeError(() => {
-                    defaultOptions.pattern.push('**');
+                    defaultOptions.options.map = true;
                 });
                 t.deepEqual(
                     defaultOptions,
@@ -43,7 +44,10 @@ test('defaultOptions cannot be changed', async t => {
                     'Child properties cannot be changed',
                 );
 
-                return {};
+                return {
+                    // disable PostCSS warning
+                    plugins: [doubler],
+                };
             }),
         );
     await processAsync(metalsmith);
