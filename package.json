@@ -84,8 +84,13 @@
     ]
   },
   "dependencies": {
+    "@types/debug": "4.1.5",
     "@types/metalsmith": "2.3.0",
-    "multimatch": "4.0.0"
+    "@types/postcss-load-config": "2.0.0",
+    "debug": "4.1.1",
+    "multimatch": "4.0.0",
+    "postcss": "7.0.18",
+    "postcss-load-config": "2.1.0"
   },
   "devDependencies": {
     "@sounisi5011/check-peer-deps": "github:sounisi5011/check-peer-deps",
