@@ -7,12 +7,11 @@ import { InputOptions, normalizeOptions } from './options';
 import {
     addFile,
     createPlugin,
-    findFile,
     getMatchedFilenameList,
     getValidFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS } from './utils/postcss';
-import { getSourceMappingURL, isDataURL } from './utils/source-map';
+import { findSourceMapFile } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
@@ -64,27 +63,17 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
 
                 const postcssMapOption = postcssOptions.map;
                 if (postcssMapOption) {
-                    const sourceMappingURL = getSourceMappingURL(beforeCssText);
-                    if (
-                        typeof sourceMappingURL === 'string' &&
-                        !isDataURL(sourceMappingURL)
-                    ) {
-                        const sourceMapPath = path.join(
-                            path.dirname(from),
-                            sourceMappingURL,
-                        );
-                        const [, sourceMapFiledata] = findFile(
-                            files,
-                            sourceMapPath,
-                            metalsmith,
-                        );
-                        if (sourceMapFiledata) {
-                            const prev = sourceMapFiledata.contents.toString();
-                            postcssOptions.map =
-                                postcssMapOption === true
-                                    ? { prev }
-                                    : { ...postcssMapOption, prev };
-                        }
+                    const [, sourceMapFiledata] = findSourceMapFile(
+                        files,
+                        filename,
+                        metalsmith,
+                    );
+                    if (sourceMapFiledata) {
+                        const prev = sourceMapFiledata.contents.toString();
+                        postcssOptions.map =
+                            postcssMapOption === true
+                                ? { prev }
+                                : { ...postcssMapOption, prev };
                     }
                 }
 
