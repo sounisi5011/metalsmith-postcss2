@@ -11,7 +11,7 @@ import {
     getValidFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS } from './utils/postcss';
-import { findSourceMapFile } from './utils/source-map';
+import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
@@ -83,7 +83,8 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                 );
                 if (!result) return;
 
-                addFile(files, newFilename, result.css, filedata);
+                const cssText = result.css;
+                addFile(files, newFilename, cssText, filedata);
                 if (filename !== newFilename) {
                     debug(
                         'done process %o, renamed to %o',
@@ -97,7 +98,10 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                 }
 
                 if (result.map) {
-                    const sourceMapFilename = newFilename + '.map';
+                    const sourceMappingURL = getSourceMappingURL(cssText);
+                    const sourceMapFilename = sourceMappingURL
+                        ? path.join(path.dirname(newFilename), sourceMappingURL)
+                        : newFilename + '.map';
                     addFile(files, sourceMapFilename, result.map.toString());
                     debug('generate SourceMap: %o', sourceMapFilename);
                 }
