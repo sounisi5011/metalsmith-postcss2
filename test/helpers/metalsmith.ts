@@ -13,3 +13,12 @@ export async function processAsync(
         });
     });
 }
+
+export function debuggerPlugin(
+    debuggerFn: (files: Metalsmith.Files, metalsmith: Metalsmith) => void,
+): Metalsmith.Plugin {
+    return (files, metalsmith, done) => {
+        debuggerFn(files, metalsmith);
+        done(null, files, metalsmith);
+    };
+}
