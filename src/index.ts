@@ -7,10 +7,12 @@ import { InputOptions, normalizeOptions } from './options';
 import {
     addFile,
     createPlugin,
+    findFile,
     getMatchedFilenameList,
     getValidFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS } from './utils/postcss';
+import { getSourceMappingURL, isDataURL } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
@@ -52,15 +54,44 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                     );
                 }
                 const plugins = config ? config.plugins : [...options.plugins];
+                const postcssOptions = {
+                    ...(config ? config.options : options.options),
+                    from,
+                    to,
+                };
+
+                const beforeCssText = filedata.contents.toString();
+
+                const postcssMapOption = postcssOptions.map;
+                if (postcssMapOption) {
+                    const sourceMappingURL = getSourceMappingURL(beforeCssText);
+                    if (
+                        typeof sourceMappingURL === 'string' &&
+                        !isDataURL(sourceMappingURL)
+                    ) {
+                        const sourceMapPath = path.join(
+                            path.dirname(from),
+                            sourceMappingURL,
+                        );
+                        const [, sourceMapFiledata] = findFile(
+                            files,
+                            sourceMapPath,
+                            metalsmith,
+                        );
+                        if (sourceMapFiledata) {
+                            const prev = sourceMapFiledata.contents.toString();
+                            postcssOptions.map =
+                                postcssMapOption === true
+                                    ? { prev }
+                                    : { ...postcssMapOption, prev };
+                        }
+                    }
+                }
 
                 const result = await processCSS(
                     postcss(plugins),
-                    filedata.contents,
-                    {
-                        ...(config ? config.options : options.options),
-                        from,
-                        to,
-                    },
+                    beforeCssText,
+                    postcssOptions,
                 );
                 if (!result) return;
 
