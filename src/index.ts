@@ -42,7 +42,7 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                     newFilename,
                 );
                 const config = await loadConfig({
-                    options: options.options,
+                    options: { ...options.options, from, to },
                     sourceFilepath: from,
                 });
                 if (config) {
