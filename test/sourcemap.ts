@@ -192,3 +192,23 @@ for (const options of [{ map: false }, { map: undefined }, {}]) {
         );
     });
 }
+
+test('should change SourceMap file location', async t => {
+    const metalsmith = Metalsmith(fixtures('change-source-map-path'))
+        .source('src')
+        .use(postcss());
+    const files = await processAsync(metalsmith);
+
+    t.truthy(
+        files['.sourcemap.css/a.map'],
+        'should generate SourceMap file in customized location',
+    );
+    t.truthy(
+        files['.sourcemap.css/path/b.map'],
+        'should generate SourceMap file in customized location',
+    );
+    t.truthy(
+        files['.sourcemap.css/path/to/c.map'],
+        'should generate SourceMap file in customized location',
+    );
+});
