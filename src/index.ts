@@ -44,6 +44,7 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                 const config = await loadConfig({
                     options: { ...options.options, from, to },
                     sourceFilepath: from,
+                    metalsmith,
                 });
                 if (config) {
                     debugPostcssrc(

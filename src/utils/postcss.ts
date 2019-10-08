@@ -1,3 +1,4 @@
+import Metalsmith from 'metalsmith';
 import path from 'path';
 import postcss from 'postcss';
 import postcssrc from 'postcss-load-config';
@@ -44,9 +45,11 @@ export function isCssSyntaxError(
 export async function loadConfig({
     options,
     sourceFilepath,
+    metalsmith,
 }: {
     options: postcss.ProcessOptions;
     sourceFilepath: string;
+    metalsmith: Metalsmith;
 }): Promise<ConfigResult | null> {
     /**
      * @see https://github.com/postcss/postcss-cli/blob/6.1.3/index.js#L166-L187
@@ -58,6 +61,7 @@ export async function loadConfig({
             basename: path.basename(sourceFilepath),
             extname: path.extname(sourceFilepath),
         },
+        metalsmith,
     };
 
     try {
