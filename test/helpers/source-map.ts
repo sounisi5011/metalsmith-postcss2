@@ -27,8 +27,6 @@ export function isValidSourceMap(value: unknown): value is SourceMap {
     );
 }
 
-export { getSourceMappingURL };
-
 export function getSourceMappingURLType(
     cssData: string | Buffer,
 ): 'file' | 'inline' | null {

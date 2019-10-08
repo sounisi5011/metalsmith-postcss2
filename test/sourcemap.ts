@@ -7,7 +7,6 @@ import { hasProp } from '../src/utils';
 import { debuggerPlugin, processAsync } from './helpers/metalsmith';
 import { doubler } from './helpers/postcss-plugins';
 import {
-    getSourceMappingURL,
     getSourceMappingURLType,
     isValidSourceMap,
     readInlineSourceMap,
@@ -187,7 +186,7 @@ for (const options of [{ map: false }, { map: undefined }, {}]) {
         const files = await processAsync(metalsmith);
 
         t.is(
-            getSourceMappingURL(files['a.css'].contents.toString()),
+            getSourceMappingURLType(files['a.css'].contents),
             null,
             'should not exists SourceMap comment',
         );
