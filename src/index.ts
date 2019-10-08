@@ -11,6 +11,7 @@ import {
     getValidFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS } from './utils/postcss';
+import { findSourceMapFile } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
@@ -52,15 +53,32 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                     );
                 }
                 const plugins = config ? config.plugins : [...options.plugins];
+                const postcssOptions = {
+                    ...(config ? config.options : options.options),
+                    from,
+                    to,
+                };
+
+                const postcssMapOption = postcssOptions.map;
+                if (postcssMapOption) {
+                    const [, sourceMapFiledata] = findSourceMapFile(
+                        files,
+                        filename,
+                        metalsmith,
+                    );
+                    if (sourceMapFiledata) {
+                        const prev = sourceMapFiledata.contents.toString();
+                        postcssOptions.map =
+                            postcssMapOption === true
+                                ? { prev }
+                                : { ...postcssMapOption, prev };
+                    }
+                }
 
                 const result = await processCSS(
                     postcss(plugins),
                     filedata.contents,
-                    {
-                        ...(config ? config.options : options.options),
-                        from,
-                        to,
-                    },
+                    postcssOptions,
                 );
                 if (!result) return;
 

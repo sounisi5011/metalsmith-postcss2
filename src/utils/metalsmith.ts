@@ -1,5 +1,6 @@
 import Metalsmith from 'metalsmith';
 import multimatch from 'multimatch';
+import path from 'path';
 
 import { hasProp, isObject } from './';
 import { isReadonlyOrWritableArray } from './types';
@@ -62,6 +63,38 @@ export function addFile(
     };
     files[filename] = newFile;
     return newFile;
+}
+
+export function findFile(
+    files: Metalsmith.Files,
+    searchFilename: string,
+    metalsmith?: Metalsmith,
+): [string, FileInterface] | [null, null] {
+    if (hasProp(files, searchFilename)) {
+        return [searchFilename, files[searchFilename]];
+    }
+
+    const fileList = Object.entries(files);
+    const pathNormalizerList: ((filename: string) => string)[] = metalsmith
+        ? [
+              metalsmith.path.bind(metalsmith, metalsmith.source()),
+              metalsmith.path.bind(metalsmith, metalsmith.destination()),
+          ]
+        : [path.normalize];
+
+    for (const pathNormalizer of pathNormalizerList) {
+        const normalizeFilename = pathNormalizer(searchFilename);
+        for (const [filename, filedata] of fileList) {
+            if (
+                isFile(filedata) &&
+                normalizeFilename === pathNormalizer(filename)
+            ) {
+                return [filename, filedata];
+            }
+        }
+    }
+
+    return [null, null];
 }
 
 export function createPlugin(
