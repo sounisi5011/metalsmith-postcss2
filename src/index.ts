@@ -59,8 +59,6 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                     to,
                 };
 
-                const beforeCssText = filedata.contents.toString();
-
                 const postcssMapOption = postcssOptions.map;
                 if (postcssMapOption) {
                     const [, sourceMapFiledata] = findSourceMapFile(
@@ -79,7 +77,7 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
 
                 const result = await processCSS(
                     postcss(plugins),
-                    beforeCssText,
+                    filedata.contents,
                     postcssOptions,
                 );
                 if (!result) return;
