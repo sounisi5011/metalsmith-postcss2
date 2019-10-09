@@ -70,6 +70,61 @@ test('should generate multi-level SourceMap file', async t => {
     }
 });
 
+test('should not generate multi-level SourceMap file: Manually override the map.prev option', async t => {
+    const metalsmith = Metalsmith(fixtures('sass'))
+        .source('src')
+        .use(
+            sass({
+                sourceMap: true,
+                sourceMapContents: true,
+            }),
+        )
+        .use(
+            debuggerPlugin(files => {
+                t.is(
+                    getSourceMappingURLType(files['a.css'].contents),
+                    'file',
+                    'should exists SourceMap file comment by metalsmith-sass',
+                );
+                t.truthy(
+                    files['a.css.map'],
+                    'should generate SourceMap file by metalsmith-sass',
+                );
+            }),
+        )
+        .use(
+            postcss({
+                plugins: [doubler],
+                options: {
+                    map: { inline: false, prev: false },
+                },
+            }),
+        );
+    const files = await processAsync(metalsmith);
+
+    t.truthy(files['a.css.map'], 'should generate SourceMap file');
+    t.is(
+        getSourceMappingURLType(files['a.css'].contents),
+        'file',
+        'should not exists inline SourceMap',
+    );
+
+    let sourceMap: unknown = null;
+    t.notThrows(() => {
+        sourceMap = JSON.parse(files['a.css.map'].contents.toString());
+    }, 'should parse SourceMap file');
+
+    if (
+        isValidSourceMap(sourceMap) &&
+        !sourceMap.sources.includes('../src/a.sass')
+    ) {
+        t.pass('should not include the SASS filename in sources property');
+    } else {
+        t.fail('should not include the SASS filename in sources property');
+        t.log(sourceMap);
+    }
+});
+
 test('should generate multi-level SourceMap file: previous process generates inline SourceMap', async t => {
     const metalsmith = Metalsmith(fixtures('sass'))
         .source('src')
