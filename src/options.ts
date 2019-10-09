@@ -5,7 +5,11 @@ import path from 'path';
 import { hasProp } from './utils';
 import { MetalsmithStrictFiles } from './utils/metalsmith';
 import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
-import { isReadonlyOrWritableArray } from './utils/types';
+import {
+    ArrayLikeOnly,
+    ArrayValue,
+    isReadonlyOrWritableArray,
+} from './utils/types';
 
 type OptionsGenerator<T> =
     | T
@@ -22,13 +26,22 @@ export interface OptionsInterface {
     readonly renamer: (filename: string) => string;
 }
 
+type PluginsRecord = Readonly<Record<string, unknown>>;
+
 export interface InputOptionsInterface
-    extends Omit<OptionsInterface, 'renamer'> {
+    extends Omit<OptionsInterface, 'plugins' | 'renamer'> {
+    readonly plugins:
+        | OptionsInterface['plugins']
+        | ReadonlyArray<
+              ArrayValue<OptionsInterface['plugins']> | string | PluginsRecord
+          >
+        | PluginsRecord;
     readonly renamer: OptionsInterface['renamer'] | true | false | null;
 }
 
 export type InputOptions = OptionsGenerator<
-    Partial<InputOptionsInterface> | InputOptionsInterface['plugins']
+    | Partial<InputOptionsInterface>
+    | ArrayLikeOnly<InputOptionsInterface['plugins']>
 >;
 
 const defaultOptions: OptionsInterface = deepFreeze({
