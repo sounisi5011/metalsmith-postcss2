@@ -21,8 +21,13 @@ export interface OptionsInterface {
     readonly renamer: (filename: string) => string;
 }
 
+export interface InputOptionsInterface
+    extends Omit<OptionsInterface, 'renamer'> {
+    readonly renamer: OptionsInterface['renamer'] | true | false | null;
+}
+
 export type InputOptions = OptionsGenerator<
-    Partial<OptionsInterface> | OptionsInterface['plugins']
+    Partial<InputOptionsInterface> | InputOptionsInterface['plugins']
 >;
 
 const defaultOptions: OptionsInterface = deepFreeze({
