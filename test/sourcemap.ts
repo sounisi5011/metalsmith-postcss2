@@ -3,6 +3,7 @@ import Metalsmith from 'metalsmith';
 import sass from 'metalsmith-sass';
 import path from 'path';
 
+import postcss from '../src/index';
 import { hasProp } from '../src/utils';
 import { debuggerPlugin, processAsync } from './helpers/metalsmith';
 import { doubler } from './helpers/postcss-plugins';
@@ -11,7 +12,6 @@ import {
     isValidSourceMap,
     readInlineSourceMap,
 } from './helpers/source-map';
-import postcss = require('../src/index');
 
 const fixtures = path.join.bind(path, __dirname, 'fixtures');
 
