@@ -275,8 +275,6 @@ test('should fix SourceMap file location', async t => {
         .use(postcss());
     const files = await processAsync(metalsmith);
 
-    t.log(files);
-
     t.is(
         readSourceMapURL(files['src.css'].contents),
         'src.css.map',
