@@ -10,6 +10,7 @@ import {
     FileInterface,
     getMatchedFilenameList,
     getValidFiles,
+    MetalsmithStrictFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS, ProcessOptions } from './utils/postcss';
 import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
@@ -28,7 +29,7 @@ function updatePostcssOption(
     }: {
         from: string;
         to: string;
-        files: Metalsmith.Files;
+        files: MetalsmithStrictFiles;
         filename: string;
         metalsmith: Metalsmith;
     },
@@ -71,7 +72,7 @@ async function processFile({
     filename,
     filedata,
 }: {
-    files: Metalsmith.Files;
+    files: MetalsmithStrictFiles;
     metalsmith: Metalsmith;
     options: OptionsInterface;
     filename: string;

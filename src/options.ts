@@ -2,13 +2,14 @@ import deepFreeze from 'deep-freeze-strict';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
+import { MetalsmithStrictFiles } from './utils/metalsmith';
 import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
 
 type OptionsGenerator<T> =
     | T
     | ((
-          files: Metalsmith.Files,
+          files: MetalsmithStrictFiles,
           metalsmith: Metalsmith,
           defaultOptions: OptionsInterface,
       ) => T | Promise<T>);
@@ -36,7 +37,7 @@ const defaultOptions: OptionsInterface = deepFreeze({
 });
 
 export async function normalizeOptions(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     metalsmith: Metalsmith,
     opts: InputOptions,
 ): Promise<OptionsInterface> {

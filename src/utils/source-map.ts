@@ -2,7 +2,12 @@ import Metalsmith from 'metalsmith';
 import path from 'path';
 import validDataUrl from 'valid-data-url';
 
-import { FileInterface, findFile, isFile } from './metalsmith';
+import {
+    FileInterface,
+    findFile,
+    isFile,
+    MetalsmithStrictFiles,
+} from './metalsmith';
 
 /**
  * @see https://sourcemaps.info/spec.html#h.lmz475t4mvbx
@@ -20,7 +25,7 @@ export function getSourceMappingURL(cssText: string): string | null {
 }
 
 export function findSourceMapFile(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     cssFilename: string,
     metalsmith?: Metalsmith,
 ): [string, FileInterface] | [null, null] {
