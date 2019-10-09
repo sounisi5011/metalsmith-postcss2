@@ -50,13 +50,19 @@ export async function normalizeOptions(
         opts = await opts(files, metalsmith, defaultOptions);
     }
     const partialOptions: Partial<
-        OptionsInterface
+        InputOptionsInterface
     > = (Array.isArray as isReadonlyOrWritableArray)(opts)
         ? { plugins: opts }
         : opts;
 
+    const renamer =
+        typeof partialOptions.renamer === 'function'
+            ? partialOptions.renamer
+            : defaultOptions.renamer;
+
     return {
         ...defaultOptions,
         ...partialOptions,
+        renamer,
     };
 }
