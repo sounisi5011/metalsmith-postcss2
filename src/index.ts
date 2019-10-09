@@ -1,4 +1,5 @@
 import createDebug from 'debug';
+import isPathInside from 'is-path-inside';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
@@ -65,6 +66,55 @@ function updatePostcssOption(
     return postcssOptions;
 }
 
+function fixPostcssAnnotationOption(
+    options: ProcessOptions,
+    {
+        metalsmithSrcFullpath,
+        metalsmithDestFullpath,
+        destFileFullpath,
+    }: {
+        metalsmithSrcFullpath: string;
+        metalsmithDestFullpath: string;
+        destFileFullpath: string;
+    },
+): ProcessOptions {
+    const postcssMapOption = options.map;
+    if (typeof postcssMapOption !== 'object') {
+        return options;
+    }
+
+    const postcssMapAnnotation = postcssMapOption.annotation;
+    if (typeof postcssMapAnnotation !== 'string') {
+        return options;
+    }
+
+    const sourceMapFullpath = postcssMapAnnotation
+        ? path.resolve(path.dirname(destFileFullpath), postcssMapAnnotation)
+        : `${destFileFullpath}.map`;
+    const sourceMapFixedFullpath =
+        destFileFullpath === sourceMapFullpath
+            ? `${sourceMapFullpath}.map`
+            : sourceMapFullpath;
+    const sourceMapFilename = path.relative(
+        isPathInside(sourceMapFixedFullpath, metalsmithSrcFullpath)
+            ? metalsmithSrcFullpath
+            : metalsmithDestFullpath,
+        sourceMapFixedFullpath,
+    );
+    const fixedSourceMappingURL = path.relative(
+        path.dirname(destFileFullpath),
+        path.resolve(metalsmithDestFullpath, sourceMapFilename),
+    );
+
+    return {
+        ...options,
+        map: {
+            ...postcssMapOption,
+            annotation: fixedSourceMappingURL,
+        },
+    };
+}
+
 async function processFile({
     files,
     metalsmith,
@@ -78,20 +128,23 @@ async function processFile({
     filename: string;
     filedata: FileInterface;
 }): Promise<void> {
+    const metalsmithSrcFullpath = metalsmith.path(metalsmith.source());
+    const metalsmithDestFullpath = metalsmith.path(metalsmith.destination());
+
     const newFilename = options.renamer(filename);
 
-    const from = metalsmith.path(metalsmith.source(), filename);
-    const to = metalsmith.path(metalsmith.destination(), newFilename);
+    const srcFileFullpath = path.resolve(metalsmithSrcFullpath, filename);
+    const destFileFullpath = path.resolve(metalsmithDestFullpath, newFilename);
     const postcssOptions = updatePostcssOption(options.options, {
-        from,
-        to,
+        from: srcFileFullpath,
+        to: destFileFullpath,
         files,
         filename,
         metalsmith,
     });
     const config = await loadConfig({
         options: postcssOptions,
-        sourceFilepath: from,
+        sourceFilepath: srcFileFullpath,
         metalsmith,
     });
     if (config) {
@@ -126,13 +179,20 @@ async function processFile({
     const result = await processCSS(
         plugins,
         filedata.contents,
-        updatePostcssOption(config ? config.options : postcssOptions, {
-            from,
-            to,
-            files,
-            filename,
-            metalsmith,
-        }),
+        fixPostcssAnnotationOption(
+            updatePostcssOption(config ? config.options : postcssOptions, {
+                from: srcFileFullpath,
+                to: destFileFullpath,
+                files,
+                filename,
+                metalsmith,
+            }),
+            {
+                metalsmithSrcFullpath,
+                metalsmithDestFullpath,
+                destFileFullpath,
+            },
+        ),
     );
     if (!result) return;
 
