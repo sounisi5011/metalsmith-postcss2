@@ -11,44 +11,30 @@ import {
     getMatchedFilenameList,
     getValidFiles,
 } from './utils/metalsmith';
-import { loadConfig, processCSS } from './utils/postcss';
+import { loadConfig, processCSS, ProcessOptions } from './utils/postcss';
 import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
 
-async function processFile({
-    files,
-    metalsmith,
-    options,
-    filename,
-    filedata,
-}: {
-    files: Metalsmith.Files;
-    metalsmith: Metalsmith;
-    options: OptionsInterface;
-    filename: string;
-    filedata: FileInterface;
-}): Promise<void> {
-    const newFilename = options.renamer(filename);
-
-    const from = metalsmith.path(metalsmith.source(), filename);
-    const to = metalsmith.path(metalsmith.destination(), newFilename);
-    const config = await loadConfig({
-        options: { ...options.options, from, to },
-        sourceFilepath: from,
+function updatePostcssOption(
+    options: ProcessOptions,
+    {
+        from,
+        to,
+        files,
+        filename,
         metalsmith,
-    });
-    if (config) {
-        debugPostcssrc(
-            'loaded postcss config by file %o: %o',
-            filename,
-            path.relative(process.cwd(), config.file),
-        );
-    }
-    const plugins = config ? config.plugins : [...options.plugins];
+    }: {
+        from: string;
+        to: string;
+        files: Metalsmith.Files;
+        filename: string;
+        metalsmith: Metalsmith;
+    },
+): ProcessOptions & Required<Pick<ProcessOptions, 'from' | 'to'>> {
     const postcssOptions = {
-        ...(config ? config.options : options.options),
+        ...options,
         from,
         to,
     };
@@ -75,7 +61,58 @@ async function processFile({
         }
     }
 
-    const result = await processCSS(plugins, filedata.contents, postcssOptions);
+    return postcssOptions;
+}
+
+async function processFile({
+    files,
+    metalsmith,
+    options,
+    filename,
+    filedata,
+}: {
+    files: Metalsmith.Files;
+    metalsmith: Metalsmith;
+    options: OptionsInterface;
+    filename: string;
+    filedata: FileInterface;
+}): Promise<void> {
+    const newFilename = options.renamer(filename);
+
+    const from = metalsmith.path(metalsmith.source(), filename);
+    const to = metalsmith.path(metalsmith.destination(), newFilename);
+    const postcssOptions = updatePostcssOption(options.options, {
+        from,
+        to,
+        files,
+        filename,
+        metalsmith,
+    });
+    const config = await loadConfig({
+        options: postcssOptions,
+        sourceFilepath: from,
+        metalsmith,
+    });
+    if (config) {
+        debugPostcssrc(
+            'loaded postcss config by file %o: %o',
+            filename,
+            path.relative(process.cwd(), config.file),
+        );
+    }
+    const plugins = config ? config.plugins : [...options.plugins];
+
+    const result = await processCSS(
+        plugins,
+        filedata.contents,
+        updatePostcssOption(config ? config.options : postcssOptions, {
+            from,
+            to,
+            files,
+            filename,
+            metalsmith,
+        }),
+    );
     if (!result) return;
 
     const cssText = result.css;
