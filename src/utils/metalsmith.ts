@@ -2,7 +2,7 @@ import Metalsmith from 'metalsmith';
 import multimatch from 'multimatch';
 import path from 'path';
 
-import { hasProp, isObject } from './';
+import { isObject } from './';
 import { isReadonlyOrWritableArray } from './types';
 
 export type MetalsmithStrictFiles = Record<string, unknown>;
@@ -15,7 +15,7 @@ export interface FileInterface extends MetalsmithFileData {
 
 export function isFile(value: unknown): value is FileInterface {
     if (isObject(value)) {
-        return hasProp(value, 'contents') && Buffer.isBuffer(value.contents);
+        return Buffer.isBuffer(value.contents);
     }
     return false;
 }
@@ -71,11 +71,9 @@ export function findFile(
     searchFilename: string,
     metalsmith?: Metalsmith,
 ): [string, FileInterface] | [null, null] {
-    if (hasProp(files, searchFilename)) {
-        const filedata = files[searchFilename];
-        if (isFile(filedata)) {
-            return [searchFilename, filedata];
-        }
+    const filedata = files[searchFilename];
+    if (isFile(filedata)) {
+        return [searchFilename, filedata];
     }
 
     const fileList = Object.entries(files);
