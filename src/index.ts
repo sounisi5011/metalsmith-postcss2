@@ -1,7 +1,6 @@
 import createDebug from 'debug';
 import Metalsmith from 'metalsmith';
 import path from 'path';
-import postcss from 'postcss';
 
 import { InputOptions, normalizeOptions } from './options';
 import { hasProp } from './utils';
@@ -84,7 +83,7 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                 }
 
                 const result = await processCSS(
-                    postcss(plugins),
+                    plugins,
                     filedata.contents,
                     postcssOptions,
                 );

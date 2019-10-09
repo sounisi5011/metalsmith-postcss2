@@ -76,11 +76,11 @@ export async function loadConfig({
 }
 
 export async function processCSS(
-    processor: postcss.Processor,
+    plugins: postcss.AcceptedPlugin[],
     ...[css, opts]: Parameters<postcss.Processor['process']>
 ): Promise<postcss.Result | void> {
     try {
-        const result = await processor.process(css, opts);
+        const result = await postcss(plugins).process(css, opts);
 
         result.warnings().forEach(warn => {
             console.error(warn.toString());
