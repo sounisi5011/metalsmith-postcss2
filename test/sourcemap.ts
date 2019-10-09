@@ -269,7 +269,7 @@ test('should change SourceMap file location', async t => {
     );
 });
 
-test('should fix SourceMap file location', async t => {
+test('should fix SourceMap file location: Metalsmith source absolute path', async t => {
     const metalsmith = Metalsmith(fixtures('sourcemap-broken-location'))
         .source('src')
         .use(postcss());
@@ -282,6 +282,28 @@ test('should fix SourceMap file location', async t => {
     );
     t.truthy(files['src.css.map'], 'should generate SourceMap file');
 
+    let sourceMap: unknown = null;
+    t.notThrows(() => {
+        sourceMap = JSON.parse(files['src.css.map'].contents.toString());
+    }, 'should parse SourceMap file');
+    if (!isValidSourceMap(sourceMap)) {
+        t.fail('should valid SourceMap file');
+        return;
+    }
+
+    t.is(
+        sourceMap.file,
+        'src.css',
+        '"file" property should indicate the original file location',
+    );
+});
+
+test('should fix SourceMap file location: Metalsmith destination absolute path', async t => {
+    const metalsmith = Metalsmith(fixtures('sourcemap-broken-location'))
+        .source('src')
+        .use(postcss());
+    const files = await processAsync(metalsmith);
+
     t.is(
         readSourceMapURL(files['dest.css'].contents),
         'dest.css.map',
@@ -289,10 +311,47 @@ test('should fix SourceMap file location', async t => {
     );
     t.truthy(files['dest.css.map'], 'should generate SourceMap file');
 
+    let sourceMap: unknown = null;
+    t.notThrows(() => {
+        sourceMap = JSON.parse(files['dest.css.map'].contents.toString());
+    }, 'should parse SourceMap file');
+    if (!isValidSourceMap(sourceMap)) {
+        t.fail('should valid SourceMap file');
+        return;
+    }
+
+    t.is(
+        sourceMap.file,
+        'dest.css',
+        '"file" property should indicate the original file location',
+    );
+});
+
+test('should fix SourceMap file location: Same filename', async t => {
+    const metalsmith = Metalsmith(fixtures('sourcemap-broken-location'))
+        .source('src')
+        .use(postcss());
+    const files = await processAsync(metalsmith);
+
     t.is(
         readSourceMapURL(files['same.css'].contents),
         'same.css.map',
         'should add ".map" extention in SourceMap filename',
     );
     t.truthy(files['same.css.map'], 'should generate SourceMap file');
+
+    let sourceMap: unknown = null;
+    t.notThrows(() => {
+        sourceMap = JSON.parse(files['same.css.map'].contents.toString());
+    }, 'should parse SourceMap file');
+    if (!isValidSourceMap(sourceMap)) {
+        t.fail('should valid SourceMap file');
+        return;
+    }
+
+    t.is(
+        sourceMap.file,
+        'same.css',
+        '"file" property should indicate the original file location',
+    );
 });
