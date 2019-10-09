@@ -9,12 +9,3 @@ export function hasProp<
 >(value: T, prop: U): value is T & Required<Pick<T, Extract<keyof T, U>>> {
     return Object.prototype.hasOwnProperty.call(value, prop);
 }
-
-export function replaceStrByIndex(
-    str: string,
-    newSubstr: string,
-    indexStart: number,
-    indexEnd: number,
-): string {
-    return str.substring(0, indexStart) + newSubstr + str.substring(indexEnd);
-}

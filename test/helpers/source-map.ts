@@ -1,7 +1,7 @@
 import validDataUrl from 'valid-data-url';
 
 import { hasProp, isObject } from '../../src/utils';
-import { getSourceMappingURLData } from '../../src/utils/source-map';
+import { getSourceMappingURL } from '../../src/utils/source-map';
 import { isStringList } from './';
 
 export interface SourceMap {
@@ -32,23 +32,21 @@ export function isValidSourceMap(value: unknown): value is SourceMap {
 export function getSourceMappingURLType(
     cssData: string | Buffer,
 ): 'file' | 'inline' | null {
-    const sourceMappingURLData = getSourceMappingURLData(cssData.toString());
-    if (sourceMappingURLData) {
-        return validDataUrl(sourceMappingURLData.url) ? 'inline' : 'file';
+    const sourceMappingURL = getSourceMappingURL(cssData.toString());
+    if (typeof sourceMappingURL === 'string') {
+        return validDataUrl(sourceMappingURL) ? 'inline' : 'file';
     }
     return null;
 }
 
 export function readSourceMapURL(cssData: string | Buffer): string | null {
-    const sourceMappingURLData = getSourceMappingURLData(cssData.toString());
-    return sourceMappingURLData ? sourceMappingURLData.url : null;
+    return getSourceMappingURL(cssData.toString());
 }
 
 export function readInlineSourceMap(cssData: string | Buffer): string | null {
-    const sourceMappingURLData = getSourceMappingURLData(cssData.toString());
+    const sourceMappingURL = getSourceMappingURL(cssData.toString());
 
-    if (sourceMappingURLData) {
-        const sourceMappingURL = sourceMappingURLData.url;
+    if (sourceMappingURL) {
         const uri = 'data:application/json,';
         const baseUri = /^data:application\/json;base64,/;
         const baseCharsetUri = /^data:application\/json;charset=utf-?8;base64,/;
