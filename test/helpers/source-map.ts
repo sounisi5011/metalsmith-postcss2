@@ -39,6 +39,10 @@ export function getSourceMappingURLType(
     return null;
 }
 
+export function readSourceMapURL(cssData: string | Buffer): string | null {
+    return getSourceMappingURL(cssData.toString());
+}
+
 export function readInlineSourceMap(cssData: string | Buffer): string | null {
     const sourceMappingURL = getSourceMappingURL(cssData.toString());
 

@@ -11,6 +11,7 @@ import {
     getSourceMappingURLType,
     isValidSourceMap,
     readInlineSourceMap,
+    readSourceMapURL,
 } from './helpers/source-map';
 
 const fixtures = path.join.bind(path, __dirname, 'fixtures');
@@ -266,4 +267,34 @@ test('should change SourceMap file location', async t => {
         files['.sourcemap.css/path/to/c.map'],
         'should generate SourceMap file in customized location',
     );
+});
+
+test('should fix SourceMap file location', async t => {
+    const metalsmith = Metalsmith(fixtures('sourcemap-broken-location'))
+        .source('src')
+        .use(postcss());
+    const files = await processAsync(metalsmith);
+
+    t.log(files);
+
+    t.is(
+        readSourceMapURL(files['src.css'].contents),
+        'src.css.map',
+        'should remove Metalsmith source absolute path',
+    );
+    t.truthy(files['src.css.map'], 'should generate SourceMap file');
+
+    t.is(
+        readSourceMapURL(files['dest.css'].contents),
+        'dest.css.map',
+        'should remove Metalsmith destination absolute path',
+    );
+    t.truthy(files['dest.css.map'], 'should generate SourceMap file');
+
+    t.is(
+        readSourceMapURL(files['same.css'].contents),
+        'same.css.map',
+        'should add ".map" extention in SourceMap filename',
+    );
+    t.truthy(files['same.css.map'], 'should generate SourceMap file');
 });
