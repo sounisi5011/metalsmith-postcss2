@@ -2,6 +2,7 @@ import deepFreeze from 'deep-freeze-strict';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
+import { hasProp } from './utils';
 import { MetalsmithStrictFiles } from './utils/metalsmith';
 import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
@@ -54,6 +55,26 @@ export async function normalizeOptions(
     > = (Array.isArray as isReadonlyOrWritableArray)(opts)
         ? { plugins: opts }
         : opts;
+
+    if (hasProp(partialOptions, 'options')) {
+        const postcssOptions = partialOptions.options;
+        const foundOptionList: string[] = [];
+
+        for (const optionProp of ['from', 'to']) {
+            if (hasProp(postcssOptions, optionProp)) {
+                foundOptionList.push(`"${optionProp}"`);
+            }
+        }
+
+        if (foundOptionList.length > 0) {
+            throw new Error(
+                'Plugin Options Error: Can not set ' +
+                    foundOptionList.join(' and ') +
+                    ` ${foundOptionList.length > 1 ? 'options' : 'option'}` +
+                    ' in plugin options',
+            );
+        }
+    }
 
     const inputRenamer = partialOptions.renamer;
     const renamer =

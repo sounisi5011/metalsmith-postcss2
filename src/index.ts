@@ -95,11 +95,31 @@ async function processFile({
         metalsmith,
     });
     if (config) {
+        const configPath = path.relative(process.cwd(), config.file);
         debugPostcssrc(
             'loaded postcss config by file %o: %o',
             filename,
-            path.relative(process.cwd(), config.file),
+            configPath,
         );
+
+        const postcssOptions = config.options;
+        const foundOptionList: string[] = [];
+
+        for (const optionProp of ['from', 'to']) {
+            if (hasProp(postcssOptions, optionProp)) {
+                foundOptionList.push(`"${optionProp}"`);
+            }
+        }
+
+        if (foundOptionList.length > 0) {
+            throw new Error(
+                'PostCSS Config Error: Can not set ' +
+                    foundOptionList.join(' and ') +
+                    ` ${foundOptionList.length > 1 ? 'options' : 'option'}` +
+                    ' in config file: ' +
+                    configPath,
+            );
+        }
     }
     const plugins = config ? config.plugins : [...options.plugins];
 
