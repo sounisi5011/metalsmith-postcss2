@@ -3,6 +3,8 @@ import path from 'path';
 import postcss from 'postcss';
 import postcssrc from 'postcss-load-config';
 
+import { isObject } from '.';
+
 export type AcceptedPlugin = postcss.AcceptedPlugin;
 export type ProcessOptions = postcss.ProcessOptions;
 
@@ -43,6 +45,58 @@ export function isCssSyntaxError(
     error: Error,
 ): error is postcss.CssSyntaxError {
     return error.name === 'CssSyntaxError';
+}
+
+let ProcessorConstructor: Function | void;
+
+function isProcessor(value: unknown): value is postcss.Processor {
+    if (!ProcessorConstructor) {
+        ProcessorConstructor = postcss().constructor;
+    }
+    return value instanceof ProcessorConstructor;
+}
+
+function isTransformerOrProcessor(
+    value: unknown,
+): value is postcss.Processor | postcss.TransformCallback {
+    if (typeof value === 'function') {
+        return true;
+    }
+
+    if (isProcessor(value)) {
+        return true;
+    }
+
+    return false;
+}
+
+function isPluginObj(
+    value: unknown,
+): value is { postcss: postcss.Processor | postcss.TransformCallback } {
+    if (!isObject(value)) {
+        return false;
+    }
+
+    const keys = Object.keys(value);
+    return (
+        keys.length === 1 &&
+        value[0] === 'postcss' &&
+        isTransformerOrProcessor(value.postcss)
+    );
+}
+
+export function isAcceptedPlugin(value: unknown): value is AcceptedPlugin {
+    if (isTransformerOrProcessor(value)) {
+        return true;
+    }
+
+    if (typeof value === 'object' && value) {
+        if (isPluginObj(value)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 export async function loadConfig({

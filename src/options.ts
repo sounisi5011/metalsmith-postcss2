@@ -4,7 +4,11 @@ import path from 'path';
 
 import { hasProp } from './utils';
 import { MetalsmithStrictFiles } from './utils/metalsmith';
-import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
+import {
+    AcceptedPlugin,
+    isAcceptedPlugin,
+    ProcessOptions,
+} from './utils/postcss';
 import {
     ArrayLikeOnly,
     ArrayValue,
@@ -77,6 +81,33 @@ export function validatePostcssOptions(
     }
 }
 
+function loadPlugins(
+    plugins: InputOptionsInterface['plugins'] | undefined,
+): OptionsInterface['plugins'] {
+    if (!plugins) {
+        return defaultOptions.plugins;
+    }
+
+    if ((Array.isArray as isReadonlyOrWritableArray)(plugins)) {
+        return [...plugins]
+            .map(plugin => {
+                if (isAcceptedPlugin(plugin)) {
+                    return plugin;
+                }
+
+                // TODO
+                return null;
+            })
+            .filter(
+                (value): value is Exclude<typeof value, null> => value !== null,
+            );
+    } else {
+        // TODO
+    }
+
+    return [];
+}
+
 export async function normalizeOptions(
     files: MetalsmithStrictFiles,
     metalsmith: Metalsmith,
@@ -109,6 +140,7 @@ export async function normalizeOptions(
     return {
         ...defaultOptions,
         ...partialOptions,
+        plugins: loadPlugins(partialOptions.plugins),
         renamer,
     };
 }
