@@ -9,5 +9,8 @@ module.exports = ctx => {
     map.annotation = ctx.options.to;
   }
 
-  return { map };
+  return {
+    plugins: [require('postcss-plugins/doubler')],
+    map,
+  };
 };
