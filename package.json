@@ -85,11 +85,13 @@
   },
   "dependencies": {
     "@types/metalsmith": "2.3.0",
+    "@types/valid-data-url": "2.0.0",
     "debug": "4.1.1",
     "deep-freeze-strict": "1.1.1",
     "multimatch": "4.0.0",
     "postcss": "7.0.18",
-    "postcss-load-config": "2.1.0"
+    "postcss-load-config": "2.1.0",
+    "valid-data-url": "2.0.0"
   },
   "devDependencies": {
     "@sounisi5011/check-peer-deps": "github:sounisi5011/check-peer-deps",
