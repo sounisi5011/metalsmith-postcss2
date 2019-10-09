@@ -21,8 +21,13 @@ export interface OptionsInterface {
     readonly renamer: (filename: string) => string;
 }
 
+export interface InputOptionsInterface
+    extends Omit<OptionsInterface, 'renamer'> {
+    readonly renamer: OptionsInterface['renamer'] | true | false | null;
+}
+
 export type InputOptions = OptionsGenerator<
-    Partial<OptionsInterface> | OptionsInterface['plugins']
+    Partial<InputOptionsInterface> | InputOptionsInterface['plugins']
 >;
 
 const defaultOptions: OptionsInterface = deepFreeze({
@@ -45,13 +50,22 @@ export async function normalizeOptions(
         opts = await opts(files, metalsmith, defaultOptions);
     }
     const partialOptions: Partial<
-        OptionsInterface
+        InputOptionsInterface
     > = (Array.isArray as isReadonlyOrWritableArray)(opts)
         ? { plugins: opts }
         : opts;
 
+    const inputRenamer = partialOptions.renamer;
+    const renamer =
+        typeof inputRenamer === 'function'
+            ? inputRenamer
+            : inputRenamer || inputRenamer === undefined
+            ? defaultOptions.renamer
+            : (filename: string) => filename;
+
     return {
         ...defaultOptions,
         ...partialOptions,
+        renamer,
     };
 }
