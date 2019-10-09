@@ -4,6 +4,7 @@ import path from 'path';
 import postcss from 'postcss';
 
 import { InputOptions, normalizeOptions } from './options';
+import { hasProp } from './utils';
 import {
     addFile,
     createPlugin,
@@ -61,7 +62,13 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                 };
 
                 const postcssMapOption = postcssOptions.map;
-                if (postcssMapOption) {
+                if (
+                    postcssMapOption &&
+                    !(
+                        typeof postcssMapOption === 'object' &&
+                        hasProp(postcssMapOption, 'prev')
+                    )
+                ) {
                     const [, sourceMapFiledata] = findSourceMapFile(
                         files,
                         filename,
@@ -72,7 +79,7 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
                         postcssOptions.map =
                             postcssMapOption === true
                                 ? { prev }
-                                : { ...postcssMapOption, prev };
+                                : { prev, ...postcssMapOption };
                     }
                 }
 
