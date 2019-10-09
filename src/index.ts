@@ -3,7 +3,12 @@ import isPathInside from 'is-path-inside';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
-import { InputOptions, normalizeOptions, OptionsInterface } from './options';
+import {
+    InputOptions,
+    normalizeOptions,
+    OptionsInterface,
+    validatePostcssOptions,
+} from './options';
 import { hasProp } from './utils';
 import {
     addFile,
@@ -155,24 +160,10 @@ async function processFile({
             configPath,
         );
 
-        const postcssOptions = config.options;
-        const foundOptionList: string[] = [];
-
-        for (const optionProp of ['from', 'to']) {
-            if (hasProp(postcssOptions, optionProp)) {
-                foundOptionList.push(`"${optionProp}"`);
-            }
-        }
-
-        if (foundOptionList.length > 0) {
-            throw new Error(
-                'PostCSS Config Error: Can not set ' +
-                    foundOptionList.join(' and ') +
-                    ` ${foundOptionList.length > 1 ? 'options' : 'option'}` +
-                    ' in config file: ' +
-                    configPath,
-            );
-        }
+        validatePostcssOptions(config.options, {
+            type: 'PostCSS Config',
+            location: `config file: ${configPath}`,
+        });
     }
     const plugins = config ? config.plugins : [...options.plugins];
 
