@@ -3,8 +3,11 @@ import path from 'path';
 import postcss from 'postcss';
 import postcssrc from 'postcss-load-config';
 
+export type AcceptedPlugin = postcss.AcceptedPlugin;
+export type ProcessOptions = postcss.ProcessOptions;
+
 interface PostcssrcCtx
-    extends Omit<postcss.ProcessOptions, 'parser' | 'syntax' | 'stringifier'> {
+    extends Omit<ProcessOptions, 'parser' | 'syntax' | 'stringifier'> {
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L47-L56
      */
@@ -15,14 +18,14 @@ interface PostcssrcCtx
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L28-L30
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L45-L55
      */
-    plugins?: postcss.AcceptedPlugin[] | Record<string, unknown>;
+    plugins?: AcceptedPlugin[] | Record<string, unknown>;
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/options.js#L15-L45
      */
-    parser?: string | postcss.ProcessOptions['parser'];
-    syntax?: string | postcss.ProcessOptions['syntax'];
-    stringifier?: string | postcss.ProcessOptions['stringifier'];
+    parser?: string | ProcessOptions['parser'];
+    syntax?: string | ProcessOptions['syntax'];
+    stringifier?: string | ProcessOptions['stringifier'];
 
     [other: string]: unknown;
 }
@@ -32,8 +35,8 @@ interface PostcssrcCtx
  */
 export interface ConfigResult {
     file: string;
-    options: postcss.ProcessOptions;
-    plugins: postcss.AcceptedPlugin[];
+    options: ProcessOptions;
+    plugins: AcceptedPlugin[];
 }
 
 export function isCssSyntaxError(
@@ -47,7 +50,7 @@ export async function loadConfig({
     sourceFilepath,
     metalsmith,
 }: {
-    options: postcss.ProcessOptions;
+    options: ProcessOptions;
     sourceFilepath: string;
     metalsmith: Metalsmith;
 }): Promise<ConfigResult | null> {
@@ -76,7 +79,7 @@ export async function loadConfig({
 }
 
 export async function processCSS(
-    plugins: postcss.AcceptedPlugin[],
+    plugins: AcceptedPlugin[],
     ...[css, opts]: Parameters<postcss.Processor['process']>
 ): Promise<postcss.Result | void> {
     try {

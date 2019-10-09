@@ -1,8 +1,8 @@
 import deepFreeze from 'deep-freeze-strict';
 import Metalsmith from 'metalsmith';
 import path from 'path';
-import postcss from 'postcss';
 
+import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
 
 type OptionsGenerator<T> =
@@ -15,8 +15,8 @@ type OptionsGenerator<T> =
 
 export interface OptionsInterface {
     readonly pattern: string | ReadonlyArray<string>;
-    readonly plugins: ReadonlyArray<postcss.AcceptedPlugin>;
-    readonly options: Omit<postcss.ProcessOptions, 'from' | 'to'>;
+    readonly plugins: ReadonlyArray<AcceptedPlugin>;
+    readonly options: Omit<ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
 }
 
