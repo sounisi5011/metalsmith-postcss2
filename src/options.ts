@@ -55,10 +55,11 @@ export async function normalizeOptions(
         ? { plugins: opts }
         : opts;
 
+    const inputRenamer = partialOptions.renamer;
     const renamer =
-        typeof partialOptions.renamer === 'function'
-            ? partialOptions.renamer
-            : partialOptions.renamer || partialOptions.renamer === undefined
+        typeof inputRenamer === 'function'
+            ? inputRenamer
+            : inputRenamer || inputRenamer === undefined
             ? defaultOptions.renamer
             : (filename: string) => filename;
 
