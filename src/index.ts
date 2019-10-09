@@ -1,9 +1,10 @@
 import createDebug from 'debug';
+import isPathInside from 'is-path-inside';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
 import { InputOptions, normalizeOptions, OptionsInterface } from './options';
-import { hasProp } from './utils';
+import { hasProp, replaceStrByIndex } from './utils';
 import {
     addFile,
     createPlugin,
@@ -13,7 +14,7 @@ import {
     MetalsmithStrictFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS, ProcessOptions } from './utils/postcss';
-import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
+import { findSourceMapFile, getSourceMappingURLData } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
@@ -65,6 +66,63 @@ function updatePostcssOption(
     return postcssOptions;
 }
 
+function addSourceMap({
+    files,
+    metalsmithSrcFullpath,
+    metalsmithDestFullpath,
+    destFileFullpath,
+    cssText,
+    sourceMapText,
+}: {
+    files: MetalsmithStrictFiles;
+    metalsmithSrcFullpath: string;
+    metalsmithDestFullpath: string;
+    destFileFullpath: string;
+    cssText: string;
+    sourceMapText: string;
+}): { cssText: string } | null {
+    const sourceMappingURLData = getSourceMappingURLData(cssText);
+    const sourceMapFullpath =
+        sourceMappingURLData && sourceMappingURLData.url
+            ? path.resolve(
+                  path.dirname(destFileFullpath),
+                  sourceMappingURLData.url,
+              )
+            : `${destFileFullpath}.map`;
+    const sourceMapFixedFullpath =
+        destFileFullpath === sourceMapFullpath
+            ? `${sourceMapFullpath}.map`
+            : sourceMapFullpath;
+    const sourceMapFilename = path.relative(
+        isPathInside(sourceMapFixedFullpath, metalsmithSrcFullpath)
+            ? metalsmithSrcFullpath
+            : metalsmithDestFullpath,
+        sourceMapFixedFullpath,
+    );
+
+    addFile(files, sourceMapFilename, sourceMapText);
+    debug('generate SourceMap: %o', sourceMapFilename);
+
+    if (sourceMappingURLData) {
+        const fixedSourceMappingURL = path.relative(
+            path.dirname(destFileFullpath),
+            path.resolve(metalsmithDestFullpath, sourceMapFilename),
+        );
+        if (sourceMappingURLData.url !== fixedSourceMappingURL) {
+            return {
+                cssText: replaceStrByIndex(
+                    cssText,
+                    fixedSourceMappingURL,
+                    sourceMappingURLData.startPos,
+                    sourceMappingURLData.endPos,
+                ),
+            };
+        }
+    }
+
+    return null;
+}
+
 async function processFile({
     files,
     metalsmith,
@@ -78,20 +136,23 @@ async function processFile({
     filename: string;
     filedata: FileInterface;
 }): Promise<void> {
+    const metalsmithSrcFullpath = metalsmith.path(metalsmith.source());
+    const metalsmithDestFullpath = metalsmith.path(metalsmith.destination());
+
     const newFilename = options.renamer(filename);
 
-    const from = metalsmith.path(metalsmith.source(), filename);
-    const to = metalsmith.path(metalsmith.destination(), newFilename);
+    const srcFileFullpath = path.resolve(metalsmithSrcFullpath, filename);
+    const destFileFullpath = path.resolve(metalsmithDestFullpath, newFilename);
     const postcssOptions = updatePostcssOption(options.options, {
-        from,
-        to,
+        from: srcFileFullpath,
+        to: destFileFullpath,
         files,
         filename,
         metalsmith,
     });
     const config = await loadConfig({
         options: postcssOptions,
-        sourceFilepath: from,
+        sourceFilepath: srcFileFullpath,
         metalsmith,
     });
     if (config) {
@@ -127,8 +188,8 @@ async function processFile({
         plugins,
         filedata.contents,
         updatePostcssOption(config ? config.options : postcssOptions, {
-            from,
-            to,
+            from: srcFileFullpath,
+            to: destFileFullpath,
             files,
             filename,
             metalsmith,
@@ -136,7 +197,23 @@ async function processFile({
     );
     if (!result) return;
 
-    const cssText = result.css;
+    let cssText = result.css;
+
+    if (result.map) {
+        const updatedData = addSourceMap({
+            files,
+            metalsmithSrcFullpath,
+            metalsmithDestFullpath,
+            destFileFullpath,
+            cssText,
+            sourceMapText: result.map.toString(),
+        });
+
+        if (updatedData) {
+            cssText = updatedData.cssText;
+        }
+    }
+
     addFile(files, newFilename, cssText, filedata);
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
@@ -144,15 +221,6 @@ async function processFile({
         debug('file deleted: %o', filename);
     } else {
         debug('done process %o', filename);
-    }
-
-    if (result.map) {
-        const sourceMappingURL = getSourceMappingURL(cssText);
-        const sourceMapFilename = sourceMappingURL
-            ? path.join(path.dirname(newFilename), sourceMappingURL)
-            : newFilename + '.map';
-        addFile(files, sourceMapFilename, result.map.toString());
-        debug('generate SourceMap: %o', sourceMapFilename);
     }
 }
 

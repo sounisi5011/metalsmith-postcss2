@@ -12,13 +12,24 @@ import {
 /**
  * @see https://sourcemaps.info/spec.html#h.lmz475t4mvbx
  */
-export function getSourceMappingURL(cssText: string): string | null {
+export function getSourceMappingURLData(
+    cssText: string,
+): { url: string; startPos: number; endPos: number } | null {
     const pattern = /\/\*\s*# sourceMappingURL=((?:(?!\*\/).)*)\*\//g;
-    let url: string | null = null;
+    let url: { url: string; startPos: number; endPos: number } | null = null;
 
     let match: ReturnType<typeof pattern.exec>;
     while ((match = pattern.exec(cssText))) {
-        url = match[1].trim();
+        const urlStr = match[1].trim();
+        const startPos = cssText.indexOf(urlStr, match.index);
+
+        if (startPos >= 0) {
+            url = {
+                url: urlStr,
+                startPos,
+                endPos: startPos + urlStr.length,
+            };
+        }
     }
 
     return url;
@@ -33,18 +44,15 @@ export function findSourceMapFile(
 
     if (isFile(cssFiledata)) {
         const cssText = cssFiledata.contents.toString();
-        const sourceMappingURL = getSourceMappingURL(cssText);
+        const sourceMappingURL = getSourceMappingURLData(cssText);
 
-        if (
-            typeof sourceMappingURL === 'string' &&
-            !validDataUrl(sourceMappingURL)
-        ) {
+        if (sourceMappingURL && !validDataUrl(sourceMappingURL.url)) {
             const cssFilepath = metalsmith
                 ? metalsmith.path(metalsmith.source(), cssFilename)
                 : cssFilename;
             const sourceMapPath = (path.isAbsolute(cssFilepath)
                 ? path.resolve
-                : path.join)(path.dirname(cssFilepath), sourceMappingURL);
+                : path.join)(path.dirname(cssFilepath), sourceMappingURL.url);
             return findFile(files, sourceMapPath, metalsmith);
         }
     }
