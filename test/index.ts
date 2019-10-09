@@ -2,13 +2,13 @@ import test from 'ava';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
+import postcss from '../src/index';
 import { processAsync } from './helpers/metalsmith';
 import {
     asyncDoubler,
     doubler,
     objectDoubler,
 } from './helpers/postcss-plugins';
-import postcss = require('../src/index');
 
 const fixtures = path.join.bind(path, __dirname, 'fixtures');
 

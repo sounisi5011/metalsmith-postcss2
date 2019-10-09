@@ -2,11 +2,12 @@ import Metalsmith from 'metalsmith';
 import multimatch from 'multimatch';
 import path from 'path';
 
-import { hasProp, isObject } from './';
+import { isObject } from './';
 import { isReadonlyOrWritableArray } from './types';
 
-export type MetalsmithFileData = Metalsmith.Files[keyof Metalsmith.Files];
+export type MetalsmithStrictFiles = Record<string, unknown>;
 
+type MetalsmithFileData = Metalsmith.Files[keyof Metalsmith.Files];
 export interface FileInterface extends MetalsmithFileData {
     contents: Buffer;
     [index: string]: unknown;
@@ -14,13 +15,13 @@ export interface FileInterface extends MetalsmithFileData {
 
 export function isFile(value: unknown): value is FileInterface {
     if (isObject(value)) {
-        return hasProp(value, 'contents') && Buffer.isBuffer(value.contents);
+        return Buffer.isBuffer(value.contents);
     }
     return false;
 }
 
 export function getValidFiles(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     filterFilenames?: ReadonlyArray<string>,
 ): Record<string, FileInterface> {
     return Object.entries(files).reduce<Record<string, FileInterface>>(
@@ -39,7 +40,7 @@ export function getValidFiles(
 }
 
 export function getMatchedFilenameList(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     pattern: string | ReadonlyArray<string>,
 ): string[] {
     const filenameList = Object.keys(files);
@@ -51,7 +52,7 @@ export function getMatchedFilenameList(
 }
 
 export function addFile(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     filename: string,
     contents: string,
     originalData?: FileInterface,
@@ -66,12 +67,13 @@ export function addFile(
 }
 
 export function findFile(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     searchFilename: string,
     metalsmith?: Metalsmith,
 ): [string, FileInterface] | [null, null] {
-    if (hasProp(files, searchFilename)) {
-        return [searchFilename, files[searchFilename]];
+    const filedata = files[searchFilename];
+    if (isFile(filedata)) {
+        return [searchFilename, filedata];
     }
 
     const fileList = Object.entries(files);
@@ -99,7 +101,7 @@ export function findFile(
 
 export function createPlugin(
     callback: (
-        files: Metalsmith.Files,
+        files: MetalsmithStrictFiles,
         metalsmith: Metalsmith,
     ) => Promise<void>,
 ): Metalsmith.Plugin {

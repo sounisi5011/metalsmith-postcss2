@@ -1,22 +1,23 @@
 import deepFreeze from 'deep-freeze-strict';
 import Metalsmith from 'metalsmith';
 import path from 'path';
-import postcss from 'postcss';
 
+import { MetalsmithStrictFiles } from './utils/metalsmith';
+import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
 
 type OptionsGenerator<T> =
     | T
     | ((
-          files: Metalsmith.Files,
+          files: MetalsmithStrictFiles,
           metalsmith: Metalsmith,
           defaultOptions: OptionsInterface,
       ) => T | Promise<T>);
 
 export interface OptionsInterface {
     readonly pattern: string | ReadonlyArray<string>;
-    readonly plugins: ReadonlyArray<postcss.AcceptedPlugin>;
-    readonly options: Omit<postcss.ProcessOptions, 'from' | 'to'>;
+    readonly plugins: ReadonlyArray<AcceptedPlugin>;
+    readonly options: Omit<ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
 }
 
@@ -36,7 +37,7 @@ const defaultOptions: OptionsInterface = deepFreeze({
 });
 
 export async function normalizeOptions(
-    files: Metalsmith.Files,
+    files: MetalsmithStrictFiles,
     metalsmith: Metalsmith,
     opts: InputOptions,
 ): Promise<OptionsInterface> {
