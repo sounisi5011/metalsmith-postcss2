@@ -1,0 +1,2 @@
+from: path/to/src.css
+to: path/to/dest.css
