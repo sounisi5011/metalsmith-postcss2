@@ -58,7 +58,9 @@ export async function normalizeOptions(
     const renamer =
         typeof partialOptions.renamer === 'function'
             ? partialOptions.renamer
-            : defaultOptions.renamer;
+            : partialOptions.renamer || partialOptions.renamer === undefined
+            ? defaultOptions.renamer
+            : (filename: string) => filename;
 
     return {
         ...defaultOptions,
