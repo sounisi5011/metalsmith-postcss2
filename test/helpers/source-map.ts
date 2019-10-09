@@ -1,5 +1,7 @@
+import validDataUrl from 'valid-data-url';
+
 import { hasProp, isObject } from '../../src/utils';
-import { getSourceMappingURL, isDataURL } from '../../src/utils/source-map';
+import { getSourceMappingURL } from '../../src/utils/source-map';
 import { isStringList } from './';
 
 export interface SourceMap {
@@ -32,7 +34,7 @@ export function getSourceMappingURLType(
 ): 'file' | 'inline' | null {
     const sourceMappingURL = getSourceMappingURL(cssData.toString());
     if (typeof sourceMappingURL === 'string') {
-        return isDataURL(sourceMappingURL) ? 'inline' : 'file';
+        return validDataUrl(sourceMappingURL) ? 'inline' : 'file';
     }
     return null;
 }

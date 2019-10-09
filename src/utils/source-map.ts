@@ -1,5 +1,6 @@
 import Metalsmith from 'metalsmith';
 import path from 'path';
+import validDataUrl from 'valid-data-url';
 
 import { FileInterface, findFile, isFile } from './metalsmith';
 
@@ -18,10 +19,6 @@ export function getSourceMappingURL(cssText: string): string | null {
     return url;
 }
 
-export function isDataURL(url: string): boolean {
-    return url.startsWith('data:');
-}
-
 export function findSourceMapFile(
     files: Metalsmith.Files,
     cssFilename: string,
@@ -35,7 +32,7 @@ export function findSourceMapFile(
 
         if (
             typeof sourceMappingURL === 'string' &&
-            !isDataURL(sourceMappingURL)
+            !validDataUrl(sourceMappingURL)
         ) {
             const cssFilepath = metalsmith
                 ? metalsmith.path(metalsmith.source(), cssFilename)
