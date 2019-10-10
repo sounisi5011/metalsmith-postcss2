@@ -10,6 +10,7 @@ import {
     ArrayLikeOnly,
     ArrayValue,
     isReadonlyOrWritableArray,
+    NestedReadonlyArray,
 } from './utils/types';
 
 type OptionsGenerator<T> =
@@ -33,7 +34,7 @@ export interface InputOptionsInterface
     extends Omit<OptionsInterface, 'plugins' | 'renamer'> {
     readonly plugins:
         | OptionsInterface['plugins']
-        | ReadonlyArray<
+        | NestedReadonlyArray<
               ArrayValue<OptionsInterface['plugins']> | string | PluginsRecord
           >
         | PluginsRecord;
