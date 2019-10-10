@@ -148,6 +148,7 @@ async function processFile({
         metalsmith,
     });
     const config = await loadConfig({
+        plugins: options.plugins,
         options: postcssOptions,
         sourceFilepath: srcFileFullpath,
         metalsmith,

@@ -100,10 +100,12 @@ export function isAcceptedPlugin(value: unknown): value is AcceptedPlugin {
 }
 
 export async function loadConfig({
+    plugins,
     options,
     sourceFilepath,
     metalsmith,
 }: {
+    plugins: ReadonlyArray<AcceptedPlugin>;
     options: ProcessOptions;
     sourceFilepath: string;
     metalsmith: Metalsmith;
@@ -112,6 +114,7 @@ export async function loadConfig({
      * @see https://github.com/postcss/postcss-cli/blob/6.1.3/index.js#L166-L187
      */
     const ctx: PostcssrcCtx = {
+        plugins: [...plugins],
         options,
         file: {
             dirname: path.dirname(sourceFilepath),
