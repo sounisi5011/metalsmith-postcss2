@@ -86,7 +86,13 @@ test('should transform css files with deps', async t => {
 
     t.deepEqual(
         Object.keys(files['main.css'][dependenciesKey]).sort(),
-        ['_sub.css', '_mod.css', 'dir/_child.css'].sort(),
+        ['main.css', '_sub.css', '_mod.css', 'dir/_child.css'].sort(),
+    );
+    t.is(Object.keys(files['main.css'][dependenciesKey])[0], 'main.css');
+
+    t.is(
+        files['main.css'][dependenciesKey]['main.css'],
+        beforeFiles['main.css'],
     );
     t.is(
         files['main.css'][dependenciesKey]['_sub.css'],
@@ -171,7 +177,13 @@ test('should transform css files with deps and SourceMap', async t => {
 
     t.deepEqual(
         Object.keys(files['main.css'][dependenciesKey]).sort(),
-        ['_sub.css', '_mod.css', 'dir/_child.css'].sort(),
+        ['main.css', '_sub.css', '_mod.css', 'dir/_child.css'].sort(),
+    );
+    t.is(Object.keys(files['main.css'][dependenciesKey])[0], 'main.css');
+
+    t.is(
+        files['main.css'][dependenciesKey]['main.css'],
+        beforeFiles['main.css'],
     );
     t.is(
         files['main.css'][dependenciesKey]['_sub.css'],
@@ -190,6 +202,12 @@ test('should transform css files with deps and SourceMap', async t => {
         Object.keys(files['main.css.map'][dependenciesKey]).sort(),
         ['main.css', '_sub.css', '_mod.css', 'dir/_child.css'].sort(),
     );
+    t.is(Object.keys(files['main.css.map'][dependenciesKey])[0], 'main.css');
+
+    t.is(
+        files['main.css.map'][dependenciesKey]['main.css'],
+        beforeFiles['main.css'],
+    );
     t.is(
         files['main.css.map'][dependenciesKey]['_sub.css'],
         beforeFiles['_sub.css'],
@@ -201,10 +219,6 @@ test('should transform css files with deps and SourceMap', async t => {
     t.is(
         files['main.css.map'][dependenciesKey]['dir/_child.css'],
         beforeFiles['dir/_child.css'],
-    );
-    t.is(
-        files['main.css.map'][dependenciesKey]['main.css'],
-        beforeFiles['main.css'],
     );
 });
 
@@ -249,7 +263,13 @@ test('should transform css files with deps and forget ignore pattern', async t =
 
     t.deepEqual(
         Object.keys(files['main.css'][dependenciesKey]).sort(),
-        ['_sub.css', '_mod.css', 'dir/_child.css'].sort(),
+        ['main.css', '_sub.css', '_mod.css', 'dir/_child.css'].sort(),
+    );
+    t.is(Object.keys(files['main.css'][dependenciesKey])[0], 'main.css');
+
+    t.is(
+        files['main.css'][dependenciesKey]['main.css'],
+        beforeFiles['main.css'],
     );
     t.is(
         files['main.css'][dependenciesKey]['_sub.css'],
