@@ -2,6 +2,7 @@ import importCwd from 'import-cwd';
 import util from 'util';
 
 import { defaultOptions, InputOptionsInterface } from './options';
+import { isObject } from './utils';
 import { AcceptedPlugin, isAcceptedPlugin } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
 
@@ -14,32 +15,38 @@ function loadPlugin(
     pluginOptions: unknown,
     propList: (string | number)[],
 ): AcceptedPlugin {
-    let plugin;
-
+    let pluginGenerator: unknown;
     try {
-        const pluginGenerator = importCwd(pluginName);
-        plugin =
-            typeof pluginGenerator === 'function' &&
-            (typeof pluginOptions === 'object' &&
-                pluginOptions &&
-                Object.keys(pluginOptions).length > 0)
-                ? pluginGenerator(pluginOptions)
-                : pluginGenerator;
+        pluginGenerator = importCwd(pluginName);
     } catch (err) {
         throw new Error(`Loading PostCSS Plugin failed: ${err.message}`);
+    }
+
+    let plugin = pluginGenerator;
+
+    /**
+     * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L18-L26
+     */
+    if (isObject(pluginOptions) && Object.keys(pluginOptions).length > 0) {
+        if (typeof pluginGenerator !== 'function') {
+            throw new TypeError(
+                `Loading PostCSS Plugin failed: Module does not export function '${pluginName}'`,
+            );
+        }
+        plugin = pluginGenerator(pluginOptions);
     }
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L59-L61
      */
-    if (plugin.postcss) {
+    if (isObject(plugin) && plugin.postcss) {
         plugin = plugin.postcss;
     }
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L63-L65
      */
-    if (plugin.default) {
+    if (isObject(plugin) && plugin.default) {
         plugin = plugin.default;
     }
 
