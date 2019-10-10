@@ -8,26 +8,31 @@ import { isObject } from '.';
 export type AcceptedPlugin = postcss.AcceptedPlugin;
 export type ProcessOptions = postcss.ProcessOptions;
 
-interface PostcssrcCtx
-    extends Omit<ProcessOptions, 'parser' | 'syntax' | 'stringifier'> {
+/**
+ * When JSON or YAML postcssrc config file is specified, the contents of postcssrc are overwritten with the ctx argument.
+ * To prevent the risk of overwriting postcssrc settings, this interface makes the properties expected by postcss-load-config non-overridable.
+ * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L25
+ */
+interface ProtectPostcssrcCtx
+    extends Partial<Record<keyof ProcessOptions, never>> {
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L47-L56
      */
-    cwd?: string;
-    env?: string;
+    cwd?: never;
+    env?: never;
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L28-L30
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L45-L55
      */
-    plugins?: AcceptedPlugin[] | Record<string, unknown>;
+    plugins?: never;
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/options.js#L15-L45
      */
-    parser?: string | ProcessOptions['parser'];
-    syntax?: string | ProcessOptions['syntax'];
-    stringifier?: string | ProcessOptions['stringifier'];
+    parser?: never;
+    syntax?: never;
+    stringifier?: never;
 
     [other: string]: unknown;
 }
@@ -113,14 +118,14 @@ export async function loadConfig({
     /**
      * @see https://github.com/postcss/postcss-cli/blob/6.1.3/index.js#L166-L187
      */
-    const ctx: PostcssrcCtx = {
-        plugins: [...plugins],
+    const ctx: ProtectPostcssrcCtx = {
         options,
         file: {
             dirname: path.dirname(sourceFilepath),
             basename: path.basename(sourceFilepath),
             extname: path.extname(sourceFilepath),
         },
+        pluginsList: [...plugins],
         metalsmith,
     };
 
