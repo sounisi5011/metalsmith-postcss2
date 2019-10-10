@@ -2,13 +2,10 @@ import deepFreeze from 'deep-freeze-strict';
 import Metalsmith from 'metalsmith';
 import path from 'path';
 
+import { loadPlugins } from './plugins';
 import { hasProp } from './utils';
 import { MetalsmithStrictFiles } from './utils/metalsmith';
-import {
-    AcceptedPlugin,
-    isAcceptedPlugin,
-    ProcessOptions,
-} from './utils/postcss';
+import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import {
     ArrayLikeOnly,
     ArrayValue,
@@ -48,7 +45,7 @@ export type InputOptions = OptionsGenerator<
     | ArrayLikeOnly<InputOptionsInterface['plugins']>
 >;
 
-const defaultOptions: OptionsInterface = deepFreeze({
+export const defaultOptions: OptionsInterface = deepFreeze({
     pattern: ['**/*.css'],
     plugins: [],
     options: {},
@@ -79,33 +76,6 @@ export function validatePostcssOptions(
                 ` in ${location}`,
         );
     }
-}
-
-function loadPlugins(
-    plugins: InputOptionsInterface['plugins'] | undefined,
-): OptionsInterface['plugins'] {
-    if (!plugins) {
-        return defaultOptions.plugins;
-    }
-
-    if ((Array.isArray as isReadonlyOrWritableArray)(plugins)) {
-        return [...plugins]
-            .map(plugin => {
-                if (isAcceptedPlugin(plugin)) {
-                    return plugin;
-                }
-
-                // TODO
-                return null;
-            })
-            .filter(
-                (value): value is Exclude<typeof value, null> => value !== null,
-            );
-    } else {
-        // TODO
-    }
-
-    return [];
 }
 
 export async function normalizeOptions(
