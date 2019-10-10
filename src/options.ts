@@ -4,7 +4,7 @@ import path from 'path';
 
 import { loadPlugins } from './plugins';
 import { hasProp } from './utils';
-import { MetalsmithStrictFiles } from './utils/metalsmith';
+import { MetalsmithStrictWritableFiles } from './utils/metalsmith';
 import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import {
     ArrayLikeOnly,
@@ -16,7 +16,7 @@ import {
 type OptionsGenerator<T> =
     | T
     | ((
-          files: MetalsmithStrictFiles,
+          files: MetalsmithStrictWritableFiles,
           metalsmith: Metalsmith,
           defaultOptions: OptionsInterface,
       ) => T | Promise<T>);
@@ -82,7 +82,7 @@ export function validatePostcssOptions(
 }
 
 export async function normalizeOptions(
-    files: MetalsmithStrictFiles,
+    files: MetalsmithStrictWritableFiles,
     metalsmith: Metalsmith,
     opts: InputOptions,
 ): Promise<OptionsInterface> {

@@ -18,6 +18,7 @@ import {
     getMatchedFilenameList,
     getValidFiles,
     MetalsmithStrictFiles,
+    MetalsmithStrictWritableFiles,
 } from './utils/metalsmith';
 import { loadConfig, processCSS, ProcessOptions } from './utils/postcss';
 import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
@@ -149,12 +150,14 @@ function defineDependencyData(
 
 async function processFile({
     files,
+    writableFiles,
     metalsmith,
     options,
     filename,
     filedata,
 }: {
     files: MetalsmithStrictFiles;
+    writableFiles: MetalsmithStrictWritableFiles;
     metalsmith: Metalsmith;
     options: OptionsInterface;
     filename: string;
@@ -235,7 +238,7 @@ async function processFile({
 
     const cssText = result.css;
     addFile(
-        files,
+        writableFiles,
         newFilename,
         cssText,
         filedata,
@@ -243,7 +246,7 @@ async function processFile({
     );
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
-        delete files[filename];
+        delete writableFiles[filename];
         debug('file deleted: %o', filename);
     } else {
         debug('done process %o', filename);
@@ -256,7 +259,7 @@ async function processFile({
             : newFilename + '.map';
         const sourceMapDependencies = { [filename]: filedata, ...dependencies };
         addFile(
-            files,
+            writableFiles,
             sourceMapFilename,
             result.map.toString(),
             undefined,
@@ -286,7 +289,14 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
 
         await Promise.all(
             Object.entries(targetFiles).map(async ([filename, filedata]) =>
-                processFile({ files, metalsmith, options, filename, filedata }),
+                processFile({
+                    files: { ...files },
+                    writableFiles: files,
+                    metalsmith,
+                    options,
+                    filename,
+                    filedata,
+                }),
             ),
         );
     });

@@ -5,7 +5,8 @@ import path from 'path';
 import { isObject } from './';
 import { isReadonlyOrWritableArray } from './types';
 
-export type MetalsmithStrictFiles = Record<string, unknown>;
+export type MetalsmithStrictWritableFiles = Record<string, unknown>;
+export type MetalsmithStrictFiles = Readonly<MetalsmithStrictWritableFiles>;
 
 type MetalsmithFileData = Metalsmith.Files[keyof Metalsmith.Files];
 export interface FileInterface extends MetalsmithFileData {
@@ -52,7 +53,7 @@ export function getMatchedFilenameList(
 }
 
 export function addFile(
-    files: MetalsmithStrictFiles,
+    files: MetalsmithStrictWritableFiles,
     filename: string,
     contents: string,
     originalData?: FileInterface,
@@ -103,7 +104,7 @@ export function findFile(
 
 export function createPlugin(
     callback: (
-        files: MetalsmithStrictFiles,
+        files: MetalsmithStrictWritableFiles,
         metalsmith: Metalsmith,
     ) => Promise<void>,
 ): Metalsmith.Plugin {
