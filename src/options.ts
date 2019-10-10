@@ -26,6 +26,7 @@ export interface OptionsInterface {
     readonly plugins: ReadonlyArray<AcceptedPlugin>;
     readonly options: Omit<ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
+    readonly dependenciesKey: string | false | null;
 }
 
 type PluginsRecord = Readonly<Record<string, unknown>>;
@@ -55,6 +56,7 @@ export const defaultOptions: OptionsInterface = deepFreeze({
             path.basename(filename, path.extname(filename)) + '.css';
         return path.join(path.dirname(filename), newFilename);
     },
+    dependenciesKey: false,
 });
 
 export function validatePostcssOptions(
