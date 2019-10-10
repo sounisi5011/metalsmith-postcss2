@@ -1,15 +1,46 @@
 import test from 'ava';
 import Metalsmith from 'metalsmith';
 import path from 'path';
+import postcss from 'postcss';
 import util from 'util';
 
 import { normalizeOptions } from '../src/options';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+async function execPlugins(
+    plugins: ReadonlyArray<postcss.AcceptedPlugin>,
+): Promise<any[]> {
+    const list: any[] = [];
+
+    for (const plugin of plugins) {
+        if (typeof plugin === 'function') {
+            list.push(await plugin({} as any, {} as any));
+        }
+    }
+
+    return list;
+}
+/* eslint-enable */
+
+async function execPluginRecord(
+    pluginRecord: Record<string, unknown>,
+): ReturnType<typeof execPlugins> {
+    const cwd = process.cwd();
+
+    return execPlugins(
+        Object.entries(pluginRecord).map(([pluginPath, pluginOptions]) =>
+            // Note: In order to avoid the side effects of esModuleInterop, require() is used.
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            require(path.join(cwd, pluginPath))(pluginOptions),
+        ),
+    );
+}
 
 test.before(() => {
     process.chdir(path.join(__dirname, 'fixtures', 'plugins'));
 });
 
-test('should to import plugin files by string array', async t => {
+test('should import plugin files by string array', async t => {
     const pluginPathList = ['./plugin-01', './plugin-02'];
 
     const cwd = process.cwd();
@@ -24,30 +55,26 @@ test('should to import plugin files by string array', async t => {
 });
 
 for (const opts of [{ x: 42 }]) {
-    test(`should to import plugin file with ${util.inspect(opts)}`, async t => {
+    test(`should import and execute plugin file with option ${util.inspect(
+        opts,
+    )}`, async t => {
         const pluginRecord = {
             './plugin-01': opts,
         };
 
-        const cwd = process.cwd();
         const options = await normalizeOptions({}, Metalsmith(__dirname), {
             plugins: pluginRecord,
         });
 
         t.deepEqual(
-            options.plugins,
-            Object.entries(pluginRecord).map(([pluginPath, pluginOptions]) =>
-                // Note: In order to avoid the side effects of esModuleInterop, require() is used.
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                require(path.join(cwd, pluginPath))(pluginOptions),
-            ),
+            await execPlugins(options.plugins),
+            await execPluginRecord(pluginRecord),
         );
     });
 }
 
 for (const opts of [
     true,
-    false,
     null,
     undefined,
     0,
@@ -59,8 +86,12 @@ for (const opts of [
     Symbol('sym'),
     [],
     {},
+    () => {},
+    async () => {},
 ]) {
-    test(`should to import plugin file with ${util.inspect(opts)}`, async t => {
+    test(`should import plugin file with option ${util.inspect(
+        opts,
+    )}`, async t => {
         const pluginRecord = {
             './plugin-01': opts,
         };
@@ -72,37 +103,42 @@ for (const opts of [
 
         t.deepEqual(
             options.plugins,
-            opts !== false
-                ? Object.keys(pluginRecord).map(pluginPath =>
-                      require(path.join(cwd, pluginPath)),
-                  )
-                : [],
+            Object.keys(pluginRecord).map(pluginPath =>
+                require(path.join(cwd, pluginPath)),
+            ),
         );
     });
 }
 
-test('should to import plugin files by plain object', async t => {
+test('should ignore import plugin file with false option', async t => {
+    const pluginRecord = {
+        './plugin-01': false,
+    };
+
+    const options = await normalizeOptions({}, Metalsmith(__dirname), {
+        plugins: pluginRecord,
+    });
+
+    t.deepEqual(options.plugins, []);
+});
+
+test('should import and execute plugin files by plain object', async t => {
     const pluginRecord = {
         './plugin-01': { x: 42 },
         './plugin-02': { y: 51 },
     };
 
-    const cwd = process.cwd();
     const options = await normalizeOptions({}, Metalsmith(__dirname), {
         plugins: pluginRecord,
     });
 
     t.deepEqual(
-        options.plugins,
-        Object.entries(pluginRecord).map(([pluginPath, pluginOptions]) =>
-            // Note: In order to avoid the side effects of esModuleInterop, require() is used.
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            require(path.join(cwd, pluginPath))(pluginOptions),
-        ),
+        await execPlugins(options.plugins),
+        await execPluginRecord(pluginRecord),
     );
 });
 
-test('should to import plugin files by plain object array', async t => {
+test('should import and execute plugin files by plain object array', async t => {
     const opt1 = { x: 42 };
     const opt2 = { y: 51 };
 
@@ -116,17 +152,19 @@ test('should to import plugin files by plain object array', async t => {
     });
 
     t.deepEqual(
-        options.plugins,
-        ([
-            ['./plugin-01', opt1],
-            ['./plugin-02', opt2],
-            ['./plugin-01', opt1],
-            ['./plugin-02', opt1],
-        ] as [string, typeof opt1 | typeof opt2][]).map(
-            ([pluginPath, pluginOptions]) =>
-                // Note: In order to avoid the side effects of esModuleInterop, require() is used.
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                require(path.join(cwd, pluginPath))(pluginOptions),
+        await execPlugins(options.plugins),
+        await execPlugins(
+            ([
+                ['./plugin-01', opt1],
+                ['./plugin-02', opt2],
+                ['./plugin-01', opt1],
+                ['./plugin-02', opt1],
+            ] as [string, typeof opt1 | typeof opt2][]).map(
+                ([pluginPath, pluginOptions]) =>
+                    // Note: In order to avoid the side effects of esModuleInterop, require() is used.
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    require(path.join(cwd, pluginPath))(pluginOptions),
+            ),
         ),
     );
 });
@@ -149,7 +187,7 @@ test('import of non-existent script file should fail', async t => {
             });
         },
         {
-            instanceOf: TypeError,
+            instanceOf: Error,
             message: /^Loading PostCSS Plugin failed(?:\W|$)/,
         },
     );
@@ -163,7 +201,7 @@ test('If the plugin name does not start with "." and "/", should to import it li
             });
         },
         {
-            instanceOf: TypeError,
+            instanceOf: Error,
             message: /^Loading PostCSS Plugin failed(?:\W|$)/,
         },
     );

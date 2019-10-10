@@ -1,1 +1,5 @@
-module.exports = opts => opts;
+module.exports = pluginOptions => {
+  return (root, result) => {
+    return pluginOptions;
+  };
+};
