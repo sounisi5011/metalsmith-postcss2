@@ -218,7 +218,7 @@ async function processFile({
     );
     if (!result) return;
 
-    const dependencies: Record<string, unknown> = {};
+    const dependencies: Record<string, unknown> = { [filename]: filedata };
     const dependenciesKey =
         typeof options.dependenciesKey === 'string' && options.dependenciesKey
             ? options.dependenciesKey
@@ -257,15 +257,12 @@ async function processFile({
         const sourceMapFilename = sourceMappingURL
             ? path.join(path.dirname(newFilename), sourceMappingURL)
             : newFilename + '.map';
-        const sourceMapDependencies = { [filename]: filedata, ...dependencies };
         addFile(
             writableFiles,
             sourceMapFilename,
             result.map.toString(),
             undefined,
-            dependenciesKey
-                ? { [dependenciesKey]: sourceMapDependencies }
-                : undefined,
+            dependenciesKey ? { [dependenciesKey]: dependencies } : undefined,
         );
         debug('generate SourceMap: %o', sourceMapFilename);
     }
