@@ -259,6 +259,51 @@ test('import of non-existent script file should fail', async t => {
     );
 });
 
+test('import of script files that do not export functions should fail: with plugin options', async t => {
+    await t.throwsAsync(
+        async () => {
+            await normalizeOptions({}, Metalsmith(__dirname), {
+                plugins: { './no-func-plugin': { x: 542 } },
+            });
+        },
+        {
+            instanceOf: TypeError,
+            message: /^Loading PostCSS Plugin failed: Module does not export function(?:\W|$)/,
+        },
+    );
+});
+
+test('import of script files that do not export functions should success: without plugin options', async t => {
+    await t.notThrowsAsync(async () => {
+        await normalizeOptions({}, Metalsmith(__dirname), {
+            plugins: ['./no-func-plugin'],
+        });
+    });
+});
+
+test('import of script files that do not export PostCSS Plugin should fail', async t => {
+    await t.throwsAsync(
+        async () => {
+            await normalizeOptions({}, Metalsmith(__dirname), {
+                plugins: [
+                    [
+                        { any: false },
+                        [
+                            {
+                                './invalid-return-plugin': {},
+                            },
+                        ],
+                    ],
+                ],
+            });
+        },
+        {
+            instanceOf: TypeError,
+            message: /^Invalid PostCSS Plugin found at: plugins\[0\]\[1\]\[0\]\['\.\/invalid-return-plugin'\](?:(?!\[|\.\w)\W|$)/,
+        },
+    );
+});
+
 test('If the plugin name does not start with "." and "/", should to import it like require() function', async t => {
     await t.throwsAsync(
         async () => {
