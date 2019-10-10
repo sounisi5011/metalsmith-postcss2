@@ -14,6 +14,7 @@ import {
     addFile,
     createPlugin,
     FileInterface,
+    findFile,
     getMatchedFilenameList,
     getValidFiles,
     MetalsmithStrictFiles,
@@ -120,6 +121,32 @@ function fixPostcssAnnotationOption(
     };
 }
 
+function defineDependencyData(
+    dependencies: Record<string, unknown>,
+    {
+        dependencyFileFullpath,
+        metalsmithSrcFullpath,
+        files,
+        metalsmith,
+    }: {
+        dependencyFileFullpath: string;
+        metalsmithSrcFullpath: string;
+        files: MetalsmithStrictFiles;
+        metalsmith?: Metalsmith;
+    },
+): void {
+    const filename = path.relative(
+        metalsmithSrcFullpath,
+        dependencyFileFullpath,
+    );
+    const [foundFilename, foundFiledata] = findFile(
+        files,
+        filename,
+        metalsmith,
+    );
+    dependencies[filename] = foundFilename !== null ? foundFiledata : undefined;
+}
+
 async function processFile({
     files,
     metalsmith,
@@ -188,8 +215,32 @@ async function processFile({
     );
     if (!result) return;
 
+    const dependencies: Record<string, unknown> = {};
+    const dependenciesKey =
+        typeof options.dependenciesKey === 'string' && options.dependenciesKey
+            ? options.dependenciesKey
+            : null;
+    if (dependenciesKey) {
+        result.messages.forEach(message => {
+            if (message.type === 'dependency') {
+                defineDependencyData(dependencies, {
+                    dependencyFileFullpath: message.file,
+                    metalsmithSrcFullpath,
+                    files,
+                    metalsmith,
+                });
+            }
+        });
+    }
+
     const cssText = result.css;
-    addFile(files, newFilename, cssText, filedata);
+    addFile(
+        files,
+        newFilename,
+        cssText,
+        filedata,
+        dependenciesKey ? { [dependenciesKey]: dependencies } : undefined,
+    );
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
         delete files[filename];
@@ -203,7 +254,16 @@ async function processFile({
         const sourceMapFilename = sourceMappingURL
             ? path.join(path.dirname(newFilename), sourceMappingURL)
             : newFilename + '.map';
-        addFile(files, sourceMapFilename, result.map.toString());
+        const sourceMapDependencies = { [filename]: filedata, ...dependencies };
+        addFile(
+            files,
+            sourceMapFilename,
+            result.map.toString(),
+            undefined,
+            dependenciesKey
+                ? { [dependenciesKey]: sourceMapDependencies }
+                : undefined,
+        );
         debug('generate SourceMap: %o', sourceMapFilename);
     }
 }

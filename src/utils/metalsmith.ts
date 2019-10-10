@@ -56,8 +56,10 @@ export function addFile(
     filename: string,
     contents: string,
     originalData?: FileInterface,
+    otherData?: Record<string, unknown>,
 ): FileInterface {
     const newFile = {
+        ...otherData,
         mode: '0644',
         ...originalData,
         contents: Buffer.from(contents, 'utf8'),
