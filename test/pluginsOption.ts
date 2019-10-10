@@ -5,26 +5,30 @@ import postcss from 'postcss';
 import util from 'util';
 
 import { normalizeOptions } from '../src/options';
+import { isArray } from './helpers';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 async function execPlugins(
     plugins: ReadonlyArray<postcss.AcceptedPlugin>,
-): Promise<any[]> {
-    const list: any[] = [];
+): Promise<unknown[]> {
+    const list: unknown[] = [];
 
     for (const plugin of plugins) {
         if (typeof plugin === 'function') {
-            list.push(await plugin({} as any, {} as any));
+            list.push(
+                plugin.length === 2
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      await plugin({} as any, {} as any)
+                    : plugin,
+            );
         }
     }
 
     return list;
 }
-/* eslint-enable */
 
 async function execPluginRecord(
     pluginRecord: Record<string, unknown>,
-): ReturnType<typeof execPlugins> {
+): Promise<unknown[]> {
     const cwd = process.cwd();
 
     return execPlugins(
@@ -34,6 +38,27 @@ async function execPluginRecord(
             require(path.join(cwd, pluginPath))(pluginOptions),
         ),
     );
+}
+
+async function execPluginDefList(
+    pluginDefList: ReadonlyArray<
+        string | postcss.AcceptedPlugin | readonly [string, unknown]
+    >,
+): Promise<unknown[]> {
+    const list: unknown[] = [];
+    const cwd = process.cwd();
+
+    for (const pluginDef of pluginDefList) {
+        list.push(
+            ...(await (typeof pluginDef === 'string'
+                ? [require(path.join(cwd, pluginDef))]
+                : isArray(pluginDef)
+                ? execPluginRecord({ [pluginDef[0]]: pluginDef[1] })
+                : execPlugins([pluginDef]))),
+        );
+    }
+
+    return list;
 }
 
 test.before(() => {
@@ -177,6 +202,47 @@ test('should pass the plugin function array to the options value', async t => {
     });
 
     t.deepEqual(options.plugins, [plugin1, plugin2]);
+});
+
+test('should import and execute plugin files by recursive array', async t => {
+    const opt1 = { x: 42 };
+    const opt2 = { y: 51 };
+    const plugin1 = (): string => 'plugin1';
+
+    const options = await normalizeOptions({}, Metalsmith(__dirname), {
+        plugins: [
+            plugin1,
+            './plugin-01',
+            { './plugin-01': opt1 },
+            [
+                plugin1,
+                './plugin-01',
+                { './plugin-01': opt2 },
+                [[{ './plugin-01': opt2 }]],
+            ],
+            [
+                [[[plugin1, plugin1, [[[{ './plugin-02': opt1 }]]]]]],
+                './plugin-02',
+            ],
+        ],
+    });
+
+    t.deepEqual(
+        await execPlugins(options.plugins),
+        await execPluginDefList([
+            plugin1,
+            './plugin-01',
+            ['./plugin-01', opt1],
+            plugin1,
+            './plugin-01',
+            ['./plugin-01', opt2],
+            ['./plugin-01', opt2],
+            plugin1,
+            plugin1,
+            ['./plugin-02', opt1],
+            './plugin-02',
+        ]),
+    );
 });
 
 test('import of non-existent script file should fail', async t => {

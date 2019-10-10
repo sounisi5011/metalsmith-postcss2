@@ -1,3 +1,7 @@
+import { isReadonlyOrWritableArray } from '../../src/utils/types';
+
+export const isArray: isReadonlyOrWritableArray = Array.isArray;
+
 export function isStringList(value: unknown): value is string[] {
     return Array.isArray(value) && value.every(v => typeof v === 'string');
 }
