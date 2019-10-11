@@ -228,7 +228,7 @@
   },
   "peerDependencies": {
     "metalsmith": ">=2.3.0",
-    "postcss": "7.0.18"
+    "postcss": "5.x || 6.x || 7.x - 7.0.18"
   },
   "engines": {
     "node": ">=8.3.0"
