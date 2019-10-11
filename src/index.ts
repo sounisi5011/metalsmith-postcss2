@@ -20,7 +20,12 @@ import {
     MetalsmithStrictFiles,
     MetalsmithStrictWritableFiles,
 } from './utils/metalsmith';
-import { loadConfig, processCSS, ProcessOptions } from './utils/postcss';
+import {
+    loadConfig,
+    processCSS,
+    ProcessOptions,
+    Result,
+} from './utils/postcss';
 import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
@@ -122,30 +127,40 @@ function fixPostcssAnnotationOption(
     };
 }
 
-function defineDependencyData(
-    dependencies: Record<string, unknown>,
+function getDependenciesRecord(
+    result: Result,
     {
-        dependencyFileFullpath,
         metalsmithSrcFullpath,
         files,
         metalsmith,
     }: {
-        dependencyFileFullpath: string;
         metalsmithSrcFullpath: string;
         files: MetalsmithStrictFiles;
         metalsmith?: Metalsmith;
     },
-): void {
-    const filename = path.relative(
-        metalsmithSrcFullpath,
-        dependencyFileFullpath,
-    );
-    const [foundFilename, foundFiledata] = findFile(
-        files,
-        filename,
-        metalsmith,
-    );
-    dependencies[filename] = foundFilename !== null ? foundFiledata : undefined;
+): Record<string, unknown> {
+    const dependencies: Record<string, unknown> = {};
+
+    /**
+     * @see https://github.com/postcss/postcss-loader/blob/v3.0.0/src/index.js#L149-L153
+     */
+    for (const message of result.messages) {
+        if (message.type === 'dependency') {
+            const dependencyFilename = path.relative(
+                metalsmithSrcFullpath,
+                message.file,
+            );
+            const [foundFilename, foundFiledata] = findFile(
+                files,
+                dependencyFilename,
+                metalsmith,
+            );
+            dependencies[dependencyFilename] =
+                foundFilename !== null ? foundFiledata : undefined;
+        }
+    }
+
+    return dependencies;
 }
 
 async function processFile({
@@ -218,32 +233,23 @@ async function processFile({
     );
     if (!result) return;
 
-    const dependencies: Record<string, unknown> = { [filename]: filedata };
-    const dependenciesKey =
-        typeof options.dependenciesKey === 'string' && options.dependenciesKey
-            ? options.dependenciesKey
-            : null;
-    if (dependenciesKey) {
-        result.messages.forEach(message => {
-            if (message.type === 'dependency') {
-                defineDependencyData(dependencies, {
-                    dependencyFileFullpath: message.file,
-                    metalsmithSrcFullpath,
-                    files,
-                    metalsmith,
-                });
-            }
-        });
-    }
+    const dependencies: Record<string, Record<string, unknown>> | undefined =
+        typeof options.dependenciesKey === 'string' &&
+        options.dependenciesKey !== ''
+            ? {
+                  [options.dependenciesKey]: {
+                      [filename]: filedata,
+                      ...getDependenciesRecord(result, {
+                          metalsmithSrcFullpath,
+                          files,
+                          metalsmith,
+                      }),
+                  },
+              }
+            : undefined;
 
     const cssText = result.css;
-    addFile(
-        writableFiles,
-        newFilename,
-        cssText,
-        filedata,
-        dependenciesKey ? { [dependenciesKey]: dependencies } : undefined,
-    );
+    addFile(writableFiles, newFilename, cssText, filedata, dependencies);
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
         delete writableFiles[filename];
@@ -262,7 +268,7 @@ async function processFile({
             sourceMapFilename,
             result.map.toString(),
             undefined,
-            dependenciesKey ? { [dependenciesKey]: dependencies } : undefined,
+            dependencies,
         );
         debug('generate SourceMap: %o', sourceMapFilename);
     }
