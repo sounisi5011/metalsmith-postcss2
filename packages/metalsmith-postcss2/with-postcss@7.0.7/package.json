@@ -1,0 +1,9 @@
+{
+  "name": "metalsmith-postcss2-with-postcss-7.0.7",
+  "private": true,
+  "main": "dist/index",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "postcss": "7.0.7"
+  }
+}

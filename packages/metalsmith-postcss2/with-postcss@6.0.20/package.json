@@ -1,0 +1,9 @@
+{
+  "name": "metalsmith-postcss2-with-postcss-6.0.20",
+  "private": true,
+  "main": "dist/index",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "postcss": "6.0.20"
+  }
+}
