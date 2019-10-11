@@ -5,7 +5,8 @@ import path from 'path';
 import { isObject } from './';
 import { isReadonlyOrWritableArray } from './types';
 
-export type MetalsmithStrictFiles = Record<string, unknown>;
+export type MetalsmithStrictWritableFiles = Record<string, unknown>;
+export type MetalsmithStrictFiles = Readonly<MetalsmithStrictWritableFiles>;
 
 type MetalsmithFileData = Metalsmith.Files[keyof Metalsmith.Files];
 export interface FileInterface extends MetalsmithFileData {
@@ -52,12 +53,14 @@ export function getMatchedFilenameList(
 }
 
 export function addFile(
-    files: MetalsmithStrictFiles,
+    files: MetalsmithStrictWritableFiles,
     filename: string,
     contents: string,
     originalData?: FileInterface,
+    otherData?: Record<string, unknown>,
 ): FileInterface {
     const newFile = {
+        ...otherData,
         mode: '0644',
         ...originalData,
         contents: Buffer.from(contents, 'utf8'),
@@ -70,9 +73,26 @@ export function findFile(
     files: MetalsmithStrictFiles,
     searchFilename: string,
     metalsmith?: Metalsmith,
-): [string, FileInterface] | [null, null] {
+): [string, unknown] | [null, null];
+export function findFile<T>(
+    files: MetalsmithStrictFiles,
+    searchFilename: string,
+    metalsmith: Metalsmith | undefined,
+    filter: (value: unknown) => value is T,
+): [string, T] | [null, null];
+export function findFile<T = unknown>(
+    files: MetalsmithStrictFiles,
+    searchFilename: string,
+    metalsmith?: Metalsmith,
+    filter?: (value: unknown) => value is T,
+): [string, T] | [null, null] {
+    if (!filter) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+        filter = (_value: unknown): _value is any => true;
+    }
+
     const filedata = files[searchFilename];
-    if (isFile(filedata)) {
+    if (filter(filedata)) {
         return [searchFilename, filedata];
     }
 
@@ -88,7 +108,7 @@ export function findFile(
         const normalizeFilename = pathNormalizer(searchFilename);
         for (const [filename, filedata] of fileList) {
             if (
-                isFile(filedata) &&
+                filter(filedata) &&
                 normalizeFilename === pathNormalizer(filename)
             ) {
                 return [filename, filedata];
@@ -101,7 +121,7 @@ export function findFile(
 
 export function createPlugin(
     callback: (
-        files: MetalsmithStrictFiles,
+        files: MetalsmithStrictWritableFiles,
         metalsmith: Metalsmith,
     ) => Promise<void>,
 ): Metalsmith.Plugin {

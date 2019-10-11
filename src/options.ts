@@ -4,7 +4,7 @@ import path from 'path';
 
 import { loadPlugins } from './plugins';
 import { hasProp } from './utils';
-import { MetalsmithStrictFiles } from './utils/metalsmith';
+import { MetalsmithStrictWritableFiles } from './utils/metalsmith';
 import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
 import {
     ArrayLikeOnly,
@@ -16,7 +16,7 @@ import {
 type OptionsGenerator<T> =
     | T
     | ((
-          files: MetalsmithStrictFiles,
+          files: MetalsmithStrictWritableFiles,
           metalsmith: Metalsmith,
           defaultOptions: OptionsInterface,
       ) => T | Promise<T>);
@@ -26,6 +26,7 @@ export interface OptionsInterface {
     readonly plugins: ReadonlyArray<AcceptedPlugin>;
     readonly options: Omit<ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
+    readonly dependenciesKey: string | false | null;
 }
 
 type PluginsRecord = Readonly<Record<string, unknown>>;
@@ -55,6 +56,7 @@ export const defaultOptions: OptionsInterface = deepFreeze({
             path.basename(filename, path.extname(filename)) + '.css';
         return path.join(path.dirname(filename), newFilename);
     },
+    dependenciesKey: false,
 });
 
 export function validatePostcssOptions(
@@ -80,7 +82,7 @@ export function validatePostcssOptions(
 }
 
 export async function normalizeOptions(
-    files: MetalsmithStrictFiles,
+    files: MetalsmithStrictWritableFiles,
     metalsmith: Metalsmith,
     opts: InputOptions,
 ): Promise<OptionsInterface> {

@@ -45,7 +45,7 @@ export function findSourceMapFile(
             const sourceMapPath = (path.isAbsolute(cssFilepath)
                 ? path.resolve
                 : path.join)(path.dirname(cssFilepath), sourceMappingURL);
-            return findFile(files, sourceMapPath, metalsmith);
+            return findFile(files, sourceMapPath, metalsmith, isFile);
         }
     }
 

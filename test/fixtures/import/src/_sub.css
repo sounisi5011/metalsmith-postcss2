@@ -1,0 +1,5 @@
+@import 'dir/_child.css';
+
+.bold {
+  font-weight: bold;
+}

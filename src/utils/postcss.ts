@@ -7,6 +7,7 @@ import { isObject } from '.';
 
 export type AcceptedPlugin = postcss.AcceptedPlugin;
 export type ProcessOptions = postcss.ProcessOptions;
+export type Result = postcss.Result;
 
 /**
  * When JSON or YAML postcssrc config file is specified, the contents of postcssrc are overwritten with the ctx argument.

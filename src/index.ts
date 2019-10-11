@@ -14,11 +14,18 @@ import {
     addFile,
     createPlugin,
     FileInterface,
+    findFile,
     getMatchedFilenameList,
     getValidFiles,
     MetalsmithStrictFiles,
+    MetalsmithStrictWritableFiles,
 } from './utils/metalsmith';
-import { loadConfig, processCSS, ProcessOptions } from './utils/postcss';
+import {
+    loadConfig,
+    processCSS,
+    ProcessOptions,
+    Result,
+} from './utils/postcss';
 import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
@@ -120,14 +127,52 @@ function fixPostcssAnnotationOption(
     };
 }
 
+function getDependenciesRecord(
+    result: Result,
+    {
+        metalsmithSrcFullpath,
+        files,
+        metalsmith,
+    }: {
+        metalsmithSrcFullpath: string;
+        files: MetalsmithStrictFiles;
+        metalsmith?: Metalsmith;
+    },
+): Record<string, unknown> {
+    const dependencies: Record<string, unknown> = {};
+
+    /**
+     * @see https://github.com/postcss/postcss-loader/blob/v3.0.0/src/index.js#L149-L153
+     */
+    for (const message of result.messages) {
+        if (message.type === 'dependency') {
+            const dependencyFilename = path.relative(
+                metalsmithSrcFullpath,
+                message.file,
+            );
+            const [foundFilename, foundFiledata] = findFile(
+                files,
+                dependencyFilename,
+                metalsmith,
+            );
+            dependencies[dependencyFilename] =
+                foundFilename !== null ? foundFiledata : undefined;
+        }
+    }
+
+    return dependencies;
+}
+
 async function processFile({
     files,
+    writableFiles,
     metalsmith,
     options,
     filename,
     filedata,
 }: {
     files: MetalsmithStrictFiles;
+    writableFiles: MetalsmithStrictWritableFiles;
     metalsmith: Metalsmith;
     options: OptionsInterface;
     filename: string;
@@ -188,11 +233,26 @@ async function processFile({
     );
     if (!result) return;
 
+    const dependencies: Record<string, Record<string, unknown>> | undefined =
+        typeof options.dependenciesKey === 'string' &&
+        options.dependenciesKey !== ''
+            ? {
+                  [options.dependenciesKey]: {
+                      [filename]: filedata,
+                      ...getDependenciesRecord(result, {
+                          metalsmithSrcFullpath,
+                          files,
+                          metalsmith,
+                      }),
+                  },
+              }
+            : undefined;
+
     const cssText = result.css;
-    addFile(files, newFilename, cssText, filedata);
+    addFile(writableFiles, newFilename, cssText, filedata, dependencies);
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
-        delete files[filename];
+        delete writableFiles[filename];
         debug('file deleted: %o', filename);
     } else {
         debug('done process %o', filename);
@@ -203,7 +263,13 @@ async function processFile({
         const sourceMapFilename = sourceMappingURL
             ? path.join(path.dirname(newFilename), sourceMappingURL)
             : newFilename + '.map';
-        addFile(files, sourceMapFilename, result.map.toString());
+        addFile(
+            writableFiles,
+            sourceMapFilename,
+            result.map.toString(),
+            undefined,
+            dependencies,
+        );
         debug('generate SourceMap: %o', sourceMapFilename);
     }
 }
@@ -226,7 +292,14 @@ export = (opts: InputOptions = {}): Metalsmith.Plugin => {
 
         await Promise.all(
             Object.entries(targetFiles).map(async ([filename, filedata]) =>
-                processFile({ files, metalsmith, options, filename, filedata }),
+                processFile({
+                    files: { ...files },
+                    writableFiles: files,
+                    metalsmith,
+                    options,
+                    filename,
+                    filedata,
+                }),
             ),
         );
     });

@@ -88,6 +88,89 @@ test('should generate multi-level SourceMap file', async t => {
     );
 });
 
+test('should generate multi-level SourceMap file with multi source files', async t => {
+    const metalsmith = Metalsmith(fixtures('sass'))
+        .source('src')
+        .use(
+            sass({
+                sourceMap: true,
+                sourceMapContents: true,
+            }),
+        )
+        .use(
+            debuggerPlugin(files => {
+                t.is(
+                    getSourceMappingURLType(files['import/main.css'].contents),
+                    'file',
+                    'should exists SourceMap file comment by metalsmith-sass',
+                );
+                t.truthy(
+                    files['import/main.css.map'],
+                    'should generate SourceMap file by metalsmith-sass',
+                );
+            }),
+        )
+        .use(
+            postcss({
+                plugins: [doubler],
+                options: {
+                    map: { inline: false },
+                },
+            }),
+        );
+    const files = await processAsync(metalsmith);
+
+    t.truthy(files['import/main.css.map'], 'should generate SourceMap file');
+    t.is(
+        getSourceMappingURLType(files['import/main.css'].contents),
+        'file',
+        'should not exists inline SourceMap',
+    );
+
+    let sourceMap: unknown = null;
+    t.notThrows(() => {
+        sourceMap = JSON.parse(
+            files['import/main.css.map'].contents.toString(),
+        );
+    }, 'should parse SourceMap file');
+    if (!isValidSourceMap(sourceMap)) {
+        t.fail('should valid SourceMap file');
+        return;
+    }
+
+    switchTest(
+        sourceMap.sources.includes('../../src/import/main.sass'),
+        'should include main SASS filename in sources property',
+        msg => {
+            t.pass(msg);
+        },
+        msg => {
+            t.fail(msg);
+            t.log(sourceMap);
+        },
+    )(
+        sourceMap.sources.includes('../../src/import/_sub.sass'),
+        'should include sub SASS filename in sources property',
+        msg => {
+            t.pass(msg);
+        },
+        msg => {
+            t.fail(msg);
+            t.log(sourceMap);
+        },
+    )(
+        sourceMap.file === 'main.css',
+        '"file" property should indicate the original file location',
+        msg => {
+            t.pass(msg);
+        },
+        msg => {
+            t.fail(msg);
+            t.log(sourceMap);
+        },
+    );
+});
+
 test('should not generate multi-level SourceMap file: Manually override the map.prev option', async t => {
     const metalsmith = Metalsmith(fixtures('sass'))
         .source('src')
