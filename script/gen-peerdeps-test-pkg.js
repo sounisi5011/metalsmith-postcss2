@@ -5,10 +5,12 @@ const util = require('util');
 const cpy = require('cpy');
 const spawn = require('cross-spawn');
 const del = require('del');
+const importFrom = require('import-from');
 const getPackagesVersions = require('packages-versions');
 const semver = require('semver');
 
 const cwdRelativePath = path.relative.bind(path, process.cwd());
+const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
 function isStringList(value) {
@@ -60,11 +62,39 @@ async function writeMultilinesFileAsync(filepath, lines, indent = 2) {
   if (typeof indent === 'number') {
     indent = ' '.repeat(indent);
   }
-  return writeFileAsync(filepath, lines2str(lines, indent));
+  const data = lines2str(lines, indent);
+
+  try {
+    const origData = await readFileAsync(filepath, 'utf8');
+    if (origData === data) {
+      return false;
+    }
+  } catch (err) {}
+
+  await writeFileAsync(filepath, data);
+  return true;
 }
 
-async function writeJSONFileAsync(filepath, data) {
-  return writeFileAsync(filepath, JSON.stringify(data, null, 2) + '\n');
+async function writeJSONFileAsync(filepath, value) {
+  const data = JSON.stringify(value, null, 2) + '\n';
+
+  try {
+    const origData = await readFileAsync(filepath, 'utf8');
+    if (origData === data) {
+      return false;
+    }
+  } catch (err) {}
+
+  await writeFileAsync(filepath, data);
+  return true;
+}
+
+function getInstalledPackageVersion(moduleId, fromDirectory = process.cwd()) {
+  const pkg = importFrom.silent(fromDirectory, `${moduleId}/package.json`);
+  if (pkg && pkg.version) {
+    return pkg.version;
+  }
+  return null;
 }
 
 function spawnAsync(...args) {
@@ -142,6 +172,7 @@ async function main(args) {
 
   const pkgFullpath = path.resolve(process.cwd(), 'package.json');
   const PKG = require(pkgFullpath);
+  const devDependencies = PKG.devDependencies || {};
   const peerDependencies = PKG.peerDependencies || {};
   const copyFiles = PKG.files;
   if (!isStringList(copyFiles)) {
@@ -167,10 +198,11 @@ async function main(args) {
   const installedPkgVersionMap = options.has('exclude-installed-peerdeps')
     ? (new Map(
         [...targetPkgSet].map(pkgName => {
-          if (Object.keys(PKG.devDependencies || {}).includes(pkgName)) {
-            try {
-              return [pkgName, require(`${pkgName}/package.json`).version];
-            } catch (err) {}
+          if (Object.keys(devDependencies || {}).includes(pkgName)) {
+            const version = getInstalledPackageVersion(pkgName);
+            if (version) {
+              return [pkgName, version];
+            }
           }
           return [pkgName, null];
         }, {}),
@@ -226,7 +258,7 @@ async function main(args) {
     );
   }
 
-  /** @type {Map<string, {installPath:string, pkgs: ({name:string, version:string})[]}>} */
+  /** @type {Map<string, {installPath:string, pkgs:({name:string, version:string})[], isInstalled:boolean, isDefinedDevDeps:boolean}>} */
   const localPkgMap = new Map();
   /** @type {Set<string>} */
   const ignoreFullpathSet = new Set();
@@ -290,12 +322,18 @@ async function main(args) {
     );
 
     const newPKGFullpath = path.join(localPkgFullpath, 'package.json');
-    await writeJSONFileAsync(newPKGFullpath, newPKGData);
-    console.error(`created ${cwdRelativePath(newPKGFullpath)}`);
+    if (await writeJSONFileAsync(newPKGFullpath, newPKGData)) {
+      console.error(`created ${cwdRelativePath(newPKGFullpath)}`);
+    }
 
     localPkgMap.set(localPkgName, {
       installPath: localPkgFullpath,
       pkgs: pkgsCombination,
+      isInstalled: pkgsCombination.every(
+        ({ name, version }) =>
+          getInstalledPackageVersion(name, localPkgFullpath) === version,
+      ),
+      isDefinedDevDeps: Boolean(devDependencies[localPkgName]),
     });
   }
 
@@ -303,87 +341,101 @@ async function main(args) {
    * Create all-pkgs.js
    */
   const allPkgsJSFullpath = path.join(installDirFullpath, 'all-pkgs.js');
-  await writeMultilinesFileAsync(allPkgsJSFullpath, [
-    'module.exports = {',
-    ...[...localPkgMap].map(([localPkgName, { pkgs }]) => [
-      `${toJSCode(localPkgName)}: {`,
-      [
-        `peerDeps: ${toJSCode(
-          pkgs.reduce(
-            (deps, { name, version }) => ({ ...deps, [name]: version }),
-            {},
-          ),
-          2,
-        )},`,
-        `module: require(${toJSCode(localPkgName)}),`,
-      ],
-      `},`,
-    ]),
-    '};',
-  ]);
-  console.error(`created ${cwdRelativePath(allPkgsJSFullpath)}`);
+  if (
+    await writeMultilinesFileAsync(allPkgsJSFullpath, [
+      'module.exports = {',
+      ...[...localPkgMap].map(([localPkgName, { pkgs }]) => [
+        `${toJSCode(localPkgName)}: {`,
+        [
+          `peerDeps: ${toJSCode(
+            pkgs.reduce(
+              (deps, { name, version }) => ({ ...deps, [name]: version }),
+              {},
+            ),
+            2,
+          )},`,
+          `module: require(${toJSCode(localPkgName)}),`,
+        ],
+        `},`,
+      ]),
+      '};',
+    ])
+  ) {
+    console.error(`created ${cwdRelativePath(allPkgsJSFullpath)}`);
+  }
 
   /*
    * Create all-pkgs.ts
    */
   const allPkgsTSFullpath = path.join(installDirFullpath, 'all-pkgs.ts');
-  await writeMultilinesFileAsync(
-    allPkgsTSFullpath,
-    [
-      ...[...localPkgMap.keys()].map(
-        (localPkgName, index) =>
-          `import pkg${index} from ${toJSCode(localPkgName)};`,
-      ),
-      '',
-      'export = {',
-      ...[...localPkgMap].map(([localPkgName, { pkgs }], index) => [
-        `${toJSCode(localPkgName)}: {`,
-        [
-          `peerDeps: {`,
-          pkgs.map(
-            ({ name, version }) =>
-              `${toJSCode(name)}: ${toJSCode(version)} as ${toJSCode(
-                version,
-              )},`,
-          ),
+  if (
+    await writeMultilinesFileAsync(
+      allPkgsTSFullpath,
+      [
+        ...[...localPkgMap.keys()].map(
+          (localPkgName, index) =>
+            `import pkg${index} from ${toJSCode(localPkgName)};`,
+        ),
+        '',
+        'export = {',
+        ...[...localPkgMap].map(([localPkgName, { pkgs }], index) => [
+          `${toJSCode(localPkgName)}: {`,
+          [
+            `peerDeps: {`,
+            pkgs.map(
+              ({ name, version }) =>
+                `${toJSCode(name)}: ${toJSCode(version)} as ${toJSCode(
+                  version,
+                )},`,
+            ),
+            `},`,
+            `module: pkg${index},`,
+          ],
           `},`,
-          `module: pkg${index},`,
-        ],
-        `},`,
-      ]),
-      '};',
-    ],
-    4,
-  );
-  console.error(`created ${cwdRelativePath(allPkgsTSFullpath)}`);
+        ]),
+        '};',
+      ],
+      4,
+    )
+  ) {
+    console.error(`created ${cwdRelativePath(allPkgsTSFullpath)}`);
+  }
 
   /*
    * Create .gitignore
    */
   const gitignoreFullpath = path.join(installDirFullpath, '.gitignore');
-  await writeMultilinesFileAsync(
-    gitignoreFullpath,
-    [...ignoreFullpathSet]
-      .map(ignoreFullpath => path.relative(installDirFullpath, ignoreFullpath))
-      .map(toUnixPath)
-      .map(ignorePath =>
-        copyFiles.map(copyFile => `/${ignorePath}/${copyFile}`),
-      )
-      .reduce((list, value) => list.concat(value), []),
-  );
-  console.error(`created ${cwdRelativePath(gitignoreFullpath)}`);
+  if (
+    await writeMultilinesFileAsync(
+      gitignoreFullpath,
+      [...ignoreFullpathSet]
+        .map(ignoreFullpath =>
+          path.relative(installDirFullpath, ignoreFullpath),
+        )
+        .map(toUnixPath)
+        .map(ignorePath =>
+          copyFiles.map(copyFile => `/${ignorePath}/${copyFile}`),
+        )
+        .reduce((list, value) => list.concat(value), []),
+    )
+  ) {
+    console.error(`created ${cwdRelativePath(gitignoreFullpath)}`);
+  }
 
   /*
    * Update package.json and package-lock.json
    */
-  const npmArgs = [
-    'install',
-    '--save-dev',
-    ...[...localPkgMap.values()].map(({ installPath }) => installPath),
-  ];
-  console.error(`$ npm ${npmArgs.join(' ')}`);
-  await spawnAsync('npm', npmArgs, { stdio: 'inherit' });
-  console.error(`updated ${cwdRelativePath(pkgFullpath)}`);
+  const installPathList = [...localPkgMap.values()]
+    .filter(
+      ({ isInstalled, isDefinedDevDeps }) => !isInstalled || !isDefinedDevDeps,
+    )
+    .map(({ installPath }) => installPath);
+  if (0 < installPathList.length) {
+    const npmArgs = ['install', '--save-dev', ...installPathList];
+    console.error(`$ npm ${npmArgs.join(' ')}`);
+    await spawnAsync('npm', npmArgs, { stdio: 'inherit' });
+    console.error(`updated ${cwdRelativePath(pkgFullpath)}`);
+  }
 }
 
 (async () => {
