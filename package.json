@@ -144,7 +144,6 @@
     "metalsmith-postcss2-with-postcss-5.0.4": "file:packages/metalsmith-postcss2/with-postcss@5.0.4",
     "metalsmith-postcss2-with-postcss-5.0.5": "file:packages/metalsmith-postcss2/with-postcss@5.0.5",
     "metalsmith-postcss2-with-postcss-5.0.6": "file:packages/metalsmith-postcss2/with-postcss@5.0.6",
-    "metalsmith-postcss2-with-postcss-5.0.7": "file:packages/metalsmith-postcss2/with-postcss@5.0.7",
     "metalsmith-postcss2-with-postcss-5.0.8": "file:packages/metalsmith-postcss2/with-postcss@5.0.8",
     "metalsmith-postcss2-with-postcss-5.0.9": "file:packages/metalsmith-postcss2/with-postcss@5.0.9",
     "metalsmith-postcss2-with-postcss-5.1.0": "file:packages/metalsmith-postcss2/with-postcss@5.1.0",
@@ -228,7 +227,7 @@
   },
   "peerDependencies": {
     "metalsmith": ">=2.3.0",
-    "postcss": "5.x || 6.x || 7.x - 7.0.18"
+    "postcss": "5.x <5.0.7 || >5.0.7 5.x || 6.x || 7.x - 7.0.18"
   },
   "engines": {
     "node": ">=8.3.0"

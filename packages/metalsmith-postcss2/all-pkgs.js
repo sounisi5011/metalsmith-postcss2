@@ -473,12 +473,6 @@ module.exports = {
     },
     module: require('metalsmith-postcss2-with-postcss-5.0.8'),
   },
-  'metalsmith-postcss2-with-postcss-5.0.7': {
-    peerDeps: {
-      postcss: '5.0.7',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.0.7'),
-  },
   'metalsmith-postcss2-with-postcss-5.0.6': {
     peerDeps: {
       postcss: '5.0.6',

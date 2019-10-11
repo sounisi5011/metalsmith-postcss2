@@ -77,14 +77,13 @@ import pkg75 from "metalsmith-postcss2-with-postcss-5.0.11";
 import pkg76 from "metalsmith-postcss2-with-postcss-5.0.10";
 import pkg77 from "metalsmith-postcss2-with-postcss-5.0.9";
 import pkg78 from "metalsmith-postcss2-with-postcss-5.0.8";
-import pkg79 from "metalsmith-postcss2-with-postcss-5.0.7";
-import pkg80 from "metalsmith-postcss2-with-postcss-5.0.6";
-import pkg81 from "metalsmith-postcss2-with-postcss-5.0.5";
-import pkg82 from "metalsmith-postcss2-with-postcss-5.0.4";
-import pkg83 from "metalsmith-postcss2-with-postcss-5.0.3";
-import pkg84 from "metalsmith-postcss2-with-postcss-5.0.2";
-import pkg85 from "metalsmith-postcss2-with-postcss-5.0.1";
-import pkg86 from "metalsmith-postcss2-with-postcss-5.0.0";
+import pkg79 from "metalsmith-postcss2-with-postcss-5.0.6";
+import pkg80 from "metalsmith-postcss2-with-postcss-5.0.5";
+import pkg81 from "metalsmith-postcss2-with-postcss-5.0.4";
+import pkg82 from "metalsmith-postcss2-with-postcss-5.0.3";
+import pkg83 from "metalsmith-postcss2-with-postcss-5.0.2";
+import pkg84 from "metalsmith-postcss2-with-postcss-5.0.1";
+import pkg85 from "metalsmith-postcss2-with-postcss-5.0.0";
 
 export = {
     "metalsmith-postcss2-with-postcss-7.0.18": {
@@ -561,52 +560,46 @@ export = {
         },
         module: pkg78,
     },
-    "metalsmith-postcss2-with-postcss-5.0.7": {
-        peerDeps: {
-            "postcss": "5.0.7" as "5.0.7",
-        },
-        module: pkg79,
-    },
     "metalsmith-postcss2-with-postcss-5.0.6": {
         peerDeps: {
             "postcss": "5.0.6" as "5.0.6",
         },
-        module: pkg80,
+        module: pkg79,
     },
     "metalsmith-postcss2-with-postcss-5.0.5": {
         peerDeps: {
             "postcss": "5.0.5" as "5.0.5",
         },
-        module: pkg81,
+        module: pkg80,
     },
     "metalsmith-postcss2-with-postcss-5.0.4": {
         peerDeps: {
             "postcss": "5.0.4" as "5.0.4",
         },
-        module: pkg82,
+        module: pkg81,
     },
     "metalsmith-postcss2-with-postcss-5.0.3": {
         peerDeps: {
             "postcss": "5.0.3" as "5.0.3",
         },
-        module: pkg83,
+        module: pkg82,
     },
     "metalsmith-postcss2-with-postcss-5.0.2": {
         peerDeps: {
             "postcss": "5.0.2" as "5.0.2",
         },
-        module: pkg84,
+        module: pkg83,
     },
     "metalsmith-postcss2-with-postcss-5.0.1": {
         peerDeps: {
             "postcss": "5.0.1" as "5.0.1",
         },
-        module: pkg85,
+        module: pkg84,
     },
     "metalsmith-postcss2-with-postcss-5.0.0": {
         peerDeps: {
             "postcss": "5.0.0" as "5.0.0",
         },
-        module: pkg86,
+        module: pkg85,
     },
 };
