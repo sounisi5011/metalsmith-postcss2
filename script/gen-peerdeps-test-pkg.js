@@ -272,7 +272,7 @@ async function main(args) {
     );
 
     const deletedFullpathList = await del(
-      copyFiles.map(copyFile => `${localPkgFullpath}/${copyFiles}`),
+      copyFiles.map(copyFile => `${localPkgFullpath}/${copyFile}`),
     );
     if (0 < deletedFullpathList.length) {
       console.error(
