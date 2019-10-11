@@ -31,6 +31,8 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:peerdeps-test": "run-s clean build build:peerdeps-test:copy",
+    "build:peerdeps-test:copy": "node ./script/copy-multi-dest.js ./dist/ './packages/metalsmith-postcss2/with-postcss@*'",
     "build:readme": "node ./script/readme-generator.js --template ./readme-template.mustache",
     "clean": "del './dist/' './test/fixtures/*/build'",
     "fmt-pkg": "run-s fmt-pkg:prettier fmt-pkg:sort",
