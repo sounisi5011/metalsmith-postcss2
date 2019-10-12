@@ -2,6 +2,7 @@ import createDebug from 'debug';
 import isPathInside from 'is-path-inside';
 import Metalsmith from 'metalsmith';
 import path from 'path';
+import postcss from 'postcss';
 
 import {
     InputOptions,
@@ -20,19 +21,14 @@ import {
     MetalsmithStrictFiles,
     MetalsmithStrictWritableFiles,
 } from './utils/metalsmith';
-import {
-    loadConfig,
-    processCSS,
-    ProcessOptions,
-    Result,
-} from './utils/postcss';
+import { loadConfig, processCSS } from './utils/postcss';
 import { findSourceMapFile, getSourceMappingURL } from './utils/source-map';
 
 const debug = createDebug(require('../package.json').name);
 const debugPostcssrc = debug.extend('postcssrc');
 
 function updatePostcssOption(
-    options: ProcessOptions,
+    options: postcss.ProcessOptions,
     {
         from,
         to,
@@ -46,7 +42,8 @@ function updatePostcssOption(
         filename: string;
         metalsmith: Metalsmith;
     },
-): ProcessOptions & Required<Pick<ProcessOptions, 'from' | 'to'>> {
+): postcss.ProcessOptions &
+    Required<Pick<postcss.ProcessOptions, 'from' | 'to'>> {
     const postcssOptions = {
         ...options,
         from,
@@ -79,7 +76,7 @@ function updatePostcssOption(
 }
 
 function fixPostcssAnnotationOption(
-    options: ProcessOptions,
+    options: postcss.ProcessOptions,
     {
         metalsmithSrcFullpath,
         metalsmithDestFullpath,
@@ -89,7 +86,7 @@ function fixPostcssAnnotationOption(
         metalsmithDestFullpath: string;
         destFileFullpath: string;
     },
-): ProcessOptions {
+): postcss.ProcessOptions {
     const postcssMapOption = options.map;
     if (typeof postcssMapOption !== 'object') {
         return options;
@@ -128,7 +125,7 @@ function fixPostcssAnnotationOption(
 }
 
 function getDependenciesRecord(
-    result: Result,
+    result: postcss.Result,
     {
         metalsmithSrcFullpath,
         files,

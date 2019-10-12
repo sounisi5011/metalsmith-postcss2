@@ -1,14 +1,14 @@
 import test from 'ava';
 import Metalsmith from 'metalsmith';
 import path from 'path';
-import postcss from 'postcss';
 import util from 'util';
 
 import { normalizeOptions } from '../src/options';
+import { AcceptedPlugin } from '../src/utils/postcss';
 import { isArray } from './helpers';
 
 async function execPlugins(
-    plugins: ReadonlyArray<postcss.AcceptedPlugin>,
+    plugins: ReadonlyArray<AcceptedPlugin>,
 ): Promise<unknown[]> {
     const list: unknown[] = [];
 
@@ -42,7 +42,7 @@ async function execPluginRecord(
 
 async function execPluginDefList(
     pluginDefList: ReadonlyArray<
-        string | postcss.AcceptedPlugin | readonly [string, unknown]
+        string | AcceptedPlugin | readonly [string, unknown]
     >,
 ): Promise<unknown[]> {
     const list: unknown[] = [];
