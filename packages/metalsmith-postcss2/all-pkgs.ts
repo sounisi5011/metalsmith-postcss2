@@ -28,43 +28,22 @@ import pkg26 from "metalsmith-postcss2-with-postcss-6.0.16";
 import pkg27 from "metalsmith-postcss2-with-postcss-6.0.15";
 import pkg28 from "metalsmith-postcss2-with-postcss-6.0.14";
 import pkg29 from "metalsmith-postcss2-with-postcss-6.0.13";
-import pkg30 from "metalsmith-postcss2-with-postcss-6.0.12";
-import pkg31 from "metalsmith-postcss2-with-postcss-6.0.11";
-import pkg32 from "metalsmith-postcss2-with-postcss-6.0.10";
-import pkg33 from "metalsmith-postcss2-with-postcss-6.0.9";
-import pkg34 from "metalsmith-postcss2-with-postcss-6.0.8";
-import pkg35 from "metalsmith-postcss2-with-postcss-6.0.7";
-import pkg36 from "metalsmith-postcss2-with-postcss-6.0.6";
-import pkg37 from "metalsmith-postcss2-with-postcss-6.0.5";
-import pkg38 from "metalsmith-postcss2-with-postcss-6.0.4";
-import pkg39 from "metalsmith-postcss2-with-postcss-6.0.3";
-import pkg40 from "metalsmith-postcss2-with-postcss-6.0.2";
-import pkg41 from "metalsmith-postcss2-with-postcss-6.0.1";
-import pkg42 from "metalsmith-postcss2-with-postcss-6.0.0";
-import pkg43 from "metalsmith-postcss2-with-postcss-5.2.18";
-import pkg44 from "metalsmith-postcss2-with-postcss-5.2.17";
-import pkg45 from "metalsmith-postcss2-with-postcss-5.2.16";
-import pkg46 from "metalsmith-postcss2-with-postcss-5.2.15";
-import pkg47 from "metalsmith-postcss2-with-postcss-5.2.14";
-import pkg48 from "metalsmith-postcss2-with-postcss-5.2.13";
-import pkg49 from "metalsmith-postcss2-with-postcss-5.2.12";
-import pkg50 from "metalsmith-postcss2-with-postcss-5.2.11";
-import pkg51 from "metalsmith-postcss2-with-postcss-5.2.10";
-import pkg52 from "metalsmith-postcss2-with-postcss-5.2.9";
-import pkg53 from "metalsmith-postcss2-with-postcss-5.2.8";
-import pkg54 from "metalsmith-postcss2-with-postcss-5.2.7";
-import pkg55 from "metalsmith-postcss2-with-postcss-5.2.6";
-import pkg56 from "metalsmith-postcss2-with-postcss-5.2.5";
-import pkg57 from "metalsmith-postcss2-with-postcss-5.2.4";
-import pkg58 from "metalsmith-postcss2-with-postcss-5.2.3";
-import pkg59 from "metalsmith-postcss2-with-postcss-5.2.2";
-import pkg60 from "metalsmith-postcss2-with-postcss-5.2.1";
-import pkg61 from "metalsmith-postcss2-with-postcss-5.2.0";
-import pkg62 from "metalsmith-postcss2-with-postcss-5.1.2";
-import pkg63 from "metalsmith-postcss2-with-postcss-5.1.1";
-import pkg64 from "metalsmith-postcss2-with-postcss-5.1.0";
-import pkg65 from "metalsmith-postcss2-with-postcss-5.0.21";
-import pkg66 from "metalsmith-postcss2-with-postcss-5.0.20";
+import pkg30 from "metalsmith-postcss2-with-postcss-5.2.18";
+import pkg31 from "metalsmith-postcss2-with-postcss-5.2.10";
+import pkg32 from "metalsmith-postcss2-with-postcss-5.2.8";
+import pkg33 from "metalsmith-postcss2-with-postcss-5.2.7";
+import pkg34 from "metalsmith-postcss2-with-postcss-5.2.6";
+import pkg35 from "metalsmith-postcss2-with-postcss-5.2.5";
+import pkg36 from "metalsmith-postcss2-with-postcss-5.2.4";
+import pkg37 from "metalsmith-postcss2-with-postcss-5.2.3";
+import pkg38 from "metalsmith-postcss2-with-postcss-5.2.2";
+import pkg39 from "metalsmith-postcss2-with-postcss-5.2.1";
+import pkg40 from "metalsmith-postcss2-with-postcss-5.2.0";
+import pkg41 from "metalsmith-postcss2-with-postcss-5.1.2";
+import pkg42 from "metalsmith-postcss2-with-postcss-5.1.1";
+import pkg43 from "metalsmith-postcss2-with-postcss-5.1.0";
+import pkg44 from "metalsmith-postcss2-with-postcss-5.0.21";
+import pkg45 from "metalsmith-postcss2-with-postcss-5.0.20";
 
 export = {
     "metalsmith-postcss2-with-postcss-7.0.18": {
@@ -247,226 +226,100 @@ export = {
         },
         module: pkg29,
     },
-    "metalsmith-postcss2-with-postcss-6.0.12": {
-        peerDeps: {
-            "postcss": "6.0.12" as "6.0.12",
-        },
-        module: pkg30,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.11": {
-        peerDeps: {
-            "postcss": "6.0.11" as "6.0.11",
-        },
-        module: pkg31,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.10": {
-        peerDeps: {
-            "postcss": "6.0.10" as "6.0.10",
-        },
-        module: pkg32,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.9": {
-        peerDeps: {
-            "postcss": "6.0.9" as "6.0.9",
-        },
-        module: pkg33,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.8": {
-        peerDeps: {
-            "postcss": "6.0.8" as "6.0.8",
-        },
-        module: pkg34,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.7": {
-        peerDeps: {
-            "postcss": "6.0.7" as "6.0.7",
-        },
-        module: pkg35,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.6": {
-        peerDeps: {
-            "postcss": "6.0.6" as "6.0.6",
-        },
-        module: pkg36,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.5": {
-        peerDeps: {
-            "postcss": "6.0.5" as "6.0.5",
-        },
-        module: pkg37,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.4": {
-        peerDeps: {
-            "postcss": "6.0.4" as "6.0.4",
-        },
-        module: pkg38,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.3": {
-        peerDeps: {
-            "postcss": "6.0.3" as "6.0.3",
-        },
-        module: pkg39,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.2": {
-        peerDeps: {
-            "postcss": "6.0.2" as "6.0.2",
-        },
-        module: pkg40,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.1": {
-        peerDeps: {
-            "postcss": "6.0.1" as "6.0.1",
-        },
-        module: pkg41,
-    },
-    "metalsmith-postcss2-with-postcss-6.0.0": {
-        peerDeps: {
-            "postcss": "6.0.0" as "6.0.0",
-        },
-        module: pkg42,
-    },
     "metalsmith-postcss2-with-postcss-5.2.18": {
         peerDeps: {
             "postcss": "5.2.18" as "5.2.18",
         },
-        module: pkg43,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.17": {
-        peerDeps: {
-            "postcss": "5.2.17" as "5.2.17",
-        },
-        module: pkg44,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.16": {
-        peerDeps: {
-            "postcss": "5.2.16" as "5.2.16",
-        },
-        module: pkg45,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.15": {
-        peerDeps: {
-            "postcss": "5.2.15" as "5.2.15",
-        },
-        module: pkg46,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.14": {
-        peerDeps: {
-            "postcss": "5.2.14" as "5.2.14",
-        },
-        module: pkg47,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.13": {
-        peerDeps: {
-            "postcss": "5.2.13" as "5.2.13",
-        },
-        module: pkg48,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.12": {
-        peerDeps: {
-            "postcss": "5.2.12" as "5.2.12",
-        },
-        module: pkg49,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.11": {
-        peerDeps: {
-            "postcss": "5.2.11" as "5.2.11",
-        },
-        module: pkg50,
+        module: pkg30,
     },
     "metalsmith-postcss2-with-postcss-5.2.10": {
         peerDeps: {
             "postcss": "5.2.10" as "5.2.10",
         },
-        module: pkg51,
-    },
-    "metalsmith-postcss2-with-postcss-5.2.9": {
-        peerDeps: {
-            "postcss": "5.2.9" as "5.2.9",
-        },
-        module: pkg52,
+        module: pkg31,
     },
     "metalsmith-postcss2-with-postcss-5.2.8": {
         peerDeps: {
             "postcss": "5.2.8" as "5.2.8",
         },
-        module: pkg53,
+        module: pkg32,
     },
     "metalsmith-postcss2-with-postcss-5.2.7": {
         peerDeps: {
             "postcss": "5.2.7" as "5.2.7",
         },
-        module: pkg54,
+        module: pkg33,
     },
     "metalsmith-postcss2-with-postcss-5.2.6": {
         peerDeps: {
             "postcss": "5.2.6" as "5.2.6",
         },
-        module: pkg55,
+        module: pkg34,
     },
     "metalsmith-postcss2-with-postcss-5.2.5": {
         peerDeps: {
             "postcss": "5.2.5" as "5.2.5",
         },
-        module: pkg56,
+        module: pkg35,
     },
     "metalsmith-postcss2-with-postcss-5.2.4": {
         peerDeps: {
             "postcss": "5.2.4" as "5.2.4",
         },
-        module: pkg57,
+        module: pkg36,
     },
     "metalsmith-postcss2-with-postcss-5.2.3": {
         peerDeps: {
             "postcss": "5.2.3" as "5.2.3",
         },
-        module: pkg58,
+        module: pkg37,
     },
     "metalsmith-postcss2-with-postcss-5.2.2": {
         peerDeps: {
             "postcss": "5.2.2" as "5.2.2",
         },
-        module: pkg59,
+        module: pkg38,
     },
     "metalsmith-postcss2-with-postcss-5.2.1": {
         peerDeps: {
             "postcss": "5.2.1" as "5.2.1",
         },
-        module: pkg60,
+        module: pkg39,
     },
     "metalsmith-postcss2-with-postcss-5.2.0": {
         peerDeps: {
             "postcss": "5.2.0" as "5.2.0",
         },
-        module: pkg61,
+        module: pkg40,
     },
     "metalsmith-postcss2-with-postcss-5.1.2": {
         peerDeps: {
             "postcss": "5.1.2" as "5.1.2",
         },
-        module: pkg62,
+        module: pkg41,
     },
     "metalsmith-postcss2-with-postcss-5.1.1": {
         peerDeps: {
             "postcss": "5.1.1" as "5.1.1",
         },
-        module: pkg63,
+        module: pkg42,
     },
     "metalsmith-postcss2-with-postcss-5.1.0": {
         peerDeps: {
             "postcss": "5.1.0" as "5.1.0",
         },
-        module: pkg64,
+        module: pkg43,
     },
     "metalsmith-postcss2-with-postcss-5.0.21": {
         peerDeps: {
             "postcss": "5.0.21" as "5.0.21",
         },
-        module: pkg65,
+        module: pkg44,
     },
     "metalsmith-postcss2-with-postcss-5.0.20": {
         peerDeps: {
             "postcss": "5.0.20" as "5.0.20",
         },
-        module: pkg66,
+        module: pkg45,
     },
 };

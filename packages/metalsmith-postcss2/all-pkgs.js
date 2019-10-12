@@ -179,143 +179,17 @@ module.exports = {
     },
     module: require('metalsmith-postcss2-with-postcss-6.0.13'),
   },
-  'metalsmith-postcss2-with-postcss-6.0.12': {
-    peerDeps: {
-      postcss: '6.0.12',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.12'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.11': {
-    peerDeps: {
-      postcss: '6.0.11',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.11'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.10': {
-    peerDeps: {
-      postcss: '6.0.10',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.10'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.9': {
-    peerDeps: {
-      postcss: '6.0.9',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.9'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.8': {
-    peerDeps: {
-      postcss: '6.0.8',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.8'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.7': {
-    peerDeps: {
-      postcss: '6.0.7',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.7'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.6': {
-    peerDeps: {
-      postcss: '6.0.6',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.6'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.5': {
-    peerDeps: {
-      postcss: '6.0.5',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.5'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.4': {
-    peerDeps: {
-      postcss: '6.0.4',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.4'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.3': {
-    peerDeps: {
-      postcss: '6.0.3',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.3'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.2': {
-    peerDeps: {
-      postcss: '6.0.2',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.2'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.1': {
-    peerDeps: {
-      postcss: '6.0.1',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.1'),
-  },
-  'metalsmith-postcss2-with-postcss-6.0.0': {
-    peerDeps: {
-      postcss: '6.0.0',
-    },
-    module: require('metalsmith-postcss2-with-postcss-6.0.0'),
-  },
   'metalsmith-postcss2-with-postcss-5.2.18': {
     peerDeps: {
       postcss: '5.2.18',
     },
     module: require('metalsmith-postcss2-with-postcss-5.2.18'),
   },
-  'metalsmith-postcss2-with-postcss-5.2.17': {
-    peerDeps: {
-      postcss: '5.2.17',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.17'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.16': {
-    peerDeps: {
-      postcss: '5.2.16',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.16'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.15': {
-    peerDeps: {
-      postcss: '5.2.15',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.15'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.14': {
-    peerDeps: {
-      postcss: '5.2.14',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.14'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.13': {
-    peerDeps: {
-      postcss: '5.2.13',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.13'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.12': {
-    peerDeps: {
-      postcss: '5.2.12',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.12'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.11': {
-    peerDeps: {
-      postcss: '5.2.11',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.11'),
-  },
   'metalsmith-postcss2-with-postcss-5.2.10': {
     peerDeps: {
       postcss: '5.2.10',
     },
     module: require('metalsmith-postcss2-with-postcss-5.2.10'),
-  },
-  'metalsmith-postcss2-with-postcss-5.2.9': {
-    peerDeps: {
-      postcss: '5.2.9',
-    },
-    module: require('metalsmith-postcss2-with-postcss-5.2.9'),
   },
   'metalsmith-postcss2-with-postcss-5.2.8': {
     peerDeps: {
