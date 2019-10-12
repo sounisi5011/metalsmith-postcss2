@@ -125,27 +125,8 @@
     "lint-staged": "9.4.2",
     "lodash.clonedeep": "4.5.0",
     "metalsmith": "2.3.0",
-    "metalsmith-postcss2-with-postcss-5.0.0": "file:packages/metalsmith-postcss2/with-postcss@5.0.0",
-    "metalsmith-postcss2-with-postcss-5.0.1": "file:packages/metalsmith-postcss2/with-postcss@5.0.1",
-    "metalsmith-postcss2-with-postcss-5.0.10": "file:packages/metalsmith-postcss2/with-postcss@5.0.10",
-    "metalsmith-postcss2-with-postcss-5.0.11": "file:packages/metalsmith-postcss2/with-postcss@5.0.11",
-    "metalsmith-postcss2-with-postcss-5.0.12": "file:packages/metalsmith-postcss2/with-postcss@5.0.12",
-    "metalsmith-postcss2-with-postcss-5.0.13": "file:packages/metalsmith-postcss2/with-postcss@5.0.13",
-    "metalsmith-postcss2-with-postcss-5.0.14": "file:packages/metalsmith-postcss2/with-postcss@5.0.14",
-    "metalsmith-postcss2-with-postcss-5.0.15": "file:packages/metalsmith-postcss2/with-postcss@5.0.15",
-    "metalsmith-postcss2-with-postcss-5.0.16": "file:packages/metalsmith-postcss2/with-postcss@5.0.16",
-    "metalsmith-postcss2-with-postcss-5.0.17": "file:packages/metalsmith-postcss2/with-postcss@5.0.17",
-    "metalsmith-postcss2-with-postcss-5.0.18": "file:packages/metalsmith-postcss2/with-postcss@5.0.18",
-    "metalsmith-postcss2-with-postcss-5.0.19": "file:packages/metalsmith-postcss2/with-postcss@5.0.19",
-    "metalsmith-postcss2-with-postcss-5.0.2": "file:packages/metalsmith-postcss2/with-postcss@5.0.2",
     "metalsmith-postcss2-with-postcss-5.0.20": "file:packages/metalsmith-postcss2/with-postcss@5.0.20",
     "metalsmith-postcss2-with-postcss-5.0.21": "file:packages/metalsmith-postcss2/with-postcss@5.0.21",
-    "metalsmith-postcss2-with-postcss-5.0.3": "file:packages/metalsmith-postcss2/with-postcss@5.0.3",
-    "metalsmith-postcss2-with-postcss-5.0.4": "file:packages/metalsmith-postcss2/with-postcss@5.0.4",
-    "metalsmith-postcss2-with-postcss-5.0.5": "file:packages/metalsmith-postcss2/with-postcss@5.0.5",
-    "metalsmith-postcss2-with-postcss-5.0.6": "file:packages/metalsmith-postcss2/with-postcss@5.0.6",
-    "metalsmith-postcss2-with-postcss-5.0.8": "file:packages/metalsmith-postcss2/with-postcss@5.0.8",
-    "metalsmith-postcss2-with-postcss-5.0.9": "file:packages/metalsmith-postcss2/with-postcss@5.0.9",
     "metalsmith-postcss2-with-postcss-5.1.0": "file:packages/metalsmith-postcss2/with-postcss@5.1.0",
     "metalsmith-postcss2-with-postcss-5.1.1": "file:packages/metalsmith-postcss2/with-postcss@5.1.1",
     "metalsmith-postcss2-with-postcss-5.1.2": "file:packages/metalsmith-postcss2/with-postcss@5.1.2",
@@ -227,7 +208,7 @@
   },
   "peerDependencies": {
     "metalsmith": ">=2.3.0",
-    "postcss": "5.x <5.0.7 || >5.0.7 5.x || 6.x || 7.x - 7.0.18"
+    "postcss": "5.x >=5.0.20 || 6.x || 7.x - 7.0.18"
   },
   "engines": {
     "node": ">=8.3.0"
