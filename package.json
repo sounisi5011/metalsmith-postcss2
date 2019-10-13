@@ -32,7 +32,7 @@
   "scripts": {
     "build": "run-s tsc build:replace",
     "build:peerdeps-test": "run-s clean build build:peerdeps-test:generate",
-    "build:peerdeps-test:generate": "node ./script/gen-peerdeps-test-pkg.js --pkg postcss",
+    "build:peerdeps-test:generate": "node ./script/gen-different-deps-test.js --test-dir ./test/ --local-package-name '@sounisi5011/test-packages'",
     "build:readme": "node ./script/readme-generator.js --template ./readme-template.mustache",
     "build:replace": "node ./script/replace-AcceptedPlugin-defs.js",
     "clean": "del './dist/' './test/fixtures/*/build'",
