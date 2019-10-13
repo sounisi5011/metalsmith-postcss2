@@ -2,30 +2,42 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-const cpFile = require('cp-file');
 const spawn = require('cross-spawn');
+const escapeStringRegexp = require('escape-string-regexp');
 const importFrom = require('import-from');
 const makeDir = require('make-dir');
 const getPackagesVersions = require('packages-versions');
-const recursive = require('recursive-readdir');
+const rimraf = require('rimraf');
 const semver = require('semver');
 
 const cwdFullpath = process.cwd();
 
 const cwdRelativePath = path.relative.bind(path, cwdFullpath);
 const statAsync = util.promisify(fs.stat);
+const lstatAsync = util.promisify(fs.lstat);
 const renameAsync = util.promisify(fs.rename);
 const readdirAsync = util.promisify(fs.readdir);
 const readFileAsync = util.promisify(fs.readFile);
 const readlinkAsync = util.promisify(fs.readlink);
 const writeFileAsync = util.promisify(fs.writeFile);
+const linkAsync = util.promisify(fs.link);
 const symlinkAsync = util.promisify(fs.symlink);
+const rimrafAsync = util.promisify(rimraf);
 
 function toUnixPath(pathstr) {
   return path
     .normalize(pathstr)
     .split(path.sep)
     .join('/');
+}
+
+function trimPathSep(pathstr) {
+  const escapedSep = escapeStringRegexp(path.sep);
+  const trimPattern =
+    path.sep === path.win32.sep
+      ? /^[\\/]+|[\\/]+$/g
+      : new RegExp(`^(?:${escapedSep})+|(?:${escapedSep})+$`, 'g');
+  return pathstr.replace(trimPattern, '');
 }
 
 /**
@@ -96,6 +108,32 @@ async function getChildDirFullpathList(parentDirPath) {
 }
 
 /**
+ * An alternative to the recursive-readdir package. Supports symbolic links
+ * @param {string} dirpath
+ * @param {(function(string, {stats:fs.Stats, lstats:fs.Stats}): boolean)[]} ignores
+ * @returns {Promise<string[]>}
+ */
+async function recursiveReaddir(dirpath, ignores = []) {
+  return [].concat(
+    ...(await Promise.all(
+      (await readdirAsync(dirpath)).map(async filename => {
+        const filepath = path.join(dirpath, filename);
+        const stats = await statAsync(filepath);
+        const lstats = await lstatAsync(filepath);
+
+        if (ignores.some(matcher => matcher(filepath, { stats, lstats }))) {
+          return [];
+        }
+
+        return lstats.isDirectory()
+          ? await recursiveReaddir(filepath, ignores)
+          : [filepath];
+      }),
+    )),
+  );
+}
+
+/**
  * @param {string} filepath
  * @param {string[]|string[][]|string[][][]|string[][][][]|string[][][][][]|string[][][][][][]} lines
  * @param {string|number} indent
@@ -145,6 +183,84 @@ async function writeJSONFileAsync(filepath, value) {
   );
 }
 
+async function forceRenameFile(oldPath, newPath, { debugLog = true } = {}) {
+  const rename = async () => {
+    await renameAsync(oldPath, newPath);
+    if (debugLog) {
+      console.error(
+        `mv '${cwdRelativePath(oldPath)}' '${cwdRelativePath(newPath)}'`,
+      );
+    }
+  };
+
+  try {
+    await rename();
+  } catch (error) {
+    if (error.code !== 'EISDIR') {
+      throw error;
+    }
+
+    await rimrafAsync(newPath, { glob: false });
+    if (debugLog) {
+      console.error(`rm -rf '${cwdRelativePath(newPath)}${path.sep}'`);
+    }
+
+    await rename();
+  }
+}
+
+async function createHardlink(existingPath, newPath, { debugLog = true } = {}) {
+  await makeDir(path.dirname(newPath));
+
+  try {
+    await linkAsync(existingPath, newPath);
+    if (debugLog) {
+      console.error(
+        `ln '${cwdRelativePath(existingPath)}' '${cwdRelativePath(newPath)}'`,
+      );
+    }
+  } catch (error) {
+    if (error.code !== 'EEXIST') {
+      throw error;
+    }
+
+    const fromStats = await statAsync(existingPath);
+    const toStats = await statAsync(newPath);
+    if (fromStats.ino === toStats.ino) {
+      return false;
+    }
+
+    /*
+     * Overwrite hardlink
+     */
+    let i = 0;
+    while (true) {
+      try {
+        const tempName = `${newPath}.temp${i++}`;
+
+        await linkAsync(existingPath, tempName);
+        if (debugLog) {
+          console.error(
+            `ln '${cwdRelativePath(existingPath)}' '${cwdRelativePath(
+              tempName,
+            )}'`,
+          );
+        }
+
+        await forceRenameFile(tempName, newPath, { debugLog });
+
+        return;
+      } catch (error) {
+        if (error.code !== 'EEXIST') {
+          throw error;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 async function createSymlink({ symlinkFullpath, linkTarget }) {
   const symlinkDirFullpath = path.dirname(symlinkFullpath);
   const symlinkTargetPath = path.relative(symlinkDirFullpath, linkTarget);
@@ -177,12 +293,7 @@ async function createSymlink({ symlinkFullpath, linkTarget }) {
           `ln -s '${symlinkTargetPath}' '${cwdRelativePath(tempName)}'`,
         );
 
-        await renameAsync(tempName, symlinkFullpath);
-        console.error(
-          `mv '${cwdRelativePath(tempName)}' '${cwdRelativePath(
-            symlinkFullpath,
-          )}'`,
-        );
+        await forceRenameFile(tempName, symlinkFullpath);
 
         return;
       } catch (error) {
@@ -192,6 +303,107 @@ async function createSymlink({ symlinkFullpath, linkTarget }) {
       }
     }
   }
+}
+
+/**
+ * @param {string|{root:string, files:string[]}} sourceDirFullpath
+ * @param {string} destDirFullpath
+ * @param {{ignoreFileList:string[]}} options
+ */
+async function syncTwoDir(
+  sourceDirFullpath,
+  destDirFullpath,
+  { ignoreFileList = [] } = {},
+) {
+  /** @type {string[]} */
+  const createdFileList = [];
+  /** @type {string[]} */
+  const removedFileList = [];
+
+  /**
+   * @param {string} dirFullpath
+   * @returns {(function(string, {stats:fs.Stats, lstats:fs.Stats}): boolean)[]}
+   */
+  const ignoresGen = dirFullpath => {
+    return ignoreFileList.map(ignoreFile => {
+      ignoreFile = path.normalize(ignoreFile);
+      const isRootOnlyIgnore = ignoreFile.startsWith(path.sep);
+      const isDirOnlyIgnore = ignoreFile.endsWith(path.sep);
+      ignoreFile = trimPathSep(ignoreFile);
+      const matchPattern = new RegExp(
+        `(?:^|${escapeStringRegexp(path.sep)})${escapeStringRegexp(
+          ignoreFile,
+        )}(?:${escapeStringRegexp(path.sep)}|$)`,
+      );
+
+      return (filepath, { stats }) => {
+        if (isDirOnlyIgnore && !stats.isDirectory()) {
+          return false;
+        }
+        return isRootOnlyIgnore
+          ? filepath === path.join(dirFullpath, ignoreFile)
+          : matchPattern.test(path.relative(dirFullpath, filepath));
+      };
+    });
+  };
+
+  const sourceFileFullpathSet = new Set();
+  if (typeof sourceDirFullpath === 'string') {
+    sourceDirFullpath = path.resolve(sourceDirFullpath);
+    const sourceFileFullpathList = await recursiveReaddir(
+      sourceDirFullpath,
+      ignoresGen(sourceDirFullpath),
+    );
+    for (const sourceFileFullpath of sourceFileFullpathList) {
+      sourceFileFullpathSet.add(sourceFileFullpath);
+    }
+  } else {
+    const sourceDirRootFullpath = path.resolve(sourceDirFullpath.root);
+    for (const sourceFileFullpath of sourceDirFullpath.files) {
+      sourceFileFullpathSet.add(
+        path.resolve(sourceDirRootFullpath, sourceFileFullpath),
+      );
+    }
+    sourceDirFullpath = sourceDirRootFullpath;
+  }
+
+  destDirFullpath = path.resolve(destDirFullpath);
+  /** @type {Set<string>} */
+  const removeDestFileFullpathSet = new Set();
+  try {
+    const destFileFullpathList = await recursiveReaddir(
+      destDirFullpath,
+      ignoresGen(destDirFullpath),
+    );
+    for (const destFileFullpath of destFileFullpathList) {
+      removeDestFileFullpathSet.add(destFileFullpath);
+    }
+  } catch (err) {}
+
+  for (const sourceFileFullpath of sourceFileFullpathSet) {
+    const destFileFullpath = path.join(
+      destDirFullpath,
+      path.relative(sourceDirFullpath, sourceFileFullpath),
+    );
+    if (
+      await createHardlink(sourceFileFullpath, destFileFullpath, {
+        debugLog: false,
+      })
+    ) {
+      createdFileList.push(destFileFullpath);
+    }
+    removeDestFileFullpathSet.delete(destFileFullpath);
+  }
+
+  for (const removeDestFileFullpath of removeDestFileFullpathSet) {
+    await rimrafAsync(removeDestFileFullpath, { glob: false });
+    removedFileList.push(removeDestFileFullpath);
+  }
+
+  return {
+    create: createdFileList,
+    remove: removedFileList,
+  };
 }
 
 /**
@@ -266,6 +478,10 @@ function spawnAsync(...args) {
 
 // ----- ----- ----- ----- ----- //
 
+/**
+ * @see https://gist.github.com/jhorsman/62eeea161a13b80e39f5249281e17c39
+ */
+const semverPattern = /[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+)?/;
 const pkgNamePattern = /(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*/g;
 const pkgNameWithVersionPattern = new RegExp(
   String.raw`(${pkgNamePattern.source})@(?:latest|\*)`,
@@ -295,6 +511,19 @@ function getDefinedPkgNames(dirpath) {
     pkgNameList.push(match[1]);
   }
 
+  let randStr = '';
+  do {
+    randStr = Math.random()
+      .toString(36)
+      .substring(2);
+  } while (dirname.includes(randStr));
+  const testDirMatchPattern = escapeStringRegexp(
+    dirname.replace(
+      pkgNameWithVersionPattern,
+      (_, pkgName) => `${pkgName}@${randStr}`,
+    ),
+  ).replace(new RegExp(randStr, 'g'), semverPattern.source);
+
   const parentDirpath = path.dirname(dirpath);
   return {
     dirpath,
@@ -313,6 +542,9 @@ function getDefinedPkgNames(dirpath) {
         }),
       );
     },
+    testDirMatchRegExp: new RegExp(
+      String.raw`(^|[\\/])${testDirMatchPattern}$`,
+    ),
   };
 }
 
@@ -421,9 +653,10 @@ async function main(args) {
    * Install npm packages
    */
 
+  const packagesDirFullpath = path.resolve(testDirFullpath, '.packages');
+  /** @type {Map<string, string>} */
   const localPkgDirFullpathMap = new Map();
   {
-    const packagesDirFullpath = path.resolve(testDirFullpath, '.packages');
     const allPackagesSet = new Set(
       targetDirPkgsDataList
         .reduce(
@@ -484,11 +717,37 @@ async function main(args) {
       dependencies: packagesRecord,
     });
 
-    if (!isAllInstalled || !devDependencies[allPackagesName]) {
+    const createdDirFullpathSet = new Set(localPkgDirFullpathMap.values());
+    const allDirFullpathList = await getChildDirFullpathList(
+      packagesDirFullpath,
+    );
+    const unusedDirFullpathList = allDirFullpathList.filter(
+      dirFullpath => !createdDirFullpathSet.has(dirFullpath),
+    );
+
+    if (
+      !isAllInstalled ||
+      0 < unusedDirFullpathList.length ||
+      !devDependencies[allPackagesName]
+    ) {
       const npmArgs = ['install', '--save-dev', packagesDirFullpath];
       console.error(`$ npm ${npmArgs.join(' ')}`);
       await spawnAsync('npm', npmArgs, { stdio: 'inherit' });
     }
+
+    /*
+     * Remove unused directories
+     *
+     * Note: This operation must be done after executing the "npm install" command.
+     *       Because the execution of npm command fails.
+     */
+    await Promise.all(
+      unusedDirFullpathList.map(async unusedDirFullpath => {
+        await rimrafAsync(unusedDirFullpath, { glob: false });
+        console.error(`remove '${cwdRelativePath(unusedDirFullpath)}'`);
+        isUnusedDetect = true;
+      }),
+    );
   }
 
   /*
@@ -499,6 +758,7 @@ async function main(args) {
     dirpath: testOrigDirFullpath,
     pkgNameList,
     testDirPathGenerator,
+    testDirMatchRegExp,
   } of targetDirPkgsDataList) {
     const nodeModulesDirFullpath = path.resolve(
       testOrigDirFullpath,
@@ -527,6 +787,10 @@ async function main(args) {
       ],
     );
 
+    const createdDirFullpathSet = new Set([
+      packagesDirFullpath,
+      testOrigDirFullpath,
+    ]);
     for (const pkgsCombination of await getPkgsCombinationList(pkgNameList)) {
       const testSubdirFullpath = testDirPathGenerator(pkgsCombination);
       const nodeModulesDirFullpath = path.resolve(
@@ -554,18 +818,21 @@ async function main(args) {
       }
 
       /*
-       * Copy npm project files
+       * Sync npm project files
        */
-      for (const projectFileFullpath of await getPackFileList()) {
-        const destProjectFileFullpath = path.join(
+      {
+        const { create, remove } = await syncTwoDir(
+          { root: cwdFullpath, files: await getPackFileList(cwdFullpath) },
           copyDestFullpath,
-          path.relative(cwdFullpath, projectFileFullpath),
         );
-        await cpFile(projectFileFullpath, destProjectFileFullpath);
+        if (0 < create.length || 0 < remove.length) {
+          console.error(
+            `sync npm project files into '${cwdRelativePath(
+              copyDestFullpath,
+            )}'`,
+          );
+        }
       }
-      console.error(
-        `copy npm project files into '${cwdRelativePath(copyDestFullpath)}'`,
-      );
 
       /*
        * Create .gitignore file
@@ -589,29 +856,42 @@ async function main(args) {
       );
 
       /*
-       * Copy test files
+       * Sync test files
        */
-      const testFileFullpathList = await recursive(testOrigDirFullpath, [
-        (filepath, stats) => {
-          return (
-            (filepath === path.join(testOrigDirFullpath, '.gitignore') &&
-              stats.isFile()) ||
-            (filepath === path.join(testOrigDirFullpath, 'node_modules') &&
-              stats.isDirectory())
-          );
-        },
-      ]);
-      for (const testFileFullpath of testFileFullpathList) {
-        const destTestFileFullpath = path.join(
-          testSubdirFullpath,
-          path.relative(testOrigDirFullpath, testFileFullpath),
-        );
-        await cpFile(testFileFullpath, destTestFileFullpath);
-      }
-      console.error(
-        `copy test files from '${cwdRelativePath(
+      {
+        const { create, remove } = await syncTwoDir(
           testOrigDirFullpath,
-        )}' to '${cwdRelativePath(testSubdirFullpath)}'`,
+          testSubdirFullpath,
+          { ignoreFileList: ['/.gitignore', '/node_modules/'] },
+        );
+        if (0 < create.length || 0 < remove.length) {
+          console.error(
+            `sync test files from '${cwdRelativePath(
+              path.join(testOrigDirFullpath, '*'),
+            )}' to '${cwdRelativePath(path.join(testSubdirFullpath, '*'))}'`,
+          );
+        }
+      }
+
+      createdDirFullpathSet.add(testSubdirFullpath);
+    }
+
+    /*
+     * Remove unused directories
+     */
+    {
+      const allDirFullpathList = await getChildDirFullpathList(testDirFullpath);
+      const unusedDirFullpathList = allDirFullpathList.filter(
+        dirFullpath =>
+          testDirMatchRegExp.test(dirFullpath) &&
+          !createdDirFullpathSet.has(dirFullpath),
+      );
+
+      await Promise.all(
+        unusedDirFullpathList.map(async unusedDirFullpath => {
+          await rimrafAsync(unusedDirFullpath, { glob: false });
+          console.error(`remove '${cwdRelativePath(unusedDirFullpath)}'`);
+        }),
       );
     }
   }
