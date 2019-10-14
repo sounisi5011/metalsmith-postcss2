@@ -98,11 +98,13 @@ export function findFile<T = unknown>(
     if (filter(filedata)) return [searchFilename, filedata];
 
     const fileList = Object.entries(files);
-    for (const pathNormalizer of metalsmith
+    const pathNormalizerList: ((filename: string) => string)[] = metalsmith
         ? [metalsmith.source(), metalsmith.destination()].map(pathstr =>
               metalsmith.path.bind(metalsmith, pathstr),
           )
-        : [path.normalize]) {
+        : [path.normalize];
+
+    for (const pathNormalizer of pathNormalizerList) {
         const normalizeFilename = pathNormalizer(searchFilename);
         for (const [filename, filedata] of fileList) {
             if (
