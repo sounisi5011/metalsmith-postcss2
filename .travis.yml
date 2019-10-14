@@ -9,7 +9,7 @@ node_js:
   - 10
   - 10.0.0
   - 9
-  # - 9.0.0 # npm throws: npm ERR! zlib: Cannot read property 'length' of null
+  - 9.0.0
   - 8
   - 8.3.0
 branches:
