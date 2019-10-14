@@ -8,7 +8,7 @@ import {
     asyncDoubler,
     doubler,
     objectDoubler,
-} from '../helpers/postcss-plugins';
+} from './helpers/postcss-plugins';
 
 test('should transform css files', async t => {
     const metalsmith = Metalsmith(fixtures('basic'))

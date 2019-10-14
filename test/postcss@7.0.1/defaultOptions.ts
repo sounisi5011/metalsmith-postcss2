@@ -6,7 +6,7 @@ import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extr
 import fixtures from '../fixtures';
 import { ignoreTypeError } from '../helpers';
 import { processAsync } from '../helpers/metalsmith';
-import { doubler } from '../helpers/postcss-plugins';
+import { doubler } from './helpers/postcss-plugins';
 
 test('defaultOptions cannot be changed', async t => {
     const metalsmith = Metalsmith(fixtures('basic'))

@@ -7,13 +7,13 @@ import sass from 'metalsmith-sass';
 import fixtures from '../fixtures';
 import { switchTest } from '../helpers';
 import { debuggerPlugin, processAsync } from '../helpers/metalsmith';
-import { doubler } from '../helpers/postcss-plugins';
 import {
     getSourceMappingURLType,
     isValidSourceMap,
     readInlineSourceMap,
     readSourceMapURL,
 } from '../helpers/source-map';
+import { doubler } from './helpers/postcss-plugins';
 
 test('should generate multi-level SourceMap file', async t => {
     const metalsmith = Metalsmith(fixtures('sass'))
