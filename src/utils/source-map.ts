@@ -30,24 +30,18 @@ export function findSourceMapFile(
     metalsmith?: Metalsmith,
 ): [string, FileInterface] | [null, null] {
     const cssFiledata = files[cssFilename];
+    if (!isFile(cssFiledata)) return [null, null];
 
-    if (isFile(cssFiledata)) {
-        const cssText = cssFiledata.contents.toString();
-        const sourceMappingURL = getSourceMappingURL(cssText);
+    const cssText = cssFiledata.contents.toString();
+    const sourceMappingURL = getSourceMappingURL(cssText);
+    if (typeof sourceMappingURL !== 'string' || validDataUrl(sourceMappingURL))
+        return [null, null];
 
-        if (
-            typeof sourceMappingURL === 'string' &&
-            !validDataUrl(sourceMappingURL)
-        ) {
-            const cssFilepath = metalsmith
-                ? metalsmith.path(metalsmith.source(), cssFilename)
-                : cssFilename;
-            const sourceMapPath = (path.isAbsolute(cssFilepath)
-                ? path.resolve
-                : path.join)(path.dirname(cssFilepath), sourceMappingURL);
-            return findFile(files, sourceMapPath, metalsmith, isFile);
-        }
-    }
-
-    return [null, null];
+    const cssFilepath = metalsmith
+        ? metalsmith.path(metalsmith.source(), cssFilename)
+        : cssFilename;
+    const sourceMapPath = (path.isAbsolute(cssFilepath)
+        ? path.resolve
+        : path.join)(path.dirname(cssFilepath), sourceMappingURL);
+    return findFile(files, sourceMapPath, metalsmith, isFile);
 }
