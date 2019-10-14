@@ -1,11 +1,10 @@
 import test from 'ava';
 import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
-import { hasProp } from 'metalsmith-postcss2/dist/utils'; // eslint-disable-line import/no-extraneous-dependencies
 import sass from 'metalsmith-sass';
 
 import fixtures from '../fixtures';
-import { switchTest } from '../helpers';
+import { hasProp, switchTest } from '../helpers';
 import { debuggerPlugin, processAsync } from '../helpers/metalsmith';
 import {
     getSourceMappingURLType,
