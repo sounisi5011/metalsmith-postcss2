@@ -575,7 +575,6 @@ async function getPackFileList(cwd = cwdFullpath) {
       },
     });
   }
-  console.error('$ npm pack =>\n', packFileList);
 
   const packFileFullpathList = packFileList.map(filepath =>
     path.resolve(cwd, filepath),
