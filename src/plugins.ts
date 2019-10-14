@@ -40,20 +40,25 @@ function loadPlugin(
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L59-L61
      */
-    if (isObject(plugin) && plugin.postcss) plugin = plugin.postcss;
+    if (isObject(plugin) && plugin.postcss) {
+        plugin = plugin.postcss;
+    }
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L63-L65
      */
-    if (isObject(plugin) && plugin.default) plugin = plugin.default;
+    if (isObject(plugin) && plugin.default) {
+        plugin = plugin.default;
+    }
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L67-L73
      */
-    if (!isAcceptedPlugin(plugin))
+    if (!isAcceptedPlugin(plugin)) {
         throw new TypeError(
             `Invalid PostCSS Plugin found at: plugins${toJsPath(propList)}`,
         );
+    }
 
     return plugin;
 }
@@ -65,14 +70,19 @@ export function loadPlugins(
     plugins: InputOptionsInterface['plugins'] | undefined,
     propList: (string | number)[] = [],
 ): ReadonlyArray<AcceptedPlugin> {
-    if (!plugins) return defaultOptions.plugins;
+    if (!plugins) {
+        return defaultOptions.plugins;
+    }
 
     return (Array.isArray as isReadonlyOrWritableArray)(plugins)
         ? [...plugins]
               .map((plugin, index) => {
-                  if (isAcceptedPlugin(plugin)) return plugin;
-                  if (typeof plugin === 'string')
+                  if (isAcceptedPlugin(plugin)) {
+                      return plugin;
+                  }
+                  if (typeof plugin === 'string') {
                       return [loadPlugin(plugin, null, [...propList, index])];
+                  }
                   return loadPlugins(plugin, [...propList, index]);
               })
               .reduce<AcceptedPlugin[]>(

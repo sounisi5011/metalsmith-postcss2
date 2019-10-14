@@ -226,7 +226,9 @@ async function processFile({
             },
         ),
     );
-    if (!result) return;
+    if (!result) {
+        return;
+    }
 
     const dependencies: Record<string, Record<string, unknown>> | undefined =
         typeof options.dependenciesKey === 'string' &&

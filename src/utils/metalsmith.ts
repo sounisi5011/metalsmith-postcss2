@@ -91,11 +91,15 @@ export function findFile<T = unknown>(
     metalsmith?: Metalsmith,
     filter?: (value: unknown) => value is T,
 ): [string, T] | [null, null] {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    if (!filter) filter = (_value: unknown): _value is any => true;
+    if (!filter) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+        filter = (_value: unknown): _value is any => true;
+    }
 
     const filedata = files[searchFilename];
-    if (filter(filedata)) return [searchFilename, filedata];
+    if (filter(filedata)) {
+        return [searchFilename, filedata];
+    }
 
     const fileList = Object.entries(files);
     const pathNormalizerList: ((filename: string) => string)[] = metalsmith
@@ -110,8 +114,9 @@ export function findFile<T = unknown>(
             if (
                 filter(filedata) &&
                 normalizeFilename === pathNormalizer(filename)
-            )
+            ) {
                 return [filename, filedata];
+            }
         }
     }
 

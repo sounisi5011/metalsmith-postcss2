@@ -97,8 +97,9 @@ export async function normalizeOptions(
     metalsmith: Metalsmith,
     opts: InputOptions,
 ): Promise<OptionsInterface> {
-    if (typeof opts === 'function')
+    if (typeof opts === 'function') {
         opts = await opts(files, metalsmith, defaultOptions);
+    }
     const partialOptions: Partial<
         InputOptionsInterface
     > = (Array.isArray as isReadonlyOrWritableArray)(opts)
