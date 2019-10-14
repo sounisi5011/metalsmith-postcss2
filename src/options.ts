@@ -64,26 +64,21 @@ export function validatePostcssOptions(
     postcssOptions: postcss.ProcessOptions,
     { type, location }: { type: string; location: string },
 ): void {
-    const foundOptionList: string[] = [];
-    for (const optionProp of ['from', 'to']) {
-        if (hasProp(postcssOptions, optionProp))
-            foundOptionList.push(`"${optionProp}"`);
-    }
+    const hasFrom = hasProp(postcssOptions, 'from');
+    const hasTo = hasProp(postcssOptions, 'to');
 
-    if (foundOptionList.length > 0) {
-        if (foundOptionList.length > 1) {
-            throw new Error(
-                `${type} Error: Can not set ${foundOptionList.join(
-                    ' and ',
-                )} options in ${location}`,
-            );
-        } else {
-            throw new Error(
-                `${type} Error: Can not set ${foundOptionList.join(
-                    ' and ',
-                )} option in ${location}`,
-            );
-        }
+    if (hasFrom && hasTo) {
+        throw new Error(
+            `${type} Error: Can not set "from" and "to" options in ${location}`,
+        );
+    } else if (hasFrom) {
+        throw new Error(
+            `${type} Error: Can not set "from" option in ${location}`,
+        );
+    } else if (hasTo) {
+        throw new Error(
+            `${type} Error: Can not set "to" option in ${location}`,
+        );
     }
 }
 
