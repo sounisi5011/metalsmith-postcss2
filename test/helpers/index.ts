@@ -1,5 +1,7 @@
 import { isReadonlyOrWritableArray } from '../../src/utils/types';
 
+export { hasProp } from '../../src/utils';
+
 export const isArray: isReadonlyOrWritableArray = Array.isArray;
 
 export function isStringList(value: unknown): value is string[] {

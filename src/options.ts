@@ -1,11 +1,12 @@
 import deepFreeze from 'deep-freeze-strict';
 import Metalsmith from 'metalsmith';
 import path from 'path';
+import postcss from 'postcss';
 
 import { loadPlugins } from './plugins';
 import { hasProp } from './utils';
 import { MetalsmithStrictWritableFiles } from './utils/metalsmith';
-import { AcceptedPlugin, ProcessOptions } from './utils/postcss';
+import { AcceptedPlugin } from './utils/postcss';
 import {
     ArrayLikeOnly,
     ArrayValue,
@@ -24,7 +25,7 @@ type OptionsGenerator<T> =
 export interface OptionsInterface {
     readonly pattern: string | ReadonlyArray<string>;
     readonly plugins: ReadonlyArray<AcceptedPlugin>;
-    readonly options: Omit<ProcessOptions, 'from' | 'to'>;
+    readonly options: Omit<postcss.ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
     readonly dependenciesKey: string | false | null;
 }
@@ -60,7 +61,7 @@ export const defaultOptions: OptionsInterface = deepFreeze({
 });
 
 export function validatePostcssOptions(
-    postcssOptions: ProcessOptions,
+    postcssOptions: postcss.ProcessOptions,
     { type, location }: { type: string; location: string },
 ): void {
     const foundOptionList: string[] = [];

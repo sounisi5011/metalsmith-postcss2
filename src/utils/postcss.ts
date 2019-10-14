@@ -5,9 +5,7 @@ import postcssrc from 'postcss-load-config';
 
 import { isObject } from '.';
 
-export type AcceptedPlugin = postcss.AcceptedPlugin;
-export type ProcessOptions = postcss.ProcessOptions;
-export type Result = postcss.Result;
+export type AcceptedPlugin = Parameters<typeof postcss>[0];
 
 /**
  * When JSON or YAML postcssrc config file is specified, the contents of postcssrc are overwritten with the ctx argument.
@@ -15,7 +13,7 @@ export type Result = postcss.Result;
  * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L25
  */
 interface ProtectPostcssrcCtx
-    extends Partial<Record<keyof ProcessOptions, never>> {
+    extends Partial<Record<keyof postcss.ProcessOptions, never>> {
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/index.js#L47-L56
      */
@@ -43,7 +41,7 @@ interface ProtectPostcssrcCtx
  */
 export interface ConfigResult {
     file: string;
-    options: ProcessOptions;
+    options: postcss.ProcessOptions;
     plugins: AcceptedPlugin[];
 }
 
@@ -112,7 +110,7 @@ export async function loadConfig({
     metalsmith,
 }: {
     plugins: ReadonlyArray<AcceptedPlugin>;
-    options: ProcessOptions;
+    options: postcss.ProcessOptions;
     sourceFilepath: string;
     metalsmith: Metalsmith;
 }): Promise<ConfigResult | null> {
