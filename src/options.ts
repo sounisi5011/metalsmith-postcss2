@@ -65,11 +65,9 @@ export function validatePostcssOptions(
     { type, location }: { type: string; location: string },
 ): void {
     const foundOptionList: string[] = [];
-
     for (const optionProp of ['from', 'to']) {
-        if (hasProp(postcssOptions, optionProp)) {
+        if (hasProp(postcssOptions, optionProp))
             foundOptionList.push(`"${optionProp}"`);
-        }
     }
 
     if (foundOptionList.length > 0) {
