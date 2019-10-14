@@ -2,9 +2,21 @@ import test from 'ava';
 import path from 'path';
 import postcss from 'postcss';
 
-test('should match postcss version', t => {
-    const version = (/^postcss@(.+)$/.exec(path.basename(__dirname)) || [])[1];
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const expectedVersion = (/^postcss@(.+)$/.exec(path.basename(__dirname)) ||
+    [])[1].replace(
+    /^(?:\*|latest)$/,
+    () =>
+        require(path.resolve(PROJECT_ROOT, 'package.json')).devDependencies
+            .postcss,
+);
 
+test('should match postcss version', t => {
+    t.is(require('postcss/package.json').version, expectedVersion);
+});
+
+test('should match postcss Processor#version property', t => {
+    const postcssProcessor = postcss();
     if (
         [
             '5.0.15',
@@ -14,10 +26,10 @@ test('should match postcss version', t => {
             '5.0.19',
             '5.0.20',
             '5.0.21',
-        ].includes(version)
+        ].includes(expectedVersion)
     ) {
         /**
-         * postcss after version 5.0.15 forgot to update the "version" property until it was updated to 5.1.0.
+         * postcss after version 5.0.15 forgot to update Processor#version property until it was updated to 5.1.0.
          * @see https://github.com/postcss/postcss/blob/5.0.15/lib/processor.es6#L5
          * @see https://github.com/postcss/postcss/blob/5.0.16/lib/processor.es6#L5
          * @see https://github.com/postcss/postcss/blob/5.0.17/lib/processor.es6#L5
@@ -26,14 +38,14 @@ test('should match postcss version', t => {
          * @see https://github.com/postcss/postcss/blob/5.0.20/lib/processor.es6#L5
          * @see https://github.com/postcss/postcss/blob/5.0.21/lib/processor.es6#L5
          */
-        t.is(postcss().version, '5.0.14');
-    } else if (version === '5.2.1') {
+        t.is(postcssProcessor.version, '5.0.14');
+    } else if (expectedVersion === '5.2.1') {
         /**
-         * postcss@5.2.1 forgot to update the version property.
+         * postcss@5.2.1 forgot to update Processor#version property.
          * @see https://github.com/postcss/postcss/blob/5.2.1/lib/processor.es6#L110
          */
-        t.is(postcss().version, '5.2.0');
+        t.is(postcssProcessor.version, '5.2.0');
     } else {
-        t.is(postcss().version, version === '*' ? '7.0.18' : version);
+        t.is(postcssProcessor.version, expectedVersion);
     }
 });
