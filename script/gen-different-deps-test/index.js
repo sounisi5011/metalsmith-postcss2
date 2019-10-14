@@ -749,8 +749,19 @@ async function main(args) {
       !devDependencies[allPackagesName]
     ) {
       const npmArgs = ['install', '--save-dev', packagesDirFullpath];
-      console.error(`$ npm ${npmArgs.join(' ')}`);
-      await spawnAsync('npm', npmArgs, { stdio: 'inherit' });
+      for (let i = 2; i--; ) {
+        try {
+          console.error(`$ npm ${npmArgs.join(' ')}`);
+          await spawnAsync('npm', npmArgs, { stdio: 'inherit' });
+          break;
+        } catch (error) {
+          if (!i) {
+            throw error;
+          }
+          console.error(error);
+          console.error();
+        }
+      }
     }
 
     /*
