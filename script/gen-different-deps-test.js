@@ -9,6 +9,7 @@ const makeDir = require('make-dir');
 const getPackagesVersions = require('packages-versions');
 const rimraf = require('rimraf');
 const semver = require('semver');
+const tar = require('tar');
 
 const cwdFullpath = process.cwd();
 
@@ -23,6 +24,7 @@ const writeFileAsync = util.promisify(fs.writeFile);
 const linkAsync = util.promisify(fs.link);
 const symlinkAsync = util.promisify(fs.symlink);
 const rimrafAsync = util.promisify(rimraf);
+const tarListAsync = util.promisify(tar.list);
 
 function toUnixPath(pathstr) {
   return path
@@ -558,13 +560,28 @@ async function getPackFileList(cwd = cwdFullpath) {
   const { stdout } = await spawnAsync('npm', ['pack', '--dry-run', '--json'], {
     cwd,
   });
-  const packData = JSON.parse(stdout);
-  const packFileList = packData[0].files.map(file =>
-    path.resolve(cwd, file.path),
-  );
 
-  packFileListCache.set(cwd, packFileList);
-  return packFileList;
+  /** @type {string[]} */
+  const packFileList = [];
+  try {
+    const packData = JSON.parse(stdout);
+    packFileList.push(...packData[0].files.map(file => file.path));
+  } catch (err) {
+    const tarballFilepath = path.resolve(cwd, stdout.trim());
+    await tarListAsync({
+      file: tarballFilepath,
+      onentry(entry) {
+        packFileList.push(entry.path.replace(/^package[\\/]/, ''));
+      },
+    });
+  }
+  console.error('$ npm pack =>\n', packFileList);
+
+  const packFileFullpathList = packFileList.map(filepath =>
+    path.resolve(cwd, filepath),
+  );
+  packFileListCache.set(cwd, packFileFullpathList);
+  return packFileFullpathList;
 }
 
 function getInstalledPackageVersion(moduleId, fromDirectory = cwdFullpath) {
