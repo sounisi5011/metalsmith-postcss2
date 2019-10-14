@@ -82,14 +82,23 @@ export function validatePostcssOptions(
     }
 }
 
+function normalizeRenamer(
+    inputRenamer?: InputOptionsInterface['renamer'],
+): OptionsInterface['renamer'] {
+    return typeof inputRenamer === 'function'
+        ? inputRenamer
+        : inputRenamer || inputRenamer === undefined
+        ? defaultOptions.renamer
+        : (filename: string) => filename;
+}
+
 export async function normalizeOptions(
     files: MetalsmithStrictWritableFiles,
     metalsmith: Metalsmith,
     opts: InputOptions,
 ): Promise<OptionsInterface> {
-    if (typeof opts === 'function') {
+    if (typeof opts === 'function')
         opts = await opts(files, metalsmith, defaultOptions);
-    }
     const partialOptions: Partial<
         InputOptionsInterface
     > = (Array.isArray as isReadonlyOrWritableArray)(opts)
@@ -103,18 +112,10 @@ export async function normalizeOptions(
         });
     }
 
-    const inputRenamer = partialOptions.renamer;
-    const renamer =
-        typeof inputRenamer === 'function'
-            ? inputRenamer
-            : inputRenamer || inputRenamer === undefined
-            ? defaultOptions.renamer
-            : (filename: string) => filename;
-
     return {
         ...defaultOptions,
         ...partialOptions,
         plugins: loadPlugins(partialOptions.plugins),
-        renamer,
+        renamer: normalizeRenamer(partialOptions.renamer),
     };
 }
