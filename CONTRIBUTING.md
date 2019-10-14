@@ -35,7 +35,6 @@ Inspired of [Atom Contributing] and [Gitmoji].
 * `📝` - writing docs
 * `🚀` - deploying stuff
 * `🐛` - fixing a bug
-* `💚` - fixing CI build
 * `🔥` - removing code or files
 * `✅` - adding or updating tests
 * `➕` - adding a dependency

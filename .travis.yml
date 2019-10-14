@@ -26,5 +26,3 @@ branches:
     - /^renovate\/prettier-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
     - /^renovate\/sort-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
 cache: npm
-before_install:
-  - npm i -g npm
