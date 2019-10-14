@@ -856,6 +856,8 @@ async function main(args) {
       await writeMultilinesFileAsync(
         path.join(testSubdirFullpath, '.gitignore'),
         [
+          '/*',
+          '!/.gitignore',
           `!/${toUnixPath(
             path.relative(testSubdirFullpath, nodeModulesDirFullpath),
           )}/`,
