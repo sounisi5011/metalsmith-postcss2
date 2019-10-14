@@ -1,10 +1,17 @@
 import importCwd from 'import-cwd';
-import util from 'util';
 
 import { defaultOptions, InputOptionsInterface } from './options';
-import { isObject } from './utils';
+import { isObject, toJsPath } from './utils';
 import { AcceptedPlugin, isAcceptedPlugin } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
+
+function importPlugin(pluginName: string): unknown {
+    try {
+        return importCwd(pluginName);
+    } catch (err) {
+        throw new Error(`Loading PostCSS Plugin failed: ${err.message}`);
+    }
+}
 
 /**
  * Plugin Loader
@@ -15,18 +22,12 @@ function loadPlugin(
     pluginOptions: unknown,
     propList: (string | number)[],
 ): AcceptedPlugin {
-    let pluginGenerator: unknown;
-    try {
-        pluginGenerator = importCwd(pluginName);
-    } catch (err) {
-        throw new Error(`Loading PostCSS Plugin failed: ${err.message}`);
-    }
-
-    let plugin = pluginGenerator;
+    const pluginGenerator = importPlugin(pluginName);
 
     /**
      * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L18-L26
      */
+    let plugin = pluginGenerator;
     if (isObject(pluginOptions) && Object.keys(pluginOptions).length > 0) {
         if (typeof pluginGenerator !== 'function') {
             throw new TypeError(
@@ -55,14 +56,7 @@ function loadPlugin(
      */
     if (!isAcceptedPlugin(plugin)) {
         throw new TypeError(
-            'Invalid PostCSS Plugin found at: plugins' +
-                propList
-                    .map(prop =>
-                        typeof prop === 'string' && /^\w+$/.test(prop)
-                            ? `.${prop}`
-                            : `[${util.inspect(prop)}]`,
-                    )
-                    .join(''),
+            `Invalid PostCSS Plugin found at: plugins${toJsPath(propList)}`,
         );
     }
 
@@ -76,42 +70,32 @@ export function loadPlugins(
     plugins: InputOptionsInterface['plugins'] | undefined,
     propList: (string | number)[] = [],
 ): ReadonlyArray<AcceptedPlugin> {
-    if (!plugins) {
-        return defaultOptions.plugins;
-    }
+    if (!plugins) return defaultOptions.plugins;
 
-    let pluginList: AcceptedPlugin[] = [];
+    return (Array.isArray as isReadonlyOrWritableArray)(plugins)
+        ? [...plugins]
+              .map((plugin, index) => {
+                  if (isAcceptedPlugin(plugin)) return plugin;
 
-    if ((Array.isArray as isReadonlyOrWritableArray)(plugins)) {
-        pluginList = [...plugins]
-            .map((plugin, index) => {
-                if (isAcceptedPlugin(plugin)) {
-                    return plugin;
-                }
+                  if (typeof plugin === 'string') {
+                      return [loadPlugin(plugin, null, [...propList, index])];
+                  }
 
-                if (typeof plugin === 'string') {
-                    return [loadPlugin(plugin, null, [...propList, index])];
-                }
-
-                return loadPlugins(plugin, [...propList, index]);
-            })
-            .reduce<typeof pluginList>(
-                (list, plugins) => list.concat(plugins),
-                [],
-            );
-    } else {
-        pluginList = Object.entries(plugins)
-            /**
-             * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L49-L51
-             */
-            .filter(([, pluginOptions]) => pluginOptions !== false)
-            .map(([pluginName, pluginOptions]) =>
-                loadPlugin(pluginName, pluginOptions, [
-                    ...propList,
-                    pluginName,
-                ]),
-            );
-    }
-
-    return pluginList;
+                  return loadPlugins(plugin, [...propList, index]);
+              })
+              .reduce<AcceptedPlugin[]>(
+                  (list, plugins) => list.concat(plugins),
+                  [],
+              )
+        : Object.entries(plugins)
+              /**
+               * @see https://github.com/michael-ciniawsky/postcss-load-config/blob/v2.1.0/src/plugins.js#L49-L51
+               */
+              .filter(([, pluginOptions]) => pluginOptions !== false)
+              .map(([pluginName, pluginOptions]) =>
+                  loadPlugin(pluginName, pluginOptions, [
+                      ...propList,
+                      pluginName,
+                  ]),
+              );
 }

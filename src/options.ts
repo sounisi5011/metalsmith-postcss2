@@ -64,22 +64,32 @@ export function validatePostcssOptions(
     postcssOptions: postcss.ProcessOptions,
     { type, location }: { type: string; location: string },
 ): void {
-    const foundOptionList: string[] = [];
+    const hasFrom = hasProp(postcssOptions, 'from');
+    const hasTo = hasProp(postcssOptions, 'to');
 
-    for (const optionProp of ['from', 'to']) {
-        if (hasProp(postcssOptions, optionProp)) {
-            foundOptionList.push(`"${optionProp}"`);
-        }
-    }
-
-    if (foundOptionList.length > 0) {
+    if (hasFrom && hasTo) {
         throw new Error(
-            `${type} Error: Can not set ` +
-                foundOptionList.join(' and ') +
-                ` ${foundOptionList.length > 1 ? 'options' : 'option'}` +
-                ` in ${location}`,
+            `${type} Error: Can not set "from" and "to" options in ${location}`,
+        );
+    } else if (hasFrom) {
+        throw new Error(
+            `${type} Error: Can not set "from" option in ${location}`,
+        );
+    } else if (hasTo) {
+        throw new Error(
+            `${type} Error: Can not set "to" option in ${location}`,
         );
     }
+}
+
+function normalizeRenamer(
+    inputRenamer?: InputOptionsInterface['renamer'],
+): OptionsInterface['renamer'] {
+    return typeof inputRenamer === 'function'
+        ? inputRenamer
+        : inputRenamer || inputRenamer === undefined
+        ? defaultOptions.renamer
+        : (filename: string) => filename;
 }
 
 export async function normalizeOptions(
@@ -103,18 +113,10 @@ export async function normalizeOptions(
         });
     }
 
-    const inputRenamer = partialOptions.renamer;
-    const renamer =
-        typeof inputRenamer === 'function'
-            ? inputRenamer
-            : inputRenamer || inputRenamer === undefined
-            ? defaultOptions.renamer
-            : (filename: string) => filename;
-
     return {
         ...defaultOptions,
         ...partialOptions,
         plugins: loadPlugins(partialOptions.plugins),
-        renamer,
+        renamer: normalizeRenamer(partialOptions.renamer),
     };
 }

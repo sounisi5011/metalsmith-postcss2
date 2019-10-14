@@ -65,10 +65,7 @@ function updatePostcssOption(
         );
         if (sourceMapFiledata) {
             const prev = sourceMapFiledata.contents.toString();
-            postcssOptions.map =
-                postcssMapOption === true
-                    ? { prev }
-                    : { prev, ...postcssMapOption };
+            postcssOptions.map = { prev, ...Object(postcssMapOption) };
         }
     }
 
@@ -136,28 +133,29 @@ function getDependenciesRecord(
         metalsmith?: Metalsmith;
     },
 ): Record<string, unknown> {
-    const dependencies: Record<string, unknown> = {};
-
-    /**
-     * @see https://github.com/postcss/postcss-loader/blob/v3.0.0/src/index.js#L149-L153
-     */
-    for (const message of result.messages) {
-        if (message.type === 'dependency') {
-            const dependencyFilename = path.relative(
-                metalsmithSrcFullpath,
-                message.file,
-            );
-            const [foundFilename, foundFiledata] = findFile(
-                files,
-                dependencyFilename,
-                metalsmith,
-            );
-            dependencies[dependencyFilename] =
-                foundFilename !== null ? foundFiledata : undefined;
-        }
-    }
-
-    return dependencies;
+    return (
+        result.messages
+            /**
+             * @see https://github.com/postcss/postcss-loader/blob/v3.0.0/src/index.js#L149-L153
+             */
+            .filter(message => message.type === 'dependency')
+            .reduce<Record<string, unknown>>((dependencies, message) => {
+                const dependencyFilename = path.relative(
+                    metalsmithSrcFullpath,
+                    message.file,
+                );
+                const [foundFilename, foundFiledata] = findFile(
+                    files,
+                    dependencyFilename,
+                    metalsmith,
+                );
+                return {
+                    ...dependencies,
+                    [dependencyFilename]:
+                        foundFilename !== null ? foundFiledata : undefined,
+                };
+            }, {})
+    );
 }
 
 async function processFile({
@@ -228,7 +226,9 @@ async function processFile({
             },
         ),
     );
-    if (!result) return;
+    if (!result) {
+        return;
+    }
 
     const dependencies: Record<string, Record<string, unknown>> | undefined =
         typeof options.dependenciesKey === 'string' &&
@@ -246,7 +246,10 @@ async function processFile({
             : undefined;
 
     const cssText = result.css;
-    addFile(writableFiles, newFilename, cssText, filedata, dependencies);
+    addFile(writableFiles, newFilename, cssText, {
+        originalData: filedata,
+        otherData: dependencies,
+    });
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
         delete writableFiles[filename];
@@ -260,13 +263,9 @@ async function processFile({
         const sourceMapFilename = sourceMappingURL
             ? path.join(path.dirname(newFilename), sourceMappingURL)
             : newFilename + '.map';
-        addFile(
-            writableFiles,
-            sourceMapFilename,
-            result.map.toString(),
-            undefined,
-            dependencies,
-        );
+        addFile(writableFiles, sourceMapFilename, result.map.toString(), {
+            otherData: dependencies,
+        });
         debug('generate SourceMap: %o', sourceMapFilename);
     }
 }

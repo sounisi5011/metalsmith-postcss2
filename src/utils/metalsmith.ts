@@ -56,8 +56,13 @@ export function addFile(
     files: MetalsmithStrictWritableFiles,
     filename: string,
     contents: string,
-    originalData?: FileInterface,
-    otherData?: Record<string, unknown>,
+    {
+        originalData,
+        otherData,
+    }: {
+        originalData?: FileInterface;
+        otherData?: Record<string, unknown>;
+    } = {},
 ): FileInterface {
     const newFile = {
         ...otherData,
@@ -98,10 +103,9 @@ export function findFile<T = unknown>(
 
     const fileList = Object.entries(files);
     const pathNormalizerList: ((filename: string) => string)[] = metalsmith
-        ? [
-              metalsmith.path.bind(metalsmith, metalsmith.source()),
-              metalsmith.path.bind(metalsmith, metalsmith.destination()),
-          ]
+        ? [metalsmith.source(), metalsmith.destination()].map(pathstr =>
+              metalsmith.path.bind(metalsmith, pathstr),
+          )
         : [path.normalize];
 
     for (const pathNormalizer of pathNormalizerList) {
