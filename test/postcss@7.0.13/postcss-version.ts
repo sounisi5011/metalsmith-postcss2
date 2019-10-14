@@ -34,6 +34,6 @@ test('should match postcss version', t => {
          */
         t.is(postcss().version, '5.2.0');
     } else {
-        t.is(postcss().version, version === 'latest' ? '7.0.18' : version);
+        t.is(postcss().version, version === '*' ? '7.0.18' : version);
     }
 });
