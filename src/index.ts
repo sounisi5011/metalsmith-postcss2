@@ -244,7 +244,10 @@ async function processFile({
             : undefined;
 
     const cssText = result.css;
-    addFile(writableFiles, newFilename, cssText, filedata, dependencies);
+    addFile(writableFiles, newFilename, cssText, {
+        originalData: filedata,
+        otherData: dependencies,
+    });
     if (filename !== newFilename) {
         debug('done process %o, renamed to %o', filename, newFilename);
         delete writableFiles[filename];
@@ -258,13 +261,9 @@ async function processFile({
         const sourceMapFilename = sourceMappingURL
             ? path.join(path.dirname(newFilename), sourceMappingURL)
             : newFilename + '.map';
-        addFile(
-            writableFiles,
-            sourceMapFilename,
-            result.map.toString(),
-            undefined,
-            dependencies,
-        );
+        addFile(writableFiles, sourceMapFilename, result.map.toString(), {
+            otherData: dependencies,
+        });
         debug('generate SourceMap: %o', sourceMapFilename);
     }
 }

@@ -56,8 +56,13 @@ export function addFile(
     files: MetalsmithStrictWritableFiles,
     filename: string,
     contents: string,
-    originalData?: FileInterface,
-    otherData?: Record<string, unknown>,
+    {
+        originalData,
+        otherData,
+    }: {
+        originalData?: FileInterface;
+        otherData?: Record<string, unknown>;
+    } = {},
 ): FileInterface {
     const newFile = {
         ...otherData,
