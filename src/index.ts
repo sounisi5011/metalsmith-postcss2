@@ -136,28 +136,29 @@ function getDependenciesRecord(
         metalsmith?: Metalsmith;
     },
 ): Record<string, unknown> {
-    const dependencies: Record<string, unknown> = {};
-
-    /**
-     * @see https://github.com/postcss/postcss-loader/blob/v3.0.0/src/index.js#L149-L153
-     */
-    for (const message of result.messages) {
-        if (message.type === 'dependency') {
-            const dependencyFilename = path.relative(
-                metalsmithSrcFullpath,
-                message.file,
-            );
-            const [foundFilename, foundFiledata] = findFile(
-                files,
-                dependencyFilename,
-                metalsmith,
-            );
-            dependencies[dependencyFilename] =
-                foundFilename !== null ? foundFiledata : undefined;
-        }
-    }
-
-    return dependencies;
+    return (
+        result.messages
+            /**
+             * @see https://github.com/postcss/postcss-loader/blob/v3.0.0/src/index.js#L149-L153
+             */
+            .filter(message => message.type === 'dependency')
+            .reduce<Record<string, unknown>>((dependencies, message) => {
+                const dependencyFilename = path.relative(
+                    metalsmithSrcFullpath,
+                    message.file,
+                );
+                const [foundFilename, foundFiledata] = findFile(
+                    files,
+                    dependencyFilename,
+                    metalsmith,
+                );
+                return {
+                    ...dependencies,
+                    [dependencyFilename]:
+                        foundFilename !== null ? foundFiledata : undefined,
+                };
+            }, {})
+    );
 }
 
 async function processFile({
