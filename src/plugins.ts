@@ -70,19 +70,17 @@ export function loadPlugins(
     plugins: InputOptionsInterface['plugins'] | undefined,
     propList: (string | number)[] = [],
 ): ReadonlyArray<AcceptedPlugin> {
-    if (!plugins) {
-        return defaultOptions.plugins;
-    }
+    if (!plugins) return defaultOptions.plugins;
 
     return (Array.isArray as isReadonlyOrWritableArray)(plugins)
         ? [...plugins]
               .map((plugin, index) => {
-                  if (isAcceptedPlugin(plugin)) {
-                      return plugin;
-                  }
+                  if (isAcceptedPlugin(plugin)) return plugin;
+
                   if (typeof plugin === 'string') {
                       return [loadPlugin(plugin, null, [...propList, index])];
                   }
+
                   return loadPlugins(plugin, [...propList, index]);
               })
               .reduce<AcceptedPlugin[]>(
