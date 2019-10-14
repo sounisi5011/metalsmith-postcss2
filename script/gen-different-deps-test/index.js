@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -493,7 +495,7 @@ const pkgsDefDirnamePattern = new RegExp(
   String.raw`^${pkgNameWithVersionPattern.source}(?:(?:[^@a-z0-9-~]|[@a-z0-9-~](?=[^@a-z0-9-~]))+${pkgNameWithVersionPattern.source})*$`,
 );
 
-const pkgFullpath = path.resolve(process.cwd(), 'package.json');
+const pkgFullpath = path.resolve(cwdFullpath, 'package.json');
 const PKG = require(pkgFullpath);
 const devDependencies = PKG.devDependencies || {};
 const peerDependencies = PKG.peerDependencies || {};
