@@ -27,8 +27,9 @@ branches:
     - /^renovate\/sort-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
 cache: npm
 before_install:
-  # If npm version is less than 5.6.0, update to 5.6.0
+  # If npm version is less than 5.7.0, update to 5.7.0
   # see https://qiita.com/ybiquitous/items/dd6cfb03c589452dfdc8#ruby-%E3%82%92%E4%BD%BF%E3%81%862018-06-08
-  - if ruby -e "exit(1) if not Gem::Version.new(ARGV[0]) < Gem::Version.new('5.6.0')" $(npm -v); then
-    npm i -g npm@5.6.0;
+  - |
+    if ruby -e "exit(1) if not Gem::Version.new(ARGV[0]) < Gem::Version.new('5.7.0')" $(npm -v); then
+      npm i -g npm@5.7.0;
     fi
