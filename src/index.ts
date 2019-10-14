@@ -65,7 +65,10 @@ function updatePostcssOption(
         );
         if (sourceMapFiledata) {
             const prev = sourceMapFiledata.contents.toString();
-            postcssOptions.map = { prev, ...Object(postcssMapOption) };
+            postcssOptions.map = {
+                prev,
+                ...(postcssMapOption === true ? {} : postcssMapOption),
+            };
         }
     }
 
