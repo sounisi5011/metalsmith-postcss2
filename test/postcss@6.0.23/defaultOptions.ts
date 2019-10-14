@@ -2,13 +2,11 @@ import test from 'ava';
 import cloneDeep from 'lodash.clonedeep';
 import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
-import path from 'path';
 
+import fixtures from '../fixtures';
 import { ignoreTypeError } from '../helpers';
 import { processAsync } from '../helpers/metalsmith';
 import { doubler } from '../helpers/postcss-plugins';
-
-const fixtures = path.join.bind(path, __dirname, '..', 'fixtures');
 
 test('defaultOptions cannot be changed', async t => {
     const metalsmith = Metalsmith(fixtures('basic'))

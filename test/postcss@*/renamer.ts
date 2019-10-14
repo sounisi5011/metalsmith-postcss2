@@ -2,13 +2,11 @@ import test from 'ava';
 import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
 import { hasProp } from 'metalsmith-postcss2/dist/utils'; // eslint-disable-line import/no-extraneous-dependencies
-import path from 'path';
 import util from 'util';
 
+import fixtures from '../fixtures';
 import { switchTest } from '../helpers';
 import { processAsync } from '../helpers/metalsmith';
-
-const fixtures = path.join.bind(path, __dirname, '..', 'fixtures');
 
 test('should rename sugarss files: not set renamer option', async t => {
     const metalsmith = Metalsmith(fixtures('sugarss'))

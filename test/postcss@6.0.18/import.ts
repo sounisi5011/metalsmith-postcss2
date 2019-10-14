@@ -1,12 +1,10 @@
 import test from 'ava';
 import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
-import path from 'path';
 
+import fixtures from '../fixtures';
 import { switchTest } from '../helpers';
 import { debuggerPlugin, processAsync } from '../helpers/metalsmith';
-
-const fixtures = path.join.bind(path, __dirname, '..', 'fixtures');
 
 test('should transform css files', async t => {
     const metalsmith = Metalsmith(fixtures('import'))

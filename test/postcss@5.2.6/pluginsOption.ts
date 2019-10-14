@@ -5,6 +5,7 @@ import { AcceptedPlugin } from 'metalsmith-postcss2/dist/utils/postcss'; // esli
 import path from 'path';
 import util from 'util';
 
+import fixtures from '../fixtures';
 import { isArray } from '../helpers';
 
 async function execPlugins(
@@ -62,7 +63,7 @@ async function execPluginDefList(
 }
 
 test.before(() => {
-    process.chdir(path.join(__dirname, '..', 'fixtures', 'plugins'));
+    process.chdir(fixtures('plugins'));
 });
 
 test('should import plugin files by string array', async t => {
