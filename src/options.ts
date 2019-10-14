@@ -73,12 +73,19 @@ export function validatePostcssOptions(
     }
 
     if (foundOptionList.length > 0) {
-        throw new Error(
-            `${type} Error: Can not set ` +
-                foundOptionList.join(' and ') +
-                ` ${foundOptionList.length > 1 ? 'options' : 'option'}` +
-                ` in ${location}`,
-        );
+        if (foundOptionList.length > 1) {
+            throw new Error(
+                `${type} Error: Can not set ${foundOptionList.join(
+                    ' and ',
+                )} options in ${location}`,
+            );
+        } else {
+            throw new Error(
+                `${type} Error: Can not set ${foundOptionList.join(
+                    ' and ',
+                )} option in ${location}`,
+            );
+        }
     }
 }
 
