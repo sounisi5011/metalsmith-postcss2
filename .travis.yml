@@ -26,7 +26,14 @@ branches:
     - /^renovate\/prettier-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
     - /^renovate\/sort-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
 cache: npm
+sudo: required
 before_install:
+  - cat /proc/sys/fs/inotify/max_user_watches # show default limit
+  # Fixes an issue where the max file watch count is exceeded, triggering ENOSPC
+  # see https://stackoverflow.com/questions/22475849/node-js-error-enospc#32600959
+  # see https://github.com/ember-decorators/ember-decorators/blob/master/.travis.yml#L19-L22
+  - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
   # If npm version is less than 5.10.0, update to 5.10.0
   # see https://qiita.com/ybiquitous/items/dd6cfb03c589452dfdc8#ruby-%E3%82%92%E4%BD%BF%E3%81%862018-06-08
   - |
