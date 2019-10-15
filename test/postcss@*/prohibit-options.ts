@@ -2,8 +2,8 @@ import test from 'ava';
 import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
 
-import fixtures from '../fixtures';
 import { processAsync } from '../helpers/metalsmith';
+import fixtures from './fixtures';
 
 test('should throw error if set "from" option: plugin options', async t => {
     const metalsmith = Metalsmith(fixtures('sugarss'))

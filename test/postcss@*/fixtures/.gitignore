@@ -1,0 +1,7 @@
+/*/build/
+!/node_modules/
+
+# Metalsmith CLI only import plugins from the node_modules directory directly under the current working directory.
+# When loading a locall installed package, the node_modules directory must be in the same hierarchy as the metalsmith.json file.
+# see https://github.com/segmentio/metalsmith/blob/v2.3.0/bin/_metalsmith#L79-L92
+!/*/node_modules/

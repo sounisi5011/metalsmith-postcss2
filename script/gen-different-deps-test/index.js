@@ -98,13 +98,18 @@ function lines2str(lines, indent = 2, nestLevel = 0) {
     .join('');
 }
 
-async function getChildDirFullpathList(parentDirPath) {
+async function getChildDirFullpathList(
+  parentDirPath,
+  { excludeSymLinks = false } = {},
+) {
   return (await Promise.all(
     (await readdirAsync(parentDirPath))
       .map(filepath => path.resolve(parentDirPath, filepath))
       .map(async fileFullpath => ({
         fullpath: fileFullpath,
-        stat: await statAsync(fileFullpath),
+        stat: excludeSymLinks
+          ? await lstatAsync(fileFullpath)
+          : await statAsync(fileFullpath),
       })),
   ))
     .filter(({ stat }) => stat.isDirectory())
@@ -112,28 +117,51 @@ async function getChildDirFullpathList(parentDirPath) {
 }
 
 /**
- * An alternative to the recursive-readdir package. Supports symbolic links
+ * An alternative to the recursive-readdir package. Supports symbolic links and fs.Stats
  * @param {string} dirpath
  * @param {(function(string, {stats:fs.Stats, lstats:fs.Stats}): boolean)[]} ignores
- * @returns {Promise<string[]>}
+ * @returns {Promise<Map<string, {stats:fs.Stats, lstats:fs.Stats}>>}
  */
 async function recursiveReaddir(dirpath, ignores = []) {
-  return [].concat(
-    ...(await Promise.all(
-      (await readdirAsync(dirpath)).map(async filename => {
-        const filepath = path.join(dirpath, filename);
-        const stats = await statAsync(filepath);
-        const lstats = await lstatAsync(filepath);
+  return new Map(
+    [].concat(
+      ...(await Promise.all(
+        (await readdirAsync(dirpath)).map(async filename => {
+          const filepath = path.join(dirpath, filename);
+          const lstats = await lstatAsync(filepath);
 
-        if (ignores.some(matcher => matcher(filepath, { stats, lstats }))) {
-          return [];
-        }
+          /** @type {fs.Stats} */
+          let stats;
+          const statsObj = {
+            get stats() {
+              if (stats) {
+                return stats;
+              }
 
-        return lstats.isDirectory()
-          ? await recursiveReaddir(filepath, ignores)
-          : [filepath];
-      }),
-    )),
+              try {
+                stats = fs.statSync(filepath);
+              } catch (error) {
+                if (!(error.code === 'ENOENT' && lstats.isSymbolicLink())) {
+                  throw error;
+                }
+                stats = lstats;
+              }
+
+              return stats;
+            },
+            lstats,
+          };
+
+          if (ignores.some(matcher => matcher(filepath, statsObj))) {
+            return [];
+          }
+
+          return lstats.isDirectory()
+            ? [...(await recursiveReaddir(filepath, ignores)).entries()]
+            : [[filepath, statsObj]];
+        }),
+      )),
+    ),
   );
 }
 
@@ -239,9 +267,9 @@ async function createHardlink(existingPath, newPath, { debugLog = true } = {}) {
      */
     let i = 0;
     while (true) {
-      try {
-        const tempName = `${newPath}.temp${i++}`;
+      const tempName = `${newPath}.temp${i++}`;
 
+      try {
         await linkAsync(existingPath, tempName);
         if (debugLog) {
           console.error(
@@ -250,15 +278,16 @@ async function createHardlink(existingPath, newPath, { debugLog = true } = {}) {
             )}'`,
           );
         }
-
-        await forceRenameFile(tempName, newPath, { debugLog });
-
-        return;
       } catch (error) {
         if (error.code !== 'EEXIST') {
           throw error;
         }
+        continue;
       }
+
+      await forceRenameFile(tempName, newPath, { debugLog });
+
+      break;
     }
   }
 
@@ -266,8 +295,11 @@ async function createHardlink(existingPath, newPath, { debugLog = true } = {}) {
 }
 
 async function createSymlink({ symlinkFullpath, linkTarget }) {
+  symlinkFullpath = path.resolve(symlinkFullpath);
   const symlinkDirFullpath = path.dirname(symlinkFullpath);
-  const symlinkTargetPath = path.relative(symlinkDirFullpath, linkTarget);
+  const symlinkTargetPath = path.isAbsolute(linkTarget)
+    ? path.relative(symlinkDirFullpath, linkTarget)
+    : linkTarget;
 
   await makeDir(symlinkDirFullpath);
   try {
@@ -284,29 +316,72 @@ async function createSymlink({ symlinkFullpath, linkTarget }) {
       return;
     }
 
-    /*
-     * Overwrite symlink
-     */
-    let i = 0;
-    while (true) {
-      try {
-        const tempName = `${symlinkFullpath}.temp${i++}`;
+    await overwriteSymlink({
+      symlinkPath: symlinkFullpath,
+      linkTarget: symlinkTargetPath,
+    });
+  }
+}
 
-        await symlinkAsync(symlinkTargetPath, tempName);
-        console.error(
-          `ln -s '${symlinkTargetPath}' '${cwdRelativePath(tempName)}'`,
-        );
+async function overwriteSymlink({ symlinkPath, linkTarget, debugLog = true }) {
+  let i = 0;
+  /** @type {string} */
+  let tempName;
 
-        await forceRenameFile(tempName, symlinkFullpath);
+  while (true) {
+    tempName = `${symlinkPath}.temp${i++}`;
 
-        return;
-      } catch (error) {
-        if (error.code !== 'EEXIST') {
-          throw error;
-        }
+    try {
+      await symlinkAsync(linkTarget, tempName);
+      if (debugLog) {
+        console.error(`ln -s '${linkTarget}' '${cwdRelativePath(tempName)}'`);
+      }
+
+      break;
+    } catch (error) {
+      if (error.code !== 'EEXIST') {
+        throw error;
       }
     }
   }
+
+  await forceRenameFile(tempName, symlinkPath, { debugLog });
+}
+
+async function copySymlink(src, dest, { debugLog = true } = {}) {
+  const targetPath = await readlinkAsync(src);
+  const destFullpath = path.resolve(dest);
+  const destDirFullpath = path.dirname(destFullpath);
+
+  await makeDir(destDirFullpath);
+  try {
+    await symlinkAsync(targetPath, destFullpath);
+    if (debugLog) {
+      console.error(`ln -s '${targetPath}' '${cwdRelativePath(destFullpath)}'`);
+    }
+  } catch (error) {
+    if (error.code !== 'EEXIST') {
+      throw error;
+    }
+
+    try {
+      if ((await readlinkAsync(destFullpath)) === targetPath) {
+        return false;
+      }
+    } catch (error) {
+      if (error.code !== 'EINVAL') {
+        throw error;
+      }
+    }
+
+    await overwriteSymlink({
+      symlinkPath: destFullpath,
+      linkTarget: targetPath,
+      debugLog,
+    });
+  }
+
+  return true;
 }
 
 /**
@@ -351,55 +426,96 @@ async function syncTwoDir(
     });
   };
 
-  const sourceFileFullpathSet = new Set();
+  /** @type {Map<string, {lstats:fs.Stats}} */
+  let sourceFileDataMap;
   if (typeof sourceDirFullpath === 'string') {
     sourceDirFullpath = path.resolve(sourceDirFullpath);
-    const sourceFileFullpathList = await recursiveReaddir(
+    sourceFileDataMap = await recursiveReaddir(
       sourceDirFullpath,
       ignoresGen(sourceDirFullpath),
     );
-    for (const sourceFileFullpath of sourceFileFullpathList) {
-      sourceFileFullpathSet.add(sourceFileFullpath);
-    }
   } else {
     const sourceDirRootFullpath = path.resolve(sourceDirFullpath.root);
-    for (const sourceFileFullpath of sourceDirFullpath.files) {
-      sourceFileFullpathSet.add(
-        path.resolve(sourceDirRootFullpath, sourceFileFullpath),
-      );
-    }
+    sourceFileDataMap = new Map(
+      await Promise.all(
+        sourceDirFullpath.files.map(async sourceFilepath => {
+          const sourceFileFullpath = path.resolve(
+            sourceDirRootFullpath,
+            sourceFilepath,
+          );
+
+          return [
+            sourceFileFullpath,
+            { lstats: await lstatAsync(sourceFileFullpath) },
+          ];
+        }),
+      ),
+    );
     sourceDirFullpath = sourceDirRootFullpath;
   }
 
   destDirFullpath = path.resolve(destDirFullpath);
-  /** @type {Set<string>} */
-  const removeDestFileFullpathSet = new Set();
+  /** @type {Map<string, {stats:fs.Stats, lstats:fs.Stats}} */
+  let removeDestFileDataMap;
   try {
-    const destFileFullpathList = await recursiveReaddir(
+    removeDestFileDataMap = await recursiveReaddir(
       destDirFullpath,
       ignoresGen(destDirFullpath),
     );
-    for (const destFileFullpath of destFileFullpathList) {
-      removeDestFileFullpathSet.add(destFileFullpath);
-    }
-  } catch (err) {}
+  } catch (err) {
+    removeDestFileDataMap = new Map();
+  }
 
-  for (const sourceFileFullpath of sourceFileFullpathSet) {
+  for (const [
+    sourceFileFullpath,
+    { lstats: sourceFileLStats },
+  ] of sourceFileDataMap) {
     const destFileFullpath = path.join(
       destDirFullpath,
       path.relative(sourceDirFullpath, sourceFileFullpath),
     );
-    if (
-      await createHardlink(sourceFileFullpath, destFileFullpath, {
-        debugLog: false,
-      })
-    ) {
-      createdFileList.push(destFileFullpath);
+
+    /*
+     * Remove files that name duplicate the parent directories of destination path
+     */
+    let existFilepath = destFileFullpath;
+    do {
+      existFilepath = path.dirname(existFilepath);
+      if (removeDestFileDataMap.has(existFilepath)) {
+        await rimrafAsync(existFilepath, { glob: false });
+        removeDestFileDataMap.delete(existFilepath);
+        removedFileList.push(existFilepath);
+      }
+    } while (destDirFullpath !== existFilepath);
+
+    if (!sourceFileLStats.isSymbolicLink()) {
+      /*
+       * create hardlink
+       */
+      if (
+        await createHardlink(sourceFileFullpath, destFileFullpath, {
+          debugLog: false,
+        })
+      ) {
+        createdFileList.push(destFileFullpath);
+      }
+    } else {
+      /*
+       * copy symlink
+       */
+      if (
+        await copySymlink(sourceFileFullpath, destFileFullpath, {
+          debugLog: false,
+        })
+      ) {
+        createdFileList.push(destFileFullpath);
+      }
     }
-    removeDestFileFullpathSet.delete(destFileFullpath);
+
+    removeDestFileDataMap.delete(destFileFullpath);
   }
 
-  for (const removeDestFileFullpath of removeDestFileFullpathSet) {
+  for (const [removeDestFileFullpath] of removeDestFileDataMap) {
     await rimrafAsync(removeDestFileFullpath, { glob: false });
     removedFileList.push(removeDestFileFullpath);
   }
@@ -663,7 +779,10 @@ async function main(args) {
   const allPackagesName =
     options.get('local-package-name') || '@sounisi5011/test-packages';
 
-  const targetDirPkgsDataList = (await getChildDirFullpathList(testDirFullpath))
+  const targetDirPkgsDataList = (await getChildDirFullpathList(
+    testDirFullpath,
+    { excludeSymLinks: true },
+  ))
     .map(getDefinedPkgNames)
     .filter(Boolean);
 

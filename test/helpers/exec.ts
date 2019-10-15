@@ -47,8 +47,11 @@ export default function(
                 Object.assign(err, {
                     name: 'CommandFailedError',
                     code,
+                    signal,
                     cmd: [command, ...(args || [])],
                     options,
+                    stdout,
+                    stderr,
                 });
                 reject(err);
             }

@@ -5,8 +5,8 @@ import { AcceptedPlugin } from 'metalsmith-postcss2/dist/utils/postcss'; // esli
 import path from 'path';
 import util from 'util';
 
-import fixtures from '../fixtures';
 import { isArray } from '../helpers';
+import fixtures from './fixtures';
 
 async function execPlugins(
     plugins: ReadonlyArray<AcceptedPlugin>,

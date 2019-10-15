@@ -1,5 +1,0 @@
-{
-  "plugins": {
-    "metalsmith-postcss2": true
-  }
-}

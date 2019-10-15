@@ -3,9 +3,9 @@ import cloneDeep from 'lodash.clonedeep';
 import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
 
-import fixtures from '../fixtures';
 import { ignoreTypeError } from '../helpers';
 import { processAsync } from '../helpers/metalsmith';
+import fixtures from './fixtures';
 import { doubler } from './helpers/postcss-plugins';
 
 test('defaultOptions cannot be changed', async t => {

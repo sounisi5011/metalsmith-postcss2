@@ -17,7 +17,7 @@ module.exports = ctx => {
   );
 
   return {
-    plugins: [require('./postcss-plugins/doubler')],
+    plugins: [require('postcss-plugins/doubler')],
     map: {
       inline: false,
       annotation: sourceMapFilepath,
