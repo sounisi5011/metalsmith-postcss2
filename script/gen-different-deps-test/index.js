@@ -603,8 +603,9 @@ function spawnAsync(...args) {
  */
 const semverPattern = /[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+)?/;
 const pkgNamePattern = /(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*/g;
+const latestVersionPattern = /latest|\*/;
 const pkgNameWithVersionPattern = new RegExp(
-  String.raw`(${pkgNamePattern.source})@(?:latest|\*)`,
+  String.raw`(${pkgNamePattern.source})@(${latestVersionPattern.source})`,
   'g',
 );
 const pkgsDefDirnamePattern = new RegExp(
@@ -642,7 +643,10 @@ function getDefinedPkgNames(dirpath) {
       pkgNameWithVersionPattern,
       (_, pkgName) => `${pkgName}@${randStr}`,
     ),
-  ).replace(new RegExp(randStr, 'g'), semverPattern.source);
+  ).replace(
+    new RegExp(randStr, 'g'),
+    String.raw`(?:${latestVersionPattern.source}|${semverPattern.source})`,
+  );
 
   const parentDirpath = path.dirname(dirpath);
   return {
@@ -654,12 +658,19 @@ function getDefinedPkgNames(dirpath) {
     testDirPathGenerator(pkgsCombination) {
       return path.join(
         parentDirpath,
-        dirname.replace(pkgNameWithVersionPattern, (matchStr, pkgName) => {
-          const foundData = pkgsCombination.find(
-            ({ name }) => name === pkgName,
-          );
-          return foundData ? `${pkgName}@${foundData.version}` : matchStr;
-        }),
+        dirname.replace(
+          pkgNameWithVersionPattern,
+          (matchStr, pkgName, latestChar) => {
+            const foundData = pkgsCombination.find(
+              ({ name }) => name === pkgName,
+            );
+            const version =
+              foundData.version === getInstalledPackageVersion(pkgName)
+                ? latestChar
+                : foundData.version;
+            return foundData ? `${pkgName}@${version}` : matchStr;
+          },
+        ),
       );
     },
     testDirMatchRegExp: new RegExp(
@@ -710,8 +721,12 @@ function getInstalledPackageVersion(moduleId, fromDirectory = cwdFullpath) {
 }
 
 const pkgVersionsCache = new Map();
-async function getPkgVersions(pkgName) {
-  const cachedVersions = pkgVersionsCache.get(pkgName);
+async function getPkgVersions(
+  pkgName,
+  { excludeInstalledVersion = false } = {},
+) {
+  const cacheKey = `${pkgName}/${excludeInstalledVersion}`;
+  const cachedVersions = pkgVersionsCache.get(cacheKey);
   if (cachedVersions) {
     return cachedVersions;
   }
@@ -723,13 +738,15 @@ async function getPkgVersions(pkgName) {
     );
   }
 
-  const installedVersion = getInstalledPackageVersion(pkgName);
+  const installedVersion = excludeInstalledVersion
+    ? getInstalledPackageVersion(pkgName)
+    : null;
   const allVersions = await getPackagesVersions(pkgName);
   const filteredVersions = allVersions
     .filter(version => version !== installedVersion)
     .filter(version => semver.satisfies(version, versionRange));
 
-  pkgVersionsCache.set(pkgName, filteredVersions);
+  pkgVersionsCache.set(cacheKey, filteredVersions);
   return filteredVersions;
 }
 
@@ -810,7 +827,7 @@ async function main(args) {
 
     for (const packageName of allPackagesSet) {
       for (const { version, sortFriendly } of semverSortFriendlyName(
-        await getPkgVersions(packageName),
+        await getPkgVersions(packageName, { excludeInstalledVersion: true }),
       )) {
         const localPkgName = `${packageName}-${sortFriendly}`;
         const localPkgDirFullpath = path.resolve(
@@ -941,6 +958,10 @@ async function main(args) {
     ]);
     for (const pkgsCombination of await getPkgsCombinationList(pkgNameList)) {
       const testSubdirFullpath = testDirPathGenerator(pkgsCombination);
+      if (testSubdirFullpath === testOrigDirFullpath) {
+        continue;
+      }
+
       const nodeModulesDirFullpath = path.resolve(
         testSubdirFullpath,
         'node_modules',
@@ -952,17 +973,22 @@ async function main(args) {
        */
       const symlinkFullpathList = [];
       for (const { name: pkgName, version: pkgVersion } of pkgsCombination) {
-        const pkgInstalledFullpath = path.join(
-          localPkgDirFullpathMap.get(`${pkgName}@${pkgVersion}`),
-          'node_modules',
-          pkgName,
+        const localPkgDirFullpath = localPkgDirFullpathMap.get(
+          `${pkgName}@${pkgVersion}`,
         );
-        const symlinkFullpath = path.join(nodeModulesDirFullpath, pkgName);
-        await createSymlink({
-          symlinkFullpath,
-          linkTarget: pkgInstalledFullpath,
-        });
-        symlinkFullpathList.push(symlinkFullpath);
+        if (localPkgDirFullpath) {
+          const pkgInstalledFullpath = path.join(
+            localPkgDirFullpath,
+            'node_modules',
+            pkgName,
+          );
+          const symlinkFullpath = path.join(nodeModulesDirFullpath, pkgName);
+          await createSymlink({
+            symlinkFullpath,
+            linkTarget: pkgInstalledFullpath,
+          });
+          symlinkFullpathList.push(symlinkFullpath);
+        }
       }
 
       /*
