@@ -3,9 +3,9 @@ import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
 import util from 'util';
 
-import fixtures from '../fixtures';
 import { hasProp, switchTest } from '../helpers';
 import { processAsync } from '../helpers/metalsmith';
+import fixtures from './fixtures';
 
 test('should rename sugarss files: not set renamer option', async t => {
     const metalsmith = Metalsmith(fixtures('sugarss'))

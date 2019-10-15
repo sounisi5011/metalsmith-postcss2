@@ -1,8 +1,8 @@
 import test from 'ava';
 import path from 'path';
 
-import fixtures from './fixtures';
 import exec from './helpers/exec';
+import fixtures from './postcss@*/fixtures';
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const metalsmithCLI = path.resolve(

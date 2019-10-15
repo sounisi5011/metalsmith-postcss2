@@ -3,7 +3,6 @@ import Metalsmith from 'metalsmith';
 import postcss from 'metalsmith-postcss2'; // eslint-disable-line import/no-extraneous-dependencies
 import sass from 'metalsmith-sass';
 
-import fixtures from '../fixtures';
 import { hasProp, switchTest } from '../helpers';
 import { debuggerPlugin, processAsync } from '../helpers/metalsmith';
 import {
@@ -12,6 +11,7 @@ import {
     readInlineSourceMap,
     readSourceMapURL,
 } from '../helpers/source-map';
+import fixtures from './fixtures';
 import { doubler } from './helpers/postcss-plugins';
 
 test('should generate multi-level SourceMap file', async t => {
