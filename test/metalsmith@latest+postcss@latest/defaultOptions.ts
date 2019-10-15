@@ -34,7 +34,7 @@ test('defaultOptions cannot be changed', async t => {
                 );
 
                 ignoreTypeError(() => {
-                    defaultOptions.options.map = true;
+                    defaultOptions.options.map = {};
                 });
                 t.deepEqual(
                     defaultOptions,

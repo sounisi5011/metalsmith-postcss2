@@ -321,7 +321,9 @@ test('should generate multi-level inline SourceMap', async t => {
             postcss({
                 plugins: [doubler],
                 options: {
-                    map: true,
+                    // Note: Older versions of postcss cannot specify boolean in the map option due to the type definition problem that is included.
+                    //       This problem has been resolved in postcss@7.0.2 and above.
+                    map: true as any, // eslint-disable-line @typescript-eslint/no-explicit-any
                 },
             }),
         );
@@ -366,7 +368,13 @@ test('should generate multi-level inline SourceMap', async t => {
     );
 });
 
-for (const options of [{ map: false }, { map: undefined }, {}]) {
+for (const options of [
+    // Note: Older versions of postcss cannot specify false in the map option due to the type definition problem that is included.
+    //       This problem has been resolved in postcss@7.0.17 and above.
+    { map: false as any }, // eslint-disable-line @typescript-eslint/no-explicit-any
+    { map: undefined },
+    {},
+]) {
     test(`should not generate SourceMap: ${
         hasProp(options, 'map') ? options.map : 'not set map property'
     }`, async t => {
