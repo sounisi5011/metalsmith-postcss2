@@ -1,10 +1,10 @@
 import test from 'ava';
 import path from 'path';
 
-import exec from './helpers/exec';
-import fixtures from './postcss@*/fixtures';
+import exec from '../helpers/exec';
+import { PROJECT_ROOT } from '../helpers/rootPaths';
+import fixtures from './fixtures';
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
 const metalsmithCLI = path.resolve(
     PROJECT_ROOT,
     'node_modules',
