@@ -1,3 +1,3 @@
 module.exports = {
-  plugins: [require('./postcss-plugins/doubler')],
+  plugins: [require('postcss-plugins/doubler')],
 };
