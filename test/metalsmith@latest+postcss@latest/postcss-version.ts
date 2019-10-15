@@ -1,15 +1,9 @@
 import test from 'ava';
-import path from 'path';
 import postcss from 'postcss';
 
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const expectedVersion = (/^postcss@(.+)$/.exec(path.basename(__dirname)) ||
-    [])[1].replace(
-    /^(?:\*|latest)$/,
-    () =>
-        require(path.resolve(PROJECT_ROOT, 'package.json')).devDependencies
-            .postcss,
-);
+import pkgVersions from './_packages-versions';
+
+const expectedVersion = pkgVersions.postcss.version;
 
 test('should match postcss version', t => {
     t.is(require('postcss/package.json').version, expectedVersion);

@@ -3,6 +3,7 @@ import path from 'path';
 
 import exec from '../helpers/exec';
 import { PROJECT_ROOT } from '../helpers/rootPaths';
+import pkgVersions from './_packages-versions';
 import fixtures from './fixtures';
 
 const metalsmithCLI = path.resolve(
@@ -20,7 +21,7 @@ test.before(async t => {
             throw error;
         }
 
-        if (path.basename(__dirname) === 'postcss@*') {
+        if (Object.values(pkgVersions).every(pkgData => pkgData.isLatest)) {
             t.log('$ npm run build');
             await exec('npm', ['run', 'build'], { cwd: PROJECT_ROOT });
         } else {
