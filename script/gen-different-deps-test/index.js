@@ -35,6 +35,13 @@ function toUnixPath(pathstr) {
     .join('/');
 }
 
+function toJSCode(value, indent = 2) {
+  return JSON.stringify(value, null, indent).replace(
+    /[\u2028\u2029]/g,
+    char => `\\u${char.charCodeAt(0).toString(16)}`,
+  );
+}
+
 function trimPathSep(pathstr) {
   const escapedSep = escapeStringRegexp(path.sep);
   const trimPattern =
@@ -787,6 +794,82 @@ async function getPkgsCombinationList(pkgNameList) {
   return pkgsCombinationList;
 }
 
+/**
+ * @param {string} testDirFullpath
+ * @param {(string|{name:string, version:string})[]} pkgNameListOrPkgsCombination
+ * @returns {string[]}
+ */
+async function createPkgVersDefScripts(
+  testDirFullpath,
+  pkgNameListOrPkgsCombination,
+) {
+  /*
+   * Note: AVA ignores files with an underscore prefix
+   * see https://github.com/avajs/ava/blob/v2.4.0/docs/06-configuration.md#options
+   */
+  const pkgVersDefScriptNamePrefix = '_packages-versions';
+
+  /** @type {{name:string, version:string, isLatest:boolean}[]} */
+  const pkgDataList = pkgNameListOrPkgsCombination.map(pkgNameOrPkgData => {
+    if (typeof pkgNameOrPkgData === 'string') {
+      const name = pkgNameOrPkgData;
+      return {
+        name,
+        version: getInstalledPackageVersion(name),
+        isLatest: true,
+      };
+    } else {
+      const { name, version } = pkgNameOrPkgData;
+      return {
+        name,
+        version,
+        isLatest: getInstalledPackageVersion(name) === version,
+      };
+    }
+  });
+
+  /*
+   * Create JS file
+   */
+  const jsFilepath = path.join(
+    testDirFullpath,
+    `${pkgVersDefScriptNamePrefix}.js`,
+  );
+  await writeMultilinesFileAsync(jsFilepath, [
+    'module.exports = {',
+    ...pkgDataList.map(({ name, version, isLatest }) => [
+      `${toJSCode(name)}: {`,
+      [`version: ${toJSCode(version)},`, `isLatest: ${toJSCode(isLatest)}`],
+      `},`,
+    ]),
+    '};',
+  ]);
+
+  /*
+   * Create TypeScript Type Definition file
+   */
+  const tsFilepath = path.join(
+    testDirFullpath,
+    `${pkgVersDefScriptNamePrefix}.d.ts`,
+  );
+  await writeMultilinesFileAsync(
+    tsFilepath,
+    [
+      'declare const x: {',
+      ...pkgDataList.map(({ name }) => [
+        `readonly ${toJSCode(name)}: {`,
+        [`readonly version: string;`, `readonly isLatest: boolean;`],
+        `};`,
+      ]),
+      '};',
+      'export = x;',
+    ],
+    4,
+  );
+
+  return [jsFilepath, tsFilepath];
+}
+
 async function main(args) {
   const { options } = parseArgs(args);
   const testDirFullpath = path.resolve(
@@ -937,6 +1020,11 @@ async function main(args) {
     await createSymlink({ symlinkFullpath, linkTarget: cwdFullpath });
 
     /*
+     * Create packages version definition script files
+     */
+    await createPkgVersDefScripts(testOrigDirFullpath, pkgNameList);
+
+    /*
      * Create .gitignore file
      */
     await writeMultilinesFileAsync(
@@ -1009,6 +1097,14 @@ async function main(args) {
       }
 
       /*
+       * Create packages version definition script files
+       */
+      const pkgVersDefScriptFilepathList = await createPkgVersDefScripts(
+        testSubdirFullpath,
+        pkgsCombination,
+      );
+
+      /*
        * Create .gitignore file
        */
       await writeMultilinesFileAsync(
@@ -1022,11 +1118,9 @@ async function main(args) {
           `/${toUnixPath(
             path.relative(testSubdirFullpath, nodeModulesDirFullpath),
           )}/*`,
-          ...symlinkFullpathList.map(
-            symlinkFullpath =>
-              `!/${toUnixPath(
-                path.relative(testSubdirFullpath, symlinkFullpath),
-              )}`,
+          ...[...symlinkFullpathList, ...pkgVersDefScriptFilepathList].map(
+            fullpath =>
+              `!/${toUnixPath(path.relative(testSubdirFullpath, fullpath))}`,
           ),
         ],
       );
@@ -1038,7 +1132,15 @@ async function main(args) {
         const { create, remove } = await syncTwoDir(
           testOrigDirFullpath,
           testSubdirFullpath,
-          { ignoreFileList: ['/.gitignore', '/node_modules/'] },
+          {
+            ignoreFileList: [
+              '/.gitignore',
+              '/node_modules/',
+              ...pkgVersDefScriptFilepathList.map(
+                fullpath => `/${path.relative(testSubdirFullpath, fullpath)}`,
+              ),
+            ],
+          },
         );
         if (0 < create.length || 0 < remove.length) {
           console.error(

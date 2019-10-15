@@ -3,3 +3,5 @@
 !/node_modules/
 /node_modules/*
 !/node_modules/postcss
+!/_packages-versions.js
+!/_packages-versions.d.ts
