@@ -9,6 +9,7 @@ const escapeStringRegexp = require('escape-string-regexp');
 const importFrom = require('import-from');
 const makeDir = require('make-dir');
 const getPackagesVersions = require('packages-versions');
+const prettier = require('prettier');
 const rimraf = require('rimraf');
 const semver = require('semver');
 const tar = require('tar');
@@ -201,6 +202,32 @@ async function writeMultilinesFileAsync(filepath, lines, indent = 2) {
   );
 }
 
+/**
+ * @param {string} filepath
+ * @param {string[]|string[][]|string[][][]|string[][][][]|string[][][][][]|string[][][][][][]} lines
+ */
+async function writeScriptFileAsync(filepath, lines) {
+  const data = lines2str(lines);
+  const code = await formatCode(data, filepath);
+
+  let isExist = false;
+  try {
+    const origData = await readFileAsync(filepath);
+    if (origData.equals(Buffer.from(code))) {
+      return;
+    }
+    isExist = true;
+  } catch (err) {}
+
+  await makeDir(path.dirname(filepath));
+
+  await writeFileAsync(filepath, code);
+  console.error(
+    (isExist ? 'overwrite' : 'create') +
+      ` script file '${cwdRelativePath(filepath)}'`,
+  );
+}
+
 async function writeJSONFileAsync(filepath, value) {
   const data = JSON.stringify(value, null, 2) + '\n';
 
@@ -220,6 +247,16 @@ async function writeJSONFileAsync(filepath, value) {
     (isExist ? 'overwrite' : 'create') +
       ` JSON file '${cwdRelativePath(filepath)}'`,
   );
+}
+
+/**
+ * @param {string} code
+ * @param {string} filename
+ */
+async function formatCode(code, filename) {
+  const { languages } = prettier.getSupportInfo();
+  const prettierOptions = await prettier.resolveConfig(filename);
+  return prettier.format(code, { filepath: filename, ...prettierOptions });
 }
 
 async function forceRenameFile(oldPath, newPath, { debugLog = true } = {}) {
@@ -835,7 +872,7 @@ async function createPkgVersDefScripts(
     testDirFullpath,
     `${pkgVersDefScriptNamePrefix}.js`,
   );
-  await writeMultilinesFileAsync(jsFilepath, [
+  await writeScriptFileAsync(jsFilepath, [
     'module.exports = {',
     ...pkgDataList.map(({ name, version, isLatest }) => [
       `${toJSCode(name)}: {`,
@@ -852,20 +889,16 @@ async function createPkgVersDefScripts(
     testDirFullpath,
     `${pkgVersDefScriptNamePrefix}.d.ts`,
   );
-  await writeMultilinesFileAsync(
-    tsFilepath,
-    [
-      'declare const x: {',
-      ...pkgDataList.map(({ name }) => [
-        `readonly ${toJSCode(name)}: {`,
-        [`readonly version: string;`, `readonly isLatest: boolean;`],
-        `};`,
-      ]),
-      '};',
-      'export = x;',
-    ],
-    4,
-  );
+  await writeScriptFileAsync(tsFilepath, [
+    'declare const x: {',
+    ...pkgDataList.map(({ name }) => [
+      `readonly ${toJSCode(name)}: {`,
+      [`readonly version: string;`, `readonly isLatest: boolean;`],
+      `};`,
+    ]),
+    '};',
+    'export = x;',
+  ]);
 
   return [jsFilepath, tsFilepath];
 }
