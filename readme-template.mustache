@@ -1,11 +1,17 @@
 # {{{pkg.name}}}
 
+[![npm package](https://img.shields.io/npm/v/{{{pkg.name}}}.svg)][npm]
 [![License: {{{pkg.license}}}](https://img.shields.io/static/v1?label=license&message={{#encURL}} {{{pkg.license}}} {{/encURL}}&color=green)][github-license]
-![Supported Node version: {{{pkg.engines.node}}}](https://img.shields.io/static/v1?label=node&message={{#encURL}} {{{pkg.engines.node}}} {{/encURL}}&color=brightgreen)
+![Supported Node.js version: {{{pkg.engines.node}}}](https://img.shields.io/static/v1?label=node&message={{#encURL}} {{{pkg.engines.node}}} {{/encURL}}&color=brightgreen)
+![Supported Metalsmith version: {{{pkg.peerDependencies.metalsmith}}}](https://img.shields.io/static/v1?label=metalsmith&message={{#encURL}} {{{pkg.peerDependencies.metalsmith}}} {{/encURL}}&color=blue)
+![Supported PostCSS version: {{{pkg.peerDependencies.postcss}}}](https://img.shields.io/static/v1?label=postcss&message={{#encURL}} {{{pkg.peerDependencies.postcss}}} {{/encURL}}&color=blue)
+![Type Definitions: TypeScript](https://img.shields.io/static/v1?label=types&message=TypeScript&color=blue)
+[![bundle size](https://badgen.net/bundlephobia/min/{{{pkg.name}}}@{{{pkg.version}}})](https://bundlephobia.com/result?p={{{pkg.name}}}@{{{pkg.version}}})
 [![Dependencies Status](https://david-dm.org/sounisi5011/{{{pkg.name}}}/status.svg)](https://david-dm.org/sounisi5011/{{{pkg.name}}})
 [![Build Status](https://dev.azure.com/sounisi5011/{{{pkg.name}}}/_apis/build/status/sounisi5011.{{{pkg.name}}}?branchName=master)](https://dev.azure.com/sounisi5011/{{{pkg.name}}}/_build/latest?definitionId=1&branchName=master)
 [![Maintainability Status](https://api.codeclimate.com/v1/badges/dd1dfc5d976b1bce125c/maintainability)](https://codeclimate.com/github/sounisi5011/{{{pkg.name}}}/maintainability)
 
+[npm]: https://www.npmjs.com/package/{{{pkg.name}}}
 [github-license]: https://github.com/sounisi5011/{{{pkg.name}}}/blob/v{{{pkg.version}}}/LICENSE
 
 [Metalsmith] plugin for [PostCSS].
