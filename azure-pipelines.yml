@@ -30,6 +30,16 @@ strategy:
       node_version: 12.x
 
 steps:
+  - script: sudo sysctl fs.inotify.max_user_watches=524288
+    displayName: Fixes an issue where the max file watch count is exceeded, triggering ENOSPC
+
+    # see https://github.com/ember-decorators/ember-decorators/commit/8bd65ec0ba4c7bc962434bcc35927f50a47a9db9
+    # see https://stackoverflow.com/questions/22475849/node-js-error-enospc#32600959
+    # see https://serv-ops.com/knowledge/open.knowledge/view/15
+    # see https://www.virment.com/how-to-fix-system-limit-for-number-of-file-watchers-reached/
+    #
+    # Note: The maximum value for max_user_watches is 524288
+    #       see https://qiita.com/neuwell/items/c827c80673de0d787d41
   - task: NodeTool@0
     inputs:
       versionSpec: $(node_version)
