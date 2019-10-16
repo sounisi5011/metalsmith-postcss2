@@ -55,10 +55,18 @@ test('should transform css files with multiple processors', async t => {
 });
 
 test('should transform css files with postcssrc files', async t => {
+    // Note: postcss-load-config imports a plugins from the current working directory.
+    //       The current working directory of the test files executed by AVA indicates the project root.
+    //       To solve this problem, this test temporarily changes the current working directory.
+    const origCwd = process.cwd();
+    process.chdir(__dirname);
+
     const metalsmith = Metalsmith(fixtures('postcssrc'))
         .source('src')
         .use(postcss());
     const files = await processAsync(metalsmith);
+
+    process.chdir(origCwd);
 
     t.is(
         files['a.css'].contents.toString('utf8'),
