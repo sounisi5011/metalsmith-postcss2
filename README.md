@@ -6,7 +6,7 @@
 [![Build Status](https://dev.azure.com/sounisi5011/metalsmith-postcss2/_apis/build/status/sounisi5011.metalsmith-postcss2?branchName=master)](https://dev.azure.com/sounisi5011/metalsmith-postcss2/_build/latest?definitionId=1&branchName=master)
 [![Maintainability Status](https://api.codeclimate.com/v1/badges/dd1dfc5d976b1bce125c/maintainability)](https://codeclimate.com/github/sounisi5011/metalsmith-postcss2/maintainability)
 
-[github-license]: https://github.com/sounisi5011/metalsmith-postcss2/blob/v0.0.0/LICENSE
+[github-license]: https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/LICENSE
 
 [Metalsmith] plugin for [PostCSS].
 
