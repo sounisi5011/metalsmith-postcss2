@@ -151,7 +151,7 @@ If you want to stop renaming, set the `renamer` option to `false` or `null`.
 
 ### Use Metalsmith plugin options
 
-If you need to specify an options in `metalsmith.json`, set the options to the value of the `metalsmith-postcss2` key.
+If you need to specify an PostCSS options in `metalsmith.json`, set the options to the value of the `metalsmith-postcss2` key.
 
 ```json
 {
@@ -218,6 +218,8 @@ metalsmith
 
 For compatibility with the [Metalsmith CLI], this package exports single function in CommonJS style.  
 When using with TypeScript, it is better to use the [`import = require()` statement](https://www.typescriptlang.org/docs/handbook/modules.html#export--and-import--require).
+
+[Metalsmith CLI]: https://github.com/segmentio/metalsmith#cli
 
 ```js
 import postcss = require('metalsmith-postcss2');
