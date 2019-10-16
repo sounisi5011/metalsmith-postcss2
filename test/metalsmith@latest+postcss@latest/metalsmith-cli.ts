@@ -1,17 +1,9 @@
 import test from 'ava';
-import path from 'path';
 
 import exec from '../helpers/exec';
 import { PROJECT_ROOT } from '../helpers/rootPaths';
 import pkgVersions from './_packages-versions';
 import fixtures from './fixtures';
-
-const metalsmithCLI = path.resolve(
-    PROJECT_ROOT,
-    'node_modules',
-    '.bin',
-    'metalsmith',
-);
 
 test.before(async t => {
     try {
@@ -62,5 +54,6 @@ test.before(async t => {
 });
 
 test('should work with Metalsmith CLI', async t => {
+    const metalsmithCLI = require.resolve('metalsmith/bin/metalsmith');
     await t.notThrowsAsync(exec(metalsmithCLI, [], { cwd: fixtures('basic') }));
 });
