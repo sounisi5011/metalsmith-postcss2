@@ -1,0 +1,67 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - master
+
+pool:
+  vmImage: "ubuntu-latest"
+
+strategy:
+  matrix:
+    Node.js 8.3.0:
+      node_version: 8.3.0
+    Node.js 8.x:
+      node_version: 8.x
+    Node.js 9.0.0:
+      node_version: 9.0.0
+    Node.js 9.x:
+      node_version: 9.x
+    Node.js 10.0.0:
+      node_version: 10.0.0
+    Node.js 10.x:
+      node_version: 10.x
+    Node.js 11.0.0:
+      node_version: 11.0.0
+    Node.js 11.x:
+      node_version: 11.x
+    Node.js 12.0.0:
+      node_version: 12.0.0
+    Node.js 12.x:
+      node_version: 12.x
+
+steps:
+  - script:
+      sudo sysctl fs.inotify.max_user_watches=524288
+      # see https://github.com/ember-decorators/ember-decorators/commit/8bd65ec0ba4c7bc962434bcc35927f50a47a9db9
+      # see https://stackoverflow.com/questions/22475849/node-js-error-enospc#32600959
+      # see https://serv-ops.com/knowledge/open.knowledge/view/15
+      # see https://www.virment.com/how-to-fix-system-limit-for-number-of-file-watchers-reached/
+      #
+      # Note: The maximum value for max_user_watches is 524288
+      #       see https://qiita.com/neuwell/items/c827c80673de0d787d41
+    displayName: Fixes an issue where the max file watch count is exceeded, triggering ENOSPC
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: $(node_version)
+    displayName: Install Node.js
+
+  - script: |
+      echo node $(node --version)
+      echo npm $(npm --version)
+    displayName: Show node and npm version
+
+  - script: |
+      if node -e '/^(?:[0-4]\.|5\.[0-9]\.|5\.10\.0-)/.test(process.argv.pop()) || process.exit(1)' $(npm -v); then
+        npm i -g npm@5.10.0;
+      fi
+    displayName: If npm version is less than 5.10.0, update to 5.10.0
+
+  - script: npm ci
+    displayName: Install dependencies
+
+  - script: npm test
+    displayName: Run test
