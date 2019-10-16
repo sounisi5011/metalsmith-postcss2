@@ -1,0 +1,7 @@
+/*
+!/.gitignore
+!/node_modules/
+/node_modules/*
+!/node_modules/metalsmith
+!/_packages-versions.js
+!/_packages-versions.d.ts

@@ -3,10 +3,15 @@ import postcss from 'postcss';
 
 import pkgVersions from './_packages-versions';
 
-const expectedVersion = pkgVersions.postcss.version;
+const metalsmithVersion = pkgVersions.metalsmith.version;
+const postcssVersion = pkgVersions.postcss.version;
+
+test('should match metalsmith version', t => {
+    t.is(require('metalsmith/package.json').version, metalsmithVersion);
+});
 
 test('should match postcss version', t => {
-    t.is(require('postcss/package.json').version, expectedVersion);
+    t.is(require('postcss/package.json').version, postcssVersion);
 });
 
 test('should match postcss Processor#version property', t => {
@@ -20,7 +25,7 @@ test('should match postcss Processor#version property', t => {
             '5.0.19',
             '5.0.20',
             '5.0.21',
-        ].includes(expectedVersion)
+        ].includes(postcssVersion)
     ) {
         /**
          * postcss after version 5.0.15 forgot to update Processor#version property until it was updated to 5.1.0.
@@ -33,13 +38,13 @@ test('should match postcss Processor#version property', t => {
          * @see https://github.com/postcss/postcss/blob/5.0.21/lib/processor.es6#L5
          */
         t.is(postcssProcessor.version, '5.0.14');
-    } else if (expectedVersion === '5.2.1') {
+    } else if (postcssVersion === '5.2.1') {
         /**
          * postcss@5.2.1 forgot to update Processor#version property.
          * @see https://github.com/postcss/postcss/blob/5.2.1/lib/processor.es6#L110
          */
         t.is(postcssProcessor.version, '5.2.0');
     } else {
-        t.is(postcssProcessor.version, expectedVersion);
+        t.is(postcssProcessor.version, postcssVersion);
     }
 });
