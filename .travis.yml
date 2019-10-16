@@ -26,7 +26,6 @@ branches:
     - /^renovate\/prettier-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
     - /^renovate\/sort-package-json-[0-9]+(?:\.[0-9])?\.x(?:-lockfile)?$/
 cache: npm
-sudo: required
 before_install:
   # Fixes an issue where the max file watch count is exceeded, triggering ENOSPC
   # see https://github.com/ember-decorators/ember-decorators/commit/8bd65ec0ba4c7bc962434bcc35927f50a47a9db9
