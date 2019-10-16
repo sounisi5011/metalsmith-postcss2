@@ -9,6 +9,7 @@ const escapeStringRegexp = require('escape-string-regexp');
 const importFrom = require('import-from');
 const makeDir = require('make-dir');
 const getPackagesVersions = require('packages-versions');
+const prettier = require('prettier');
 const rimraf = require('rimraf');
 const semver = require('semver');
 const tar = require('tar');
@@ -33,6 +34,13 @@ function toUnixPath(pathstr) {
     .normalize(pathstr)
     .split(path.sep)
     .join('/');
+}
+
+function toJSCode(value, indent = 2) {
+  return JSON.stringify(value, null, indent).replace(
+    /[\u2028\u2029]/g,
+    char => `\\u${char.charCodeAt(0).toString(16)}`,
+  );
 }
 
 function trimPathSep(pathstr) {
@@ -194,6 +202,32 @@ async function writeMultilinesFileAsync(filepath, lines, indent = 2) {
   );
 }
 
+/**
+ * @param {string} filepath
+ * @param {string[]|string[][]|string[][][]|string[][][][]|string[][][][][]|string[][][][][][]} lines
+ */
+async function writeScriptFileAsync(filepath, lines) {
+  const data = lines2str(lines);
+  const code = await formatCode(data, filepath);
+
+  let isExist = false;
+  try {
+    const origData = await readFileAsync(filepath);
+    if (origData.equals(Buffer.from(code))) {
+      return;
+    }
+    isExist = true;
+  } catch (err) {}
+
+  await makeDir(path.dirname(filepath));
+
+  await writeFileAsync(filepath, code);
+  console.error(
+    (isExist ? 'overwrite' : 'create') +
+      ` script file '${cwdRelativePath(filepath)}'`,
+  );
+}
+
 async function writeJSONFileAsync(filepath, value) {
   const data = JSON.stringify(value, null, 2) + '\n';
 
@@ -213,6 +247,16 @@ async function writeJSONFileAsync(filepath, value) {
     (isExist ? 'overwrite' : 'create') +
       ` JSON file '${cwdRelativePath(filepath)}'`,
   );
+}
+
+/**
+ * @param {string} code
+ * @param {string} filename
+ */
+async function formatCode(code, filename) {
+  const { languages } = prettier.getSupportInfo();
+  const prettierOptions = await prettier.resolveConfig(filename);
+  return prettier.format(code, { filepath: filename, ...prettierOptions });
 }
 
 async function forceRenameFile(oldPath, newPath, { debugLog = true } = {}) {
@@ -603,8 +647,9 @@ function spawnAsync(...args) {
  */
 const semverPattern = /[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+)?/;
 const pkgNamePattern = /(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*/g;
+const latestVersionPattern = /latest|\*/;
 const pkgNameWithVersionPattern = new RegExp(
-  String.raw`(${pkgNamePattern.source})@(?:latest|\*)`,
+  String.raw`(${pkgNamePattern.source})@(${latestVersionPattern.source})`,
   'g',
 );
 const pkgsDefDirnamePattern = new RegExp(
@@ -642,7 +687,10 @@ function getDefinedPkgNames(dirpath) {
       pkgNameWithVersionPattern,
       (_, pkgName) => `${pkgName}@${randStr}`,
     ),
-  ).replace(new RegExp(randStr, 'g'), semverPattern.source);
+  ).replace(
+    new RegExp(randStr, 'g'),
+    String.raw`(?:${latestVersionPattern.source}|${semverPattern.source})`,
+  );
 
   const parentDirpath = path.dirname(dirpath);
   return {
@@ -654,12 +702,19 @@ function getDefinedPkgNames(dirpath) {
     testDirPathGenerator(pkgsCombination) {
       return path.join(
         parentDirpath,
-        dirname.replace(pkgNameWithVersionPattern, (matchStr, pkgName) => {
-          const foundData = pkgsCombination.find(
-            ({ name }) => name === pkgName,
-          );
-          return foundData ? `${pkgName}@${foundData.version}` : matchStr;
-        }),
+        dirname.replace(
+          pkgNameWithVersionPattern,
+          (matchStr, pkgName, latestChar) => {
+            const foundData = pkgsCombination.find(
+              ({ name }) => name === pkgName,
+            );
+            const version =
+              foundData.version === getInstalledPackageVersion(pkgName)
+                ? latestChar
+                : foundData.version;
+            return foundData ? `${pkgName}@${version}` : matchStr;
+          },
+        ),
       );
     },
     testDirMatchRegExp: new RegExp(
@@ -710,8 +765,12 @@ function getInstalledPackageVersion(moduleId, fromDirectory = cwdFullpath) {
 }
 
 const pkgVersionsCache = new Map();
-async function getPkgVersions(pkgName) {
-  const cachedVersions = pkgVersionsCache.get(pkgName);
+async function getPkgVersions(
+  pkgName,
+  { excludeInstalledVersion = false } = {},
+) {
+  const cacheKey = `${pkgName}/${excludeInstalledVersion}`;
+  const cachedVersions = pkgVersionsCache.get(cacheKey);
   if (cachedVersions) {
     return cachedVersions;
   }
@@ -723,13 +782,15 @@ async function getPkgVersions(pkgName) {
     );
   }
 
-  const installedVersion = getInstalledPackageVersion(pkgName);
+  const installedVersion = excludeInstalledVersion
+    ? getInstalledPackageVersion(pkgName)
+    : null;
   const allVersions = await getPackagesVersions(pkgName);
   const filteredVersions = allVersions
     .filter(version => version !== installedVersion)
     .filter(version => semver.satisfies(version, versionRange));
 
-  pkgVersionsCache.set(pkgName, filteredVersions);
+  pkgVersionsCache.set(cacheKey, filteredVersions);
   return filteredVersions;
 }
 
@@ -768,6 +829,78 @@ async function getPkgsCombinationList(pkgNameList) {
   }
 
   return pkgsCombinationList;
+}
+
+/**
+ * @param {string} testDirFullpath
+ * @param {(string|{name:string, version:string})[]} pkgNameListOrPkgsCombination
+ * @returns {string[]}
+ */
+async function createPkgVersDefScripts(
+  testDirFullpath,
+  pkgNameListOrPkgsCombination,
+) {
+  /*
+   * Note: AVA ignores files with an underscore prefix
+   * see https://github.com/avajs/ava/blob/v2.4.0/docs/06-configuration.md#options
+   */
+  const pkgVersDefScriptNamePrefix = '_packages-versions';
+
+  /** @type {{name:string, version:string, isLatest:boolean}[]} */
+  const pkgDataList = pkgNameListOrPkgsCombination.map(pkgNameOrPkgData => {
+    if (typeof pkgNameOrPkgData === 'string') {
+      const name = pkgNameOrPkgData;
+      return {
+        name,
+        version: getInstalledPackageVersion(name),
+        isLatest: true,
+      };
+    } else {
+      const { name, version } = pkgNameOrPkgData;
+      return {
+        name,
+        version,
+        isLatest: getInstalledPackageVersion(name) === version,
+      };
+    }
+  });
+
+  /*
+   * Create JS file
+   */
+  const jsFilepath = path.join(
+    testDirFullpath,
+    `${pkgVersDefScriptNamePrefix}.js`,
+  );
+  await writeScriptFileAsync(jsFilepath, [
+    'module.exports = {',
+    ...pkgDataList.map(({ name, version, isLatest }) => [
+      `${toJSCode(name)}: {`,
+      [`version: ${toJSCode(version)},`, `isLatest: ${toJSCode(isLatest)}`],
+      `},`,
+    ]),
+    '};',
+  ]);
+
+  /*
+   * Create TypeScript Type Definition file
+   */
+  const tsFilepath = path.join(
+    testDirFullpath,
+    `${pkgVersDefScriptNamePrefix}.d.ts`,
+  );
+  await writeScriptFileAsync(tsFilepath, [
+    'declare const x: {',
+    ...pkgDataList.map(({ name }) => [
+      `readonly ${toJSCode(name)}: {`,
+      [`readonly version: string;`, `readonly isLatest: boolean;`],
+      `};`,
+    ]),
+    '};',
+    'export = x;',
+  ]);
+
+  return [jsFilepath, tsFilepath];
 }
 
 async function main(args) {
@@ -810,7 +943,7 @@ async function main(args) {
 
     for (const packageName of allPackagesSet) {
       for (const { version, sortFriendly } of semverSortFriendlyName(
-        await getPkgVersions(packageName),
+        await getPkgVersions(packageName, { excludeInstalledVersion: true }),
       )) {
         const localPkgName = `${packageName}-${sortFriendly}`;
         const localPkgDirFullpath = path.resolve(
@@ -920,6 +1053,11 @@ async function main(args) {
     await createSymlink({ symlinkFullpath, linkTarget: cwdFullpath });
 
     /*
+     * Create packages version definition script files
+     */
+    await createPkgVersDefScripts(testOrigDirFullpath, pkgNameList);
+
+    /*
      * Create .gitignore file
      */
     await writeMultilinesFileAsync(
@@ -941,6 +1079,10 @@ async function main(args) {
     ]);
     for (const pkgsCombination of await getPkgsCombinationList(pkgNameList)) {
       const testSubdirFullpath = testDirPathGenerator(pkgsCombination);
+      if (testSubdirFullpath === testOrigDirFullpath) {
+        continue;
+      }
+
       const nodeModulesDirFullpath = path.resolve(
         testSubdirFullpath,
         'node_modules',
@@ -952,17 +1094,22 @@ async function main(args) {
        */
       const symlinkFullpathList = [];
       for (const { name: pkgName, version: pkgVersion } of pkgsCombination) {
-        const pkgInstalledFullpath = path.join(
-          localPkgDirFullpathMap.get(`${pkgName}@${pkgVersion}`),
-          'node_modules',
-          pkgName,
+        const localPkgDirFullpath = localPkgDirFullpathMap.get(
+          `${pkgName}@${pkgVersion}`,
         );
-        const symlinkFullpath = path.join(nodeModulesDirFullpath, pkgName);
-        await createSymlink({
-          symlinkFullpath,
-          linkTarget: pkgInstalledFullpath,
-        });
-        symlinkFullpathList.push(symlinkFullpath);
+        if (localPkgDirFullpath) {
+          const pkgInstalledFullpath = path.join(
+            localPkgDirFullpath,
+            'node_modules',
+            pkgName,
+          );
+          const symlinkFullpath = path.join(nodeModulesDirFullpath, pkgName);
+          await createSymlink({
+            symlinkFullpath,
+            linkTarget: pkgInstalledFullpath,
+          });
+          symlinkFullpathList.push(symlinkFullpath);
+        }
       }
 
       /*
@@ -983,6 +1130,14 @@ async function main(args) {
       }
 
       /*
+       * Create packages version definition script files
+       */
+      const pkgVersDefScriptFilepathList = await createPkgVersDefScripts(
+        testSubdirFullpath,
+        pkgsCombination,
+      );
+
+      /*
        * Create .gitignore file
        */
       await writeMultilinesFileAsync(
@@ -996,11 +1151,9 @@ async function main(args) {
           `/${toUnixPath(
             path.relative(testSubdirFullpath, nodeModulesDirFullpath),
           )}/*`,
-          ...symlinkFullpathList.map(
-            symlinkFullpath =>
-              `!/${toUnixPath(
-                path.relative(testSubdirFullpath, symlinkFullpath),
-              )}`,
+          ...[...symlinkFullpathList, ...pkgVersDefScriptFilepathList].map(
+            fullpath =>
+              `!/${toUnixPath(path.relative(testSubdirFullpath, fullpath))}`,
           ),
         ],
       );
@@ -1012,7 +1165,15 @@ async function main(args) {
         const { create, remove } = await syncTwoDir(
           testOrigDirFullpath,
           testSubdirFullpath,
-          { ignoreFileList: ['/.gitignore', '/node_modules/'] },
+          {
+            ignoreFileList: [
+              '/.gitignore',
+              '/node_modules/',
+              ...pkgVersDefScriptFilepathList.map(
+                fullpath => `/${path.relative(testSubdirFullpath, fullpath)}`,
+              ),
+            ],
+          },
         );
         if (0 < create.length || 0 < remove.length) {
           console.error(

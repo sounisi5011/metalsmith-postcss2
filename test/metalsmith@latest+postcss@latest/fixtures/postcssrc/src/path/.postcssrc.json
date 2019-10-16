@@ -1,0 +1,8 @@
+{
+  "plugins": {
+    "./fixtures/node_modules/postcss-plugins/doublerAsync": {},
+    "./fixtures/node_modules/postcss-plugins/doublerObject": {
+      "dummy": 42
+    }
+  }
+}

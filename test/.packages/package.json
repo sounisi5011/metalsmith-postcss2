@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "metalsmith-2.2.0": "file:metalsmith@2.2.0",
+    "metalsmith-2.2.1": "file:metalsmith@2.2.1",
+    "metalsmith-2.2.2": "file:metalsmith@2.2.2",
     "postcss-5.2.18": "file:postcss@5.2.18",
     "postcss-6.0.13": "file:postcss@6.0.13",
     "postcss-6.0.14": "file:postcss@6.0.14",
