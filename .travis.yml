@@ -33,7 +33,7 @@ before_install:
   # see https://stackoverflow.com/questions/22475849/node-js-error-enospc#32600959
   # see https://serv-ops.com/knowledge/open.knowledge/view/15
   # see https://qiita.com/neuwell/items/c827c80673de0d787d41
-  - echo 524288 > /proc/sys/fs/inotify/max_user_watches
+  - sudo echo 524288 > /proc/sys/fs/inotify/max_user_watches
 
   # If npm version is less than 5.10.0, update to 5.10.0
   # see https://qiita.com/ybiquitous/items/dd6cfb03c589452dfdc8#ruby-%E3%82%92%E4%BD%BF%E3%81%862018-06-08
