@@ -375,7 +375,39 @@ Omit<postcss.ProcessOptions, 'from' | 'to'>
 Specify a function to rename of processed CSS files.
 
 If you specify a [falsy value] other than `undefined`, such as `null` or `false`, processed files will not be renamed.
+
+```js
+// These values ​​disable file renaming
+false
+0
+-0
+NaN
+-NaN
+''
+""
+``
+null
+```
+
 If `undefined` or a [truthy value] other than function is specified, use the default renamer.
+
+```js
+// These values ​​use the default renamer
+undefined
+true
+42
+-42
+Infinity
+-Infinity
+'str'
+"0"
+`false`
+{}
+[]
+/ab+c/i
+new Date()
+... // And other non-function objects
+```
 
 [falsy value]: https://developer.mozilla.org/en-US/docs/Glossary/Falsy
 [truthy value]: https://developer.mozilla.org/en-US/docs/Glossary/Truthy
