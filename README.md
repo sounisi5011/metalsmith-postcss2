@@ -366,14 +366,14 @@ TODO
 
 For more advanced usage it's recommend to to use a function in `postcss.config.js`, this gives you access to the CLI context to dynamically apply options and plugins **per file**
 
-| Name          | Type                                                                                                                   | Description            | Default                                      |
-| :-----------: | :--------------------------------------------------------------------------------------------------------------------: | :--------------------- | :------------------------------------------: |
-| `cwd`         | `string`                                                                                                               | `process.cwd()`        | `process.cwd()`                              |
-| `env`         | `string`                                                                                                               | `process.env.NODE_ENV` | `'development'`                              |
-| `options`     | [`postcss.ProcessOptions`][PostCSS ProcessOptions]                                                                     | PostCSS Options        | `from, to, parser, stringifier, syntax, map` |
-| `file`        | `{dirname: string, basename: string, extname: string}`                                                                 | Source File Data       | `dirname, basename, extname`                 |
-| `pluginsList` | `(`[`Plugin`][postcss.Plugin]` | `[`pluginFunction`][postcss.pluginFunction]` | `[`Processor`][postcss.Processor]`)[]` | PostCSS Plugins Array  | `[]`                                         |
-| `metalsmith`  | [`Metalsmith`]                                                                                                         | `Metalsmith` instance  | `Metalsmith(...)`                            |
+| Name          | Type                                                                                                                         | Description            | Default                                      |
+| :-----------: | :--------------------------------------------------------------------------------------------------------------------------: | :--------------------- | :------------------------------------------: |
+| `cwd`         | `string`                                                                                                                     | `process.cwd()`        | `process.cwd()`                              |
+| `env`         | `string`                                                                                                                     | `process.env.NODE_ENV` | `'development'`                              |
+| `options`     | [`postcss.ProcessOptions`][PostCSS ProcessOptions]                                                                           | PostCSS Options        | `from, to, parser, stringifier, syntax, map` |
+| `file`        | `{dirname: string, basename: string, extname: string}`                                                                       | Source File Data       | `dirname, basename, extname`                 |
+| `pluginsList` | `(` [`Plugin`][postcss.Plugin] ` | ` [`pluginFunction`][postcss.pluginFunction] ` | ` [`Processor`][postcss.Processor] `)[]` | PostCSS Plugins Array  | `[]`                                         |
+| `metalsmith`  | `Metalsmith`                                                                                                                 | `Metalsmith` instance  | `Metalsmith(...)`                            |
 
 [postcss.Plugin]: http://api.postcss.org/global.html#Plugin
 [postcss.pluginFunction]: http://api.postcss.org/global.html#pluginFunction
