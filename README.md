@@ -456,7 +456,7 @@ body {
 }
 ```
 
-If value `'dependencies data'` is specified in `dependenciesKey` option, the following objects are inserted into the metadata:
+If value `'dependencies data'` is specified in `dependenciesKey` option, the following "dependencies object" are inserted into the metadata:
 
 ```js
 {
