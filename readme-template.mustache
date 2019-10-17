@@ -291,9 +291,10 @@ NestedReadonlyArray<postcss.AcceptedPlugin | string | PluginsRecord> | PluginsRe
 ### `options`
 
 Specify options to pass to the [PostCSS Processor#process() method].
-See the [PostCSS documentation for details on options](http://api.postcss.org/global.html#processOptions).
+See the [PostCSS documentation for details on options][PostCSS ProcessOptions].
 
 [PostCSS Processor#process() method]: http://api.postcss.org/Processor.html#process
+[PostCSS ProcessOptions]: http://api.postcss.org/global.html#processOptions
 
 The "from" option and the "to" option cannot be specified because the plugin automatically sets them internally.
 If set, an exception will be thrown.
@@ -360,6 +361,36 @@ string | false | null
 ### PostCSS Plugin array
 
 TODO
+
+## [PostCSS Config][npm-postcss-load-config-used] Context
+
+For more advanced usage it's recommend to to use a function in `postcss.config.js`, this gives you access to the CLI context to dynamically apply options and plugins **per file**
+
+| Name          | Type                                                                                                                   | Description            | Default                                      |
+| :-----------: | :--------------------------------------------------------------------------------------------------------------------: | :--------------------- | :------------------------------------------: |
+| `cwd`         | `string`                                                                                                               | `process.cwd()`        | `process.cwd()`                              |
+| `env`         | `string`                                                                                                               | `process.env.NODE_ENV` | `'development'`                              |
+| `options`     | [`postcss.ProcessOptions`][PostCSS ProcessOptions]                                                                     | PostCSS Options        | `from, to, parser, stringifier, syntax, map` |
+| `file`        | `{dirname: string, basename: string, extname: string}`                                                                 | Source File Data       | `dirname, basename, extname`                 |
+| `pluginsList` | `(`[`Plugin`][postcss.Plugin]` | `[`pluginFunction`][postcss.pluginFunction]` | `[`Processor`][postcss.Processor]`)[]` | PostCSS Plugins Array  | `[]`                                         |
+| `metalsmith`  | [`Metalsmith`]                                                                                                         | `Metalsmith` instance  | `Metalsmith(...)`                            |
+
+[postcss.Plugin]: http://api.postcss.org/global.html#Plugin
+[postcss.pluginFunction]: http://api.postcss.org/global.html#pluginFunction
+[postcss.Processor]: http://api.postcss.org/Processor.html
+
+**postcss.config.js**
+
+```js
+module.exports = ctx => ({
+  map: ctx.options.map,
+  parser: ctx.file.extname === '.sss' ? 'sugarss' : false,
+  plugins: {
+    'postcss-import': { root: ctx.file.dirname },
+    cssnano: ctx.env === 'production' ? {} : false
+  }
+})
+```
 
 ## Debug mode
 
