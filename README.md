@@ -23,7 +23,7 @@
 
 *   Supports the latest PostCSS
 
-    Supported and tested version: [![^5.2.18 || ^6.0.13 || 7.x](https://img.shields.io/static/v1?label=postcss&message=%5E5.2.18%20%7C%7C%20%5E6.0.13%20%7C%7C%207.x&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L146).
+    Supported and tested version: [![ ^5.2.18 || ^6.0.13 || 7.x](https://img.shields.io/static/v1?label=postcss&message=%5E5.2.18%20%7C%7C%20%5E6.0.13%20%7C%7C%207.x&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L146).
 
 *   Loading [PostCSS config file][npm-postcss-load-config-used]
 
