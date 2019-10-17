@@ -269,7 +269,48 @@ string | string[]
 
 ### `plugins`
 
-TODO
+Specifies an array of PostCSS plugins.
+In addition to PostCSS plugins, you can also specify the following values:
+
+*   An array of strings listed the plugin package names
+
+    ```js
+    [
+      'postcss-import',     // equal to require('postcss-import')
+      'postcss-preset-env', // equal to require('postcss-preset-env')
+      'cssnano'             // equal to require('cssnano')
+    ]
+    ```
+
+*   Object that has plugin package name as key and plugin options as value. Plugins with a value of `false` are excluded
+
+    ```js
+    {
+      'postcss-import': {},               // equal to require('postcss-import') ; if value object has no properties, it is not used for options
+      'postcss-preset-env': { stage: 0 }, // equal to require('postcss-preset-env')({ stage: 0 })
+      'cssnano': 42,                      // equal to require('cssnano') ; if value is not an object, it is not used for options
+      'postcss-pseudoelements': false     // if value is false, plugin will not be imported
+    }
+    ```
+
+*   An array of the values ​​described above. Arrays can recurse indefinitely
+
+    ```js
+    [
+      'postcss-import',
+      [
+        {
+          'postcss-preset-env': { stage: 0 },
+          'postcss-pseudoelements': { single: true }
+        }
+      ],
+      [
+        [
+          require('cssnano')
+        ]
+      ]
+    ]
+    ```
 
 Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L53)):
 
@@ -360,7 +401,18 @@ string | false | null
 
 ### PostCSS Plugin array
 
-TODO
+An options can also be an array.
+If an array is specified, its value is used as the [`plugins`](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/README.md#plugins) option.
+
+```js
+const postcss = require('metalsmith-postcss2');
+
+postcss([ 'postcss-import' ])
+// equal to:
+//   postcss({
+//     plugins: [ 'postcss-import' ]
+//   })
+```
 
 ## [PostCSS Config][npm-postcss-load-config-used] Context
 
