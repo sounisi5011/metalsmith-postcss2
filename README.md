@@ -175,7 +175,7 @@ However, **this is not recommended**.
 Plugin options are parsed differently than the PostCSS configuration file. It is not fully compatible.
 A prominent example of this difference is that it currently does not support the `parser` option specified as a string.
 
-```json
+```json5
 {
   "plugins": {
     "metalsmith-postcss2": {
