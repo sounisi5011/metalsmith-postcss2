@@ -1,6 +1,6 @@
 # metalsmith-postcss2
 
-[![npm package](https://img.shields.io/npm/v/metalsmith-postcss2.svg)][npm]
+[![Go to the latest release page on npm](https://img.shields.io/npm/v/metalsmith-postcss2.svg)][npm]
 [![License: MIT](https://img.shields.io/static/v1?label=license&message=MIT&color=green)][github-license]
 ![Supported Node.js version: >=8.3.0](https://img.shields.io/static/v1?label=node&message=%3E%3D8.3.0&color=brightgreen)
 ![Supported Metalsmith version: ^2.2.0](https://img.shields.io/static/v1?label=metalsmith&message=%5E2.2.0&color=blue)
