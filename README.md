@@ -249,7 +249,7 @@ const path = require('path');
 
 ### `pattern`
 
-Specifies the Glob pattern that matches the file to be validated.  
+Only files that match this pattern will be processed.  
 Specify a glob expression string or an array of strings as the pattern.  
 Pattern are verified using [multimatch v4.0.0][npm-multimatch-used].
 
