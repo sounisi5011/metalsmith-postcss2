@@ -47,7 +47,8 @@ Install via npm and then add the `metalsmith-postcss2` key to your `metalsmith.j
 }
 ```
 
-Then create a PostCSS configuration file.　It is a file with a name like `postcss.config.js` or `.postcssrc.*`.
+Then create a PostCSS configuration file.
+It is a file with a name like `postcss.config.js` or `.postcssrc.*`.
 
 **`postcss.config.js`**
 ```js
@@ -135,7 +136,7 @@ module.exports = {
 ```
 
 By default, all processed file extensions are renamed to `.css`.
-If you want to stop renaming, set the `renamer` option to `false` or `null`.
+If you want to stop renaming, set [the `renamer` option](#renamer) to `false` or `null`.
 
 **`metalsmith.json`**
 ```json
@@ -234,7 +235,7 @@ metalsmith
 
 ## TypeScript Usage
 
-For compatibility with the [Metalsmith CLI], this package exports single function in CommonJS style.  
+For compatibility with the [Metalsmith CLI], this package exports single function in CommonJS style.
 When using with TypeScript, it is better to use the [`import = require()` statement](https://www.typescriptlang.org/docs/handbook/modules.html#export--and-import--require).
 
 [Metalsmith CLI]: https://github.com/segmentio/metalsmith#cli
@@ -267,8 +268,9 @@ const path = require('path');
 
 ### `pattern`
 
-Only files that match this pattern will be processed.  
-Specify a glob expression string or an array of strings as the pattern.  
+Only files that match this pattern will be processed.
+Specify a glob expression string or an array of strings as the pattern.
+
 Pattern are verified using [multimatch v4.0.0][npm-multimatch-used].
 
 [npm-multimatch-used]: https://www.npmjs.com/package/multimatch/v/4.0.0
@@ -311,7 +313,7 @@ In addition to PostCSS plugins, you can also specify the following values:
     }
     ```
 
-*   An array of the values ​​described above. Arrays can recurse indefinitely
+*   An array of the values described above. Arrays can recurse indefinitely
 
     ```js
     [
@@ -339,10 +341,10 @@ Type definition ([source line 27](https://github.com/sounisi5011/metalsmith-post
 ```ts
 // import postcss from 'postcss';
 //
-// type NestedReadonlyArray<T> = (T | NestedReadonlyArray<T>)[]
+// type NestedArray<T> = (T | NestedArray<T>)[]
 // type PluginsRecord = Record<string, unknown>;
 
-NestedReadonlyArray<postcss.AcceptedPlugin | string | PluginsRecord> | PluginsRecord
+NestedArray<postcss.AcceptedPlugin | string | PluginsRecord> | PluginsRecord
 ```
 
 ### `options`
@@ -377,7 +379,7 @@ Specify a function to rename of processed CSS files.
 If you specify a [falsy value] other than `undefined`, such as `null` or `false`, processed files will not be renamed.
 
 ```js
-// These values ​​disable file renaming
+// These values disable file renaming
 false
 0
 -0
@@ -392,7 +394,7 @@ null
 If `undefined` or a [truthy value] other than function is specified, use the default renamer.
 
 ```js
-// These values ​​use the default renamer
+// These values use the default renamer
 undefined
 true
 42
@@ -480,7 +482,24 @@ If value `'dependencies data'` is specified in `dependenciesKey` option, the fol
         mode: ...,
         stats: Stats { ... },
         ...
-      },
+      }
+    }
+  },
+  'foo.css': {
+    // ↓ Properties automatically added by Metalsmith
+    contents: Buffer.from('.foo { ...'), // Converted CSS contents
+    mode: ...,
+    stats: Stats { ... },
+    // ↑ Properties automatically added by Metalsmith
+
+    // ↓ dependencies object added by specifying "dependenciesKey" option
+    ['dependencies data']: {
+      'foo.css': {
+        contents: Buffer.from('.foo { ...'), // Contents of foo.css before conversion
+        mode: ...,
+        stats: Stats { ... },
+        ...
+      }
     }
   },
   ...
@@ -490,7 +509,7 @@ If value `'dependencies data'` is specified in `dependenciesKey` option, the fol
 If an empty string or a non-string value is specified in the `dependenciesKey` option, the dependencies object is not insert.
 
 ```js
-// These values ​​not insert dependencies object
+// These values not insert dependencies object
 false
 true
 null
@@ -515,7 +534,7 @@ string | false | null
 ### PostCSS Plugin array
 
 An options can also be an array.
-If an array is specified, its value is used as the [`plugins`](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/README.md#plugins) option.
+If an array is specified, its value is used as [the `plugins` option](#plugins).
 
 ```js
 const postcss = require('metalsmith-postcss2');
@@ -555,7 +574,7 @@ module.exports = ctx => ({
 
 ## Debug mode
 
-This plugin supports debugging output.  
+This plugin supports debugging output.
 To enable, use the following command when running your build script:
 
 ```sh
