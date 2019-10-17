@@ -462,7 +462,7 @@ If value `'dependencies data'` is specified in `dependenciesKey` option, the fol
 {
   'main.css': {
     // ↓ Properties automatically added by Metalsmith
-    contents: Buffer.from('.foo {\n ... body\n ...'), // Converted CSS contents
+    contents: Buffer.from('.foo { ... body { ...'), // Converted CSS contents
     mode: ...,
     stats: Stats { ... },
     // ↑ Properties automatically added by Metalsmith
@@ -470,13 +470,13 @@ If value `'dependencies data'` is specified in `dependenciesKey` option, the fol
     // ↓ dependencies object added by specifying "dependenciesKey" option
     ['dependencies data']: {
       'main.css': {
-        contents: Buffer.from('@import "foo.css";\n ...'), // Contents of main.css before conversion
+        contents: Buffer.from('@import "foo.css"; ...'), // Contents of main.css before conversion
         mode: ...,
         stats: Stats { ... },
         ...
       },
       'foo.css': {
-        contents: Buffer.from('.foo {\n ...'), // Contents of foo.css before conversion
+        contents: Buffer.from('.foo { ...'), // Contents of foo.css before conversion
         mode: ...,
         stats: Stats { ... },
         ...
