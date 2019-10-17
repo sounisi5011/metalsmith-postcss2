@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-postcss2",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Metalsmith plugin for PostCSS",
   "keywords": [
     "css",
@@ -35,7 +35,7 @@
     "build:peerdeps-test:generate": "gen-different-deps-test --test-dir ./test/ --local-package-name '@sounisi5011/test-packages'",
     "build:readme": "node ./script/readme-generator.js --template ./readme-template.mustache",
     "build:replace": "node ./script/replace-AcceptedPlugin-defs.js",
-    "clean": "del './dist/' './test/fixtures/*/build'",
+    "clean": "del './dist/' './test/*/fixtures/*/build'",
     "fmt-pkg": "run-s fmt-pkg:prettier fmt-pkg:sort",
     "fmt-pkg:prettier": "prettier-package-json --write ./package.json",
     "fmt-pkg:sort": "sort-package-json ./package.json",
