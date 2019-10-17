@@ -470,6 +470,10 @@ true | false | null | (filename: string) => string
 
 ### `dependenciesKey`
 
+**To understand the description of this option, knowledge of [the Metalsmith plugin][Metalsmith plugin] is required.**
+
+[Metalsmith plugin]: https://metalsmith.io/#writing-a-plugin
+
 Specify the property name.
 The property specified by this option contains an object with the name and metadata of the file used in the CSS conversion.
 
@@ -493,9 +497,11 @@ body {
 }
 ```
 
-If value `'dependencies data'` is specified in `dependenciesKey` option, the following "dependencies object" are inserted into the metadata:
+If value `'dependencies data'` is specified in `dependenciesKey` option, the following "dependencies object" are inserted into the Metalsmith metadata:
 
 ```js
+// This object is the value that subsequent Metalsmith plugins read from the "files" argument
+// see: https://github.com/segmentio/metalsmith#useplugin
 {
   'main.css': {
     // ↓ Properties automatically added by Metalsmith
