@@ -433,7 +433,59 @@ true | false | null | (filename: string) => string
 
 ### `dependenciesKey`
 
-TODO
+Specify the property name.
+The property specified by this option contains an object with the name and metadata of the file used in the CSS conversion.
+
+For example, if you convert the following files with the [postcss-import] plugin:
+
+[postcss-import]: https://www.npmjs.com/package/postcss-import
+
+**`main.css`**
+```css
+@import "foo.css";
+
+body {
+  background: black;
+}
+```
+
+**`foo.css`**
+```css
+.foo {
+  font-weight: bold;
+}
+```
+
+If value `'dependencies data'` is specified in `dependenciesKey` option, the following objects are inserted into the metadata:
+
+```js
+{
+  'main.css': {
+    // ↓ Properties automatically added by Metalsmith
+    contents: Buffer.from('.foo {\n ... body\n ...'), // Converted CSS contents
+    mode: ...,
+    stats: Stats { ... },
+    // ↑ Properties automatically added by Metalsmith
+
+    // ↓ dependencies object added by specifying "dependenciesKey" option
+    ['dependencies data']: {
+      'main.css': {
+        contents: Buffer.from('@import "foo.css";\n ...'), // Contents of main.css before conversion
+        mode: ...,
+        stats: Stats { ... },
+        ...
+      },
+      'foo.css': {
+        contents: Buffer.from('.foo {\n ...'), // Contents of foo.css before conversion
+        mode: ...,
+        stats: Stats { ... },
+        ...
+      },
+    }
+  },
+  ...
+}
+```
 
 Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L60)):
 
