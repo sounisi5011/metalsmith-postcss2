@@ -19,6 +19,43 @@
 [Metalsmith]: https://github.com/segmentio/metalsmith
 [PostCSS]: https://postcss.org
 
+## Features
+
+*   Supports the latest PostCSS
+
+    Supported and tested version is ![{{{pkg.peerDependencies.postcss}}}](https://img.shields.io/static/v1?label=postcss&message={{#encURL}} {{{pkg.peerDependencies.postcss}}} {{/encURL}}&color=blue).
+
+*   Loading [PostCSS config file][npm-postcss-load-config-used]
+
+    Use [postcss-load-config][npm-postcss-load-config-used] to load the PostCSS configuration.
+
+*   Automatic rename
+
+    By default, all file extensions are converted to `.css`.
+    See description of [`renamer` option](#renamer).
+
+*   Multi-level SourceMap
+
+    Supports SourceMap joins processed in the previous processing step.
+    If you want to omit the previous SourceMap, set [the PostCSS `map.prev` option](https://github.com/postcss/postcss/blob/master/docs/source-maps.md#options) to `false`.
+
+*   Customizable SourceMap location
+
+    **In the PostCSS configuration file**, specify the SourceMap filepath in the [PostCSS `map.annotation` option](https://github.com/postcss/postcss/blob/master/docs/source-maps.md#options).
+
+*   Reading dependencies
+
+    Subsequent Metalsmith plugins can read the metadata of the imported file during the conversion.
+    See description of [`dependenciesKey` option](#dependencieskey).
+
+*   Available in [TypeScript](https://www.typescriptlang.org/)
+
+    Type definition is included.
+
+*   Compliant with [PostCSS Runner Guidelines](https://github.com/postcss/postcss/blob/7.0.18/docs/guidelines/runner.md)
+
+[npm-postcss-load-config-used]: https://www.npmjs.com/package/postcss-load-config/v/{{{pkgLock.dependencies.postcss-load-config.version}}}
+
 ## Install
 
 ```sh
@@ -35,8 +72,6 @@ The simplest use is with a PostCSS configuration file.
 ### Use PostCSS configuration file
 
 Install via npm and then add the `{{{pkg.name}}}` key to your `metalsmith.json` plugin, like so:
-
-[npm-postcss-load-config-used]: https://www.npmjs.com/package/postcss-load-config/v/{{{pkgLock.dependencies.postcss-load-config.version}}}
 
 **`metalsmith.json`**
 ```json
@@ -597,3 +632,9 @@ npm test
 ## Contributing
 
 see [CONTRIBUTING.md](https://github.com/sounisi5011/{{{pkg.name}}}/blob/master/CONTRIBUTING.md)
+
+## Related
+
+* [metalsmith-postcss](https://www.npmjs.com/package/metalsmith-postcss)
+* [metalsmith-with-postcss](https://www.npmjs.com/package/metalsmith-with-postcss)
+* [@goodthnx/metalsmith-postcss](https://www.npmjs.com/package/@goodthnx/metalsmith-postcss)

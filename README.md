@@ -19,6 +19,43 @@
 [Metalsmith]: https://github.com/segmentio/metalsmith
 [PostCSS]: https://postcss.org
 
+## Features
+
+*   Supports the latest PostCSS
+
+    Supported and tested version is ![^5.2.18 || ^6.0.13 || 7.x](https://img.shields.io/static/v1?label=postcss&message=%5E5.2.18%20%7C%7C%20%5E6.0.13%20%7C%7C%207.x&color=blue).
+
+*   Loading [PostCSS config file][npm-postcss-load-config-used]
+
+    Use [postcss-load-config][npm-postcss-load-config-used] to load the PostCSS configuration.
+
+*   Automatic rename
+
+    By default, all file extensions are converted to `.css`.
+    See description of [`renamer` option](#renamer).
+
+*   Multi-level SourceMap
+
+    Supports SourceMap joins processed in the previous processing step.
+    If you want to omit the previous SourceMap, set [the PostCSS `map.prev` option](https://github.com/postcss/postcss/blob/master/docs/source-maps.md#options) to `false`.
+
+*   Customizable SourceMap location
+
+    **In the PostCSS configuration file**, specify the SourceMap filepath in the [PostCSS `map.annotation` option](https://github.com/postcss/postcss/blob/master/docs/source-maps.md#options).
+
+*   Reading dependencies
+
+    Subsequent Metalsmith plugins can read the metadata of the imported file during the conversion.
+    See description of [`dependenciesKey` option](#dependencieskey).
+
+*   Available in [TypeScript](https://www.typescriptlang.org/)
+
+    Type definition is included.
+
+*   Compliant with [PostCSS Runner Guidelines](https://github.com/postcss/postcss/blob/7.0.18/docs/guidelines/runner.md)
+
+[npm-postcss-load-config-used]: https://www.npmjs.com/package/postcss-load-config/v/2.1.0
+
 ## Install
 
 ```sh
@@ -35,8 +72,6 @@ The simplest use is with a PostCSS configuration file.
 ### Use PostCSS configuration file
 
 Install via npm and then add the `metalsmith-postcss2` key to your `metalsmith.json` plugin, like so:
-
-[npm-postcss-load-config-used]: https://www.npmjs.com/package/postcss-load-config/v/2.1.0
 
 **`metalsmith.json`**
 ```json
@@ -597,3 +632,9 @@ npm test
 ## Contributing
 
 see [CONTRIBUTING.md](https://github.com/sounisi5011/metalsmith-postcss2/blob/master/CONTRIBUTING.md)
+
+## Related
+
+* [metalsmith-postcss](https://www.npmjs.com/package/metalsmith-postcss)
+* [metalsmith-with-postcss](https://www.npmjs.com/package/metalsmith-with-postcss)
+* [@goodthnx/metalsmith-postcss](https://www.npmjs.com/package/@goodthnx/metalsmith-postcss)
