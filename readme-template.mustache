@@ -316,15 +316,13 @@ In addition to PostCSS plugins, you can also specify the following values:
     ```js
     [
       'postcss-import',
-      [
-        {
-          'postcss-preset-env': { stage: 0 },
-          'postcss-pseudoelements': { single: true }
-        }
-      ],
+      {
+        'postcss-preset-env': { stage: 0 }
+      },
+      require('postcss-pseudoelements')(),
       [
         [
-          require('cssnano')
+          'cssnano'
         ]
       ]
     ]
