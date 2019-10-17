@@ -396,7 +396,7 @@ filename => {
 Type definition ([source line 29](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L29) / [source line 43](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L43)):
 
 ```ts
-(filename: string) => string | true | false | null
+true | false | null | (filename: string) => string
 ```
 
 ### `dependenciesKey`
