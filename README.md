@@ -487,6 +487,19 @@ If value `'dependencies data'` is specified in `dependenciesKey` option, the fol
 }
 ```
 
+If an empty string or a non-string value is specified in the `dependenciesKey` option, the dependencies object is not insert.
+
+```js
+// These values ​​not insert dependencies object
+false
+true
+null
+undefined
+''
+""
+``
+```
+
 Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L60)):
 
 ```js
