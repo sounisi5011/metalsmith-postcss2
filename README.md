@@ -85,7 +85,7 @@ Install via npm and then add the `metalsmith-postcss2` key to your `metalsmith.j
 Then create a PostCSS configuration file.
 It is a file with a name like `postcss.config.js` or `.postcssrc.*`.
 
-**`postcss.config.js`**
+**`postcss.config.js`** or **`.postcssrc.js`**
 ```js
 module.exports = {
   map: { inline: false },
@@ -95,6 +95,54 @@ module.exports = {
     'cssnano': {}
   }
 };
+```
+
+or
+
+**`.postcssrc.yaml`** or **`.postcssrc.yml`**
+```yaml
+map:
+  inline: false
+plugins:
+  postcss-import: {}
+  postcss-preset-env: {}
+  cssnano: {}
+```
+
+or
+
+**`.postcssrc.json`**
+```json
+{
+  "map": {
+    "inline": false
+  },
+  "plugins": {
+    "postcss-import": {},
+    "postcss-preset-env": {},
+    "cssnano": {}
+  }
+}
+```
+
+Or you can include the PostCSS configuration in the `package.json` file
+
+**`package.json`**
+```json
+{
+  ...
+
+  "postcss": {
+    "map": {
+      "inline": false
+    },
+    "plugins": {
+      "postcss-import": {},
+      "postcss-preset-env": {},
+      "cssnano": {}
+    }
+  }
+}
 ```
 
 You can read more about common PostCSS Config [here][npm-postcss-load-config-used].
