@@ -353,8 +353,8 @@ See the [PostCSS documentation for details on options][PostCSS ProcessOptions].
 [PostCSS Processor#process() method]: http://api.postcss.org/Processor.html#process
 [PostCSS ProcessOptions]: http://api.postcss.org/global.html#processOptions
 
-The "from" option and the "to" option cannot be specified because the plugin automatically sets them internally.
-If set, an exception will be thrown.
+The `from` option and the `to` option cannot be specified because the plugin automatically sets them internally.
+If set, [an exception will be thrown](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L63-L83).
 
 Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L54)):
 
