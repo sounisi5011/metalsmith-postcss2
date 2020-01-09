@@ -31,8 +31,6 @@
   },
   "scripts": {
     "build": "run-s tsc build:replace",
-    "build:peerdeps-test": "run-s clean build build:peerdeps-test:generate",
-    "build:peerdeps-test:generate": "gen-different-deps-test --test-dir ./test/ --local-package-name '@sounisi5011/test-packages'",
     "build:readme": "node ./script/readme-generator.js --template ./readme-template.mustache",
     "build:replace": "node ./script/replace-AcceptedPlugin-defs.js",
     "clean": "del './dist/' './test/fixtures/*/build'",
@@ -99,9 +97,7 @@
   },
   "devDependencies": {
     "@sounisi5011/check-peer-deps": "github:sounisi5011/check-peer-deps",
-    "@sounisi5011/gen-different-deps-test": "file:script/gen-different-deps-test",
     "@sounisi5011/test-all-peerdeps": "file:script/test-all-peerdeps",
-    "@sounisi5011/test-packages": "file:test/.packages",
     "@types/cross-spawn": "6.0.1",
     "@types/debug": "4.1.5",
     "@types/deep-freeze-strict": "1.1.0",
