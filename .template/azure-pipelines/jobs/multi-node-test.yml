@@ -1,0 +1,48 @@
+parameters:
+  vmImage: ubuntu-latest
+  nodeVersions:
+    - 8.3.0
+    - 8.x
+    - 9.0.0
+    - 9.x
+    - 10.0.0
+    - 10.x
+    - 11.0.0
+    - 11.x
+    - 12.0.0
+    - 12.x
+    - 13.0.0
+    - 13.x
+  variables: {}
+  timeoutMin: 5
+  env: {}
+  peerDeps: []
+
+jobs:
+  - job: ${{ parameters.jobName }}
+
+    pool:
+      vmImage: ${{ parameters.vmImage }}
+
+    strategy:
+      matrix:
+        ${{ each nodeVersion in parameters.nodeVersions }}:
+          ${{ each peerDeps in parameters.peerDeps }}:
+            ${{ format('Node.js {0} / npm i {1}', nodeVersion, peerDeps) }}:
+              node_version: ${{ nodeVersion }}
+              pre_install_deps: ${{ peerDeps }}
+
+    variables: ${{ parameters.variables }}
+
+    steps:
+      - template: ../steps/init-node.yml
+        parameters:
+          nodeVersion: $(node_version)
+          preInstallDeps: $(pre_install_deps)
+
+      - script: ${{ parameters.script }}
+        displayName: ${{ parameters.stepLabel }}
+        timeoutInMinutes: ${{ parameters.timeoutMin }}
+        env: ${{ parameters.env }}
+
+    cancelTimeoutInMinutes: 1
