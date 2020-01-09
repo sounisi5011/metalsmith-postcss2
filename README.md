@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/static/v1?label=license&message=MIT&color=green)][github-license]
 ![Supported Node.js version: >=8.3.0](https://img.shields.io/static/v1?label=node&message=%3E%3D8.3.0&color=brightgreen)
 ![Supported Metalsmith version: ^2.2.0](https://img.shields.io/static/v1?label=metalsmith&message=%5E2.2.0&color=blue)
-![Supported PostCSS version: ^5.2.18 || ^6.0.13 || 7.x](https://img.shields.io/static/v1?label=postcss&message=%5E5.2.18%20%7C%7C%20%5E6.0.13%20%7C%7C%207.x&color=blue)
+![Supported PostCSS version: ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)
 ![Type Definitions: TypeScript](https://img.shields.io/static/v1?label=types&message=TypeScript&color=blue)
 [![bundle size](https://badgen.net/bundlephobia/min/metalsmith-postcss2@1.0.0)](https://bundlephobia.com/result?p=metalsmith-postcss2@1.0.0)
 [![Dependencies Status](https://david-dm.org/sounisi5011/metalsmith-postcss2/status.svg)](https://david-dm.org/sounisi5011/metalsmith-postcss2)
@@ -23,7 +23,7 @@
 
 *   Supports the latest PostCSS
 
-    Supported and tested version: [![ ^5.2.18 || ^6.0.13 || 7.x](https://img.shields.io/static/v1?label=postcss&message=%5E5.2.18%20%7C%7C%20%5E6.0.13%20%7C%7C%207.x&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L146).
+    Supported and tested version: [![ ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L146).
 
 *   Loading [PostCSS config file][npm-postcss-load-config-used]
 
