@@ -1,5 +1,6 @@
 parameters:
   nodeVersion: 12.x
+  preInstallDeps: {}
 
 steps:
   - task: NodeTool@0
