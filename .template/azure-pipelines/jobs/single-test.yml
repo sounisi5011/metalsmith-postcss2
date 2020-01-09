@@ -15,9 +15,10 @@ jobs:
     steps:
       - template: ../steps/init-node.yml
 
-      - script: ${{ parameters.script }}
-        displayName: ${{ parameters.stepLabel }}
-        timeoutInMinutes: ${{ parameters.timeoutMin }}
-        env: ${{ parameters.env }}
+      - ${{ each stepParams in parameters.steps }}:
+          - script: ${{ stepParams.script }}
+            displayName: ${{ stepParams.label }}
+            timeoutInMinutes: ${{ stepParams.timeoutMin }}
+            env: ${{ stepParams.env }}
 
     cancelTimeoutInMinutes: 1

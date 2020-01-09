@@ -36,9 +36,10 @@ jobs:
         parameters:
           nodeVersion: $(node_version)
 
-      - script: ${{ parameters.script }}
-        displayName: ${{ parameters.stepLabel }}
-        timeoutInMinutes: ${{ parameters.timeoutMin }}
-        env: ${{ parameters.env }}
+      - ${{ each stepParams in parameters.steps }}:
+          - script: ${{ stepParams.script }}
+            displayName: ${{ stepParams.label }}
+            timeoutInMinutes: ${{ stepParams.timeoutMin }}
+            env: ${{ stepParams.env }}
 
     cancelTimeoutInMinutes: 1

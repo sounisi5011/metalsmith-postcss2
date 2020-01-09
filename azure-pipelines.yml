@@ -10,13 +10,17 @@ jobs:
   - template: ./.template/azure-pipelines/jobs/single-test.yml
     parameters:
       jobName: Lint
-      stepLabel: Run linter
-      script: npx --no-install test-all-peerdeps --skip-rollback run-s test:readme test:peer-deps lint test:check-type-defs-pkgs
-      timeoutMin: 60
+      steps:
+        - label: Run checker
+          script: npx --no-install run-s test:readme test:peer-deps test:check-type-defs-pkgs
+        - label: Run linter
+          script: npx --no-install test-all-peerdeps --skip-rollback run-s lint
+          timeoutMin: 60
 
   - template: ./.template/azure-pipelines/jobs/multi-test.yml
     parameters:
       jobName: UnitTest
-      stepLabel: Run unit test
-      script: npx --no-install test-all-peerdeps --skip-rollback npm run test:ava
-      timeoutMin: 60
+      steps:
+        - label: Run unit test
+          script: npx --no-install test-all-peerdeps --skip-rollback npm run test:ava
+          timeoutMin: 60
