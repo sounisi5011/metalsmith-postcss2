@@ -209,4 +209,5 @@ async function main(args) {
     console.log();
     console.error(err);
   }
+  process.exit();
 })();
