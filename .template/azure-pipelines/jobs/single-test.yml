@@ -3,7 +3,6 @@ parameters:
   variables: {}
   timeoutMin: 5
   env: {}
-  peerDeps: []
 
 jobs:
   - job: ${{ parameters.jobName }}
@@ -11,18 +10,10 @@ jobs:
     pool:
       vmImage: ${{ parameters.vmImage }}
 
-    strategy:
-      matrix:
-        ${{ each peerDeps in parameters.peerDeps }}:
-          ${{ format('npm i {0}', peerDeps) }}:
-            pre_install_deps: ${{ peerDeps }}
-
     variables: ${{ parameters.variables }}
 
     steps:
       - template: ../steps/init-node.yml
-        parameters:
-          preInstallDeps: $(pre_install_deps)
 
       - script: ${{ parameters.script }}
         displayName: ${{ parameters.stepLabel }}

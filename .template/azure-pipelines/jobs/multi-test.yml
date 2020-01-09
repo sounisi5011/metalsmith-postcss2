@@ -16,7 +16,6 @@ parameters:
   variables: {}
   timeoutMin: 5
   env: {}
-  peerDeps: []
 
 jobs:
   - job: ${{ parameters.jobName }}
@@ -27,10 +26,8 @@ jobs:
     strategy:
       matrix:
         ${{ each nodeVersion in parameters.nodeVersions }}:
-          ${{ each peerDeps in parameters.peerDeps }}:
-            ${{ format('Node.js {0} / npm i {1}', nodeVersion, peerDeps) }}:
-              node_version: ${{ nodeVersion }}
-              pre_install_deps: ${{ peerDeps }}
+          ${{ format('Node.js {0}', nodeVersion) }}:
+            node_version: ${{ nodeVersion }}
 
     variables: ${{ parameters.variables }}
 
@@ -38,7 +35,6 @@ jobs:
       - template: ../steps/init-node.yml
         parameters:
           nodeVersion: $(node_version)
-          preInstallDeps: $(pre_install_deps)
 
       - script: ${{ parameters.script }}
         displayName: ${{ parameters.stepLabel }}

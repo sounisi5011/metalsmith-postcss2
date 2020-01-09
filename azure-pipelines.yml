@@ -7,78 +7,14 @@ trigger:
   - master
 
 jobs:
-  - template: ./.template/azure-pipelines/jobs/single-node-test.yml
+  - template: ./.template/azure-pipelines/jobs/single-test.yml
     parameters:
       jobName: Lint
       stepLabel: Run linter
       script: npx run-s test:readme test:peer-deps lint test:check-type-defs-pkgs
-      peerDeps:
-        - postcss@5.2.18
-        - postcss@6.0.13
-        - postcss@6.0.14
-        - postcss@6.0.15
-        - postcss@6.0.16
-        - postcss@6.0.17
-        - postcss@6.0.18
-        - postcss@6.0.19
-        - postcss@6.0.20
-        - postcss@6.0.21
-        - postcss@6.0.22
-        - postcss@6.0.23
-        - postcss@7.0.0
-        - postcss@7.0.1
-        - postcss@7.0.2
-        - postcss@7.0.3
-        - postcss@7.0.4
-        - postcss@7.0.5
-        - postcss@7.0.6
-        - postcss@7.0.7
-        - postcss@7.0.8
-        - postcss@7.0.9
-        - postcss@7.0.10
-        - postcss@7.0.11
-        - postcss@7.0.12
-        - postcss@7.0.13
-        - postcss@7.0.14
-        - postcss@7.0.15
-        - postcss@7.0.16
-        - postcss@7.0.17
-        - postcss@7.0.18
 
-  - template: ./.template/azure-pipelines/jobs/multi-node-test.yml
+  - template: ./.template/azure-pipelines/jobs/multi-test.yml
     parameters:
       jobName: UnitTest
       stepLabel: Run unit test
       script: npm run test:ava
-      peerDeps:
-        - postcss@5.2.18
-        - postcss@6.0.13
-        - postcss@6.0.14
-        - postcss@6.0.15
-        - postcss@6.0.16
-        - postcss@6.0.17
-        - postcss@6.0.18
-        - postcss@6.0.19
-        - postcss@6.0.20
-        - postcss@6.0.21
-        - postcss@6.0.22
-        - postcss@6.0.23
-        - postcss@7.0.0
-        - postcss@7.0.1
-        - postcss@7.0.2
-        - postcss@7.0.3
-        - postcss@7.0.4
-        - postcss@7.0.5
-        - postcss@7.0.6
-        - postcss@7.0.7
-        - postcss@7.0.8
-        - postcss@7.0.9
-        - postcss@7.0.10
-        - postcss@7.0.11
-        - postcss@7.0.12
-        - postcss@7.0.13
-        - postcss@7.0.14
-        - postcss@7.0.15
-        - postcss@7.0.16
-        - postcss@7.0.17
-        - postcss@7.0.18

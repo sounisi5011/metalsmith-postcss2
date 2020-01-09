@@ -1,6 +1,5 @@
 parameters:
   nodeVersion: 12.x
-  preInstallDeps: ""
 
 steps:
   - task: NodeTool@0
@@ -12,9 +11,6 @@ steps:
       echo node $(node --version)
       echo npm $(npm --version)
     displayName: Show node and npm version
-
-  - script: ${{ format('npm install {0}', parameters.preInstallDeps) }}
-    condition: and(succeeded(), ne(parameters.preInstallDeps, ''))
 
   - script: npm ci || npm install
     displayName: Install dependencies
