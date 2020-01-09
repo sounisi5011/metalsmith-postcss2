@@ -1,8 +1,6 @@
 parameters:
   vmImage: ubuntu-latest
   variables: {}
-  timeoutMin: 5
-  env: {}
 
 jobs:
   - job: ${{ parameters.jobName }}
@@ -17,8 +15,16 @@ jobs:
 
       - ${{ each stepParams in parameters.steps }}:
           - script: ${{ stepParams.script }}
-            displayName: ${{ stepParams.label }}
-            timeoutInMinutes: ${{ stepParams.timeoutMin }}
-            env: ${{ stepParams.env }}
+
+            ${{ if stepParams.label }}:
+              displayName: ${{ stepParams.label }}
+
+            ${{ if stepParams.timeoutMin }}:
+              timeoutInMinutes: ${{ stepParams.timeoutMin }}
+            ${{ else }}:
+              timeoutInMinutes: 5
+
+            ${{ if stepParams.env }}:
+              env: ${{ stepParams.env }}
 
     cancelTimeoutInMinutes: 1
