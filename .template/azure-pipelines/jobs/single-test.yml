@@ -21,7 +21,7 @@ jobs:
 
             ${{ if stepParams.timeoutMin }}:
               timeoutInMinutes: ${{ stepParams.timeoutMin }}
-            ${{ else }}:
+            ${{ if not(stepParams.timeoutMin) }}:
               timeoutInMinutes: 5
 
             ${{ if stepParams.env }}:
