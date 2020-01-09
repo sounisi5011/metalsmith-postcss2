@@ -140,24 +140,37 @@ async function getPkgsCombinationList(pkgMap) {
 }
 
 async function main(args) {
+  const flags = new Set();
+  while (0 < args.length) {
+    if (args[0].startsWith('-')) {
+      flags.add(args.shift());
+    } else {
+      break;
+    }
+  }
   const testCmd = args[0];
   const testCmdArgs = args.splice(1);
+  const skipRollback = flags.has('--skip-rollback');
 
   if (!testCmd) return;
 
   /** @type {Map<string, Buffer>} */
   const fileDataMap = new Map(
-    await Promise.all(
-      ['package.json', 'package-lock.json']
-        .map(filename => path.resolve(CWD_FULLPATH, filename))
-        .map(async filepath => [filepath, await readFileAsync(filepath)]),
-    ),
+    !skipRollback
+      ? (await Promise.all(
+          ['package.json', 'package-lock.json']
+            .map(filename => path.resolve(CWD_FULLPATH, filename))
+            .map(async filepath => [filepath, await readFileAsync(filepath)]),
+        ))
+      : [],
   );
 
   const changedFilenameSet = new Set();
-  watch([...fileDataMap.keys()], (event, filename) => {
-    changedFilenameSet.add(filename);
-  });
+  if (!skipRollback) {
+    watch([...fileDataMap.keys()], (event, filename) => {
+      changedFilenameSet.add(filename);
+    });
+  }
 
   let exitFn = () => {
     if (0 < changedFilenameSet.size) {
