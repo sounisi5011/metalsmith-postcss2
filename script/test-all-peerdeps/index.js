@@ -195,7 +195,6 @@ async function main(args) {
     );
     await spawnAsync('npm', ['install', ...installArgs], { stdio: 'inherit' });
     await spawnAsync(testCmd, testCmdArgs, { stdio: 'inherit' });
-    console.log(changedFilenameSet);
   }
 
   exitFn();
