@@ -1,0 +1,15 @@
+{
+  "name": "@sounisi5011/test-all-peerdeps",
+  "version": "0.0.0",
+  "private": true,
+  "bin": "index.js",
+  "dependencies": {
+    "command-join": "^3.0.0",
+    "cross-spawn": "^7.0.1",
+    "import-from": "^3.0.0",
+    "node-watch": "^0.6.3",
+    "packages-versions": "^2.0.0",
+    "semver": "^7.1.1",
+    "signal-exit": "^3.0.2"
+  }
+}
