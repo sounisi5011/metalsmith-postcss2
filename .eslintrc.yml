@@ -39,3 +39,7 @@ overrides:
       - "*.d.ts"
     rules:
       no-useless-constructor: off
+  - files:
+      - test/**/*.ts
+    rules:
+      "@typescript-eslint/no-empty-function": off
