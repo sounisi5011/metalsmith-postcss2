@@ -7,7 +7,7 @@ export function isObject(value: unknown): value is Record<any, unknown> {
 
 export function hasProp<
     T extends object,
-    U extends (Parameters<typeof Object.prototype.hasOwnProperty>)[0]
+    U extends Parameters<typeof Object.prototype.hasOwnProperty>[0]
 >(value: T, prop: U): value is T & Required<Pick<T, Extract<keyof T, U>>> {
     return Object.prototype.hasOwnProperty.call(value, prop);
 }
