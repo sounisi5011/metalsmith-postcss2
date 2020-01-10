@@ -6,6 +6,23 @@
 
 * [#51] - Change supported PostCSS version: `^5.2.18 || ^6.0.13 || 7.x` -> `^7.0.8`
 
+### Updated Dependencies
+
+#### devDependencies
+
+* `@typescript-eslint/eslint-plugin`
+    * [#44] - `2.4.0` -> `2.15.0`
+* `@typescript-eslint/parser`
+    * [#44] - `2.4.0` -> `2.15.0`
+* `eslint`
+    * [#44] - `6.5.1` -> `6.8.0`
+* `eslint-config-prettier`
+    * [#44] - `6.4.0` -> `6.9.0`
+* `eslint-plugin-import`
+    * [#44] - `2.18.2` -> `2.19.1`
+* `eslint-plugin-prettier`
+    * [#44] - `3.1.1` -> `3.1.2`
+
 ### Others
 
 * [#42] - Renovate package groups
@@ -14,6 +31,7 @@
 [Unreleased]: https://github.com/sounisi5011/metalsmith-postcss2/compare/v1.0.0...HEAD
 [#42]: https://github.com/sounisi5011/metalsmith-postcss2/pull/42
 [#51]: https://github.com/sounisi5011/metalsmith-postcss2/pull/51
+[#44]: https://github.com/sounisi5011/metalsmith-postcss2/pull/44
 
 ## [1.0.0] (2019-10-17 UTC)
 
