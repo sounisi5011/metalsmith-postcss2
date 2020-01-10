@@ -67,23 +67,25 @@ async function main(distDir) {
 
   let dynamicAcceptedPluginDefData = null;
   const dtsFileMap = new Map(
-    (await Promise.all(
-      dtsFilepathList.map(async dtsFilepath => {
-        const dtsContents = await readFileAsync(dtsFilepath, 'utf8');
+    (
+      await Promise.all(
+        dtsFilepathList.map(async dtsFilepath => {
+          const dtsContents = await readFileAsync(dtsFilepath, 'utf8');
 
-        const match = dynamicAcceptedPluginDefPattern.exec(dtsContents);
-        if (match) {
-          dynamicAcceptedPluginDefData = {
-            filepath: dtsFilepath,
-            typeName: match[1],
-          };
-        }
+          const match = dynamicAcceptedPluginDefPattern.exec(dtsContents);
+          if (match) {
+            dynamicAcceptedPluginDefData = {
+              filepath: dtsFilepath,
+              typeName: match[1],
+            };
+          }
 
-        return acceptedPluginPattern.test(dtsContents)
-          ? [dtsFilepath, dtsContents]
-          : null;
-      }),
-    )).filter(Boolean),
+          return acceptedPluginPattern.test(dtsContents)
+            ? [dtsFilepath, dtsContents]
+            : null;
+        }),
+      )
+    ).filter(Boolean),
   );
 
   await Promise.all(

@@ -85,6 +85,21 @@
       "git add"
     ]
   },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "files": [
+      "./test/**/*.ts"
+    ],
+    "helpers": [
+      "**/{fixtures,helpers}/**/*"
+    ],
+    "require": [
+      "ts-node/register/transpile-only"
+    ]
+  },
   "dependencies": {
     "@types/metalsmith": "2.3.0",
     "debug": "4.1.1",
@@ -144,20 +159,5 @@
   },
   "engines": {
     "node": ">=8.3.0"
-  },
-  "ava": {
-    "files": [
-      "./test/**/*.ts"
-    ],
-    "helpers": [
-      "**/{fixtures,helpers}/**/*"
-    ],
-    "compileEnhancements": false,
-    "require": [
-      "ts-node/register/transpile-only"
-    ],
-    "extensions": [
-      "ts"
-    ]
   }
 }
