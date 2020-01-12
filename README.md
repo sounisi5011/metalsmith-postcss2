@@ -2,7 +2,7 @@
 
 [![Go to the latest release page on npm](https://img.shields.io/npm/v/metalsmith-postcss2.svg)][npm]
 [![License: MIT](https://img.shields.io/static/v1?label=license&message=MIT&color=green)][github-license]
-![Supported Node.js version: >=8.3.0](https://img.shields.io/static/v1?label=node&message=%3E%3D8.3.0&color=brightgreen)
+![Supported Node.js version: ^8.3.0 || 10.x || >=12.x](https://img.shields.io/static/v1?label=node&message=%5E8.3.0%20%7C%7C%2010.x%20%7C%7C%20%3E%3D12.x&color=brightgreen)
 ![Supported Metalsmith version: ^2.2.0](https://img.shields.io/static/v1?label=metalsmith&message=%5E2.2.0&color=blue)
 ![Supported PostCSS version: ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)
 ![Type Definitions: TypeScript](https://img.shields.io/static/v1?label=types&message=TypeScript&color=blue)

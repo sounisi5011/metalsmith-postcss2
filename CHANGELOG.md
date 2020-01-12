@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 * [#51] - Change supported PostCSS version: `^5.2.18 || ^6.0.13 || 7.x` -> `^7.0.8`
+* [#54] - Change supported Node.js version: `>=8.3.0` -> `^8.3.0 || 10.x || >=12.x`
 
 ### Updated Dependencies
 
@@ -54,6 +55,7 @@
 [#43]: https://github.com/sounisi5011/metalsmith-postcss2/pull/43
 [#48]: https://github.com/sounisi5011/metalsmith-postcss2/pull/48
 [#46]: https://github.com/sounisi5011/metalsmith-postcss2/pull/46
+[#54]: https://github.com/sounisi5011/metalsmith-postcss2/pull/54
 
 ## [1.0.0] (2019-10-17 UTC)
 
