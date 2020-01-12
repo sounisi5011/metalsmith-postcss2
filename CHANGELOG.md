@@ -47,6 +47,7 @@
 
 * [#42] - Renovate package groups
 * [#51] - Fix peerdeps test
+* [#55] - Exclude renovate/npm-scripts-packages branch from testing on CI
 
 [Unreleased]: https://github.com/sounisi5011/metalsmith-postcss2/compare/v1.0.0...HEAD
 [#42]: https://github.com/sounisi5011/metalsmith-postcss2/pull/42
@@ -56,6 +57,7 @@
 [#48]: https://github.com/sounisi5011/metalsmith-postcss2/pull/48
 [#46]: https://github.com/sounisi5011/metalsmith-postcss2/pull/46
 [#54]: https://github.com/sounisi5011/metalsmith-postcss2/pull/54
+[#55]: https://github.com/sounisi5011/metalsmith-postcss2/pull/55
 
 ## [1.0.0] (2019-10-17 UTC)
 
