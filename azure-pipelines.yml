@@ -3,35 +3,48 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-trigger:
-  - master
+# no PR builds
+pr: none
 
-jobs:
-  - template: ./.template/azure-pipelines/jobs/single-test.yml
-    parameters:
-      jobName: Lint
-      steps:
-        - label: Run checker
-          script: npx --no-install run-s test:readme test:peer-deps test:check-type-defs-pkgs
-        - label: Run linter
-          script: npx --no-install test-all-peerdeps --skip-rollback run-s lint
-          timeoutMin: 60
+stages:
+  - stage:
 
-  - template: ./.template/azure-pipelines/jobs/multi-test.yml
-    parameters:
-      jobName: UnitTest
-      steps:
-        - label: Run unit test
-          script: npx --no-install test-all-peerdeps --skip-rollback npm run test:ava
-          timeoutMin: 60
-      nodeVersions:
-        - 8.3.0
-        - 8.x
-        - 10.0.0
-        - 10.x
-        - 12.0.0
-        - 12.x
-        - 13.0.0
-        - 13.x
-        # - 14.0.0  # Add after April 21, 2020
-        # - 14.x    # Add after April 21, 2020
+    jobs:
+      - template: ./.template/azure-pipelines/jobs/single-test.yml
+        parameters:
+          jobName: Lint
+          steps:
+            - label: Run checker
+              script: npx --no-install run-s test:readme test:peer-deps test:check-type-defs-pkgs
+            - label: Run linter
+              script: npx --no-install test-all-peerdeps --skip-rollback run-s lint
+              timeoutMin: 60
+
+      - template: ./.template/azure-pipelines/jobs/multi-test.yml
+        parameters:
+          jobName: UnitTest
+          steps:
+            - label: Run unit test
+              script: npx --no-install test-all-peerdeps --skip-rollback npm run test:ava
+              timeoutMin: 60
+          nodeVersions:
+            - 8.3.0
+            - 8.x
+            - 10.0.0
+            - 10.x
+            - 12.0.0
+            - 12.x
+            - 13.0.0
+            - 13.x
+            # - 14.0.0  # Add after April 21, 2020
+            # - 14.x    # Add after April 21, 2020
+
+    # Packages not used in Linter and / or test code cannot be tested with CI, so exclude branches of update such packages
+    condition: |
+      and(
+        succeeded(),
+        not(or(
+          eq(variables['Build.SourceBranch'], 'refs/heads/renovate/npm-scripts-packages'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/renovate/major-npm-scripts-packages')
+        ))
+      )
