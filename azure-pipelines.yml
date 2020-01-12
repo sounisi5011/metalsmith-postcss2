@@ -24,3 +24,16 @@ jobs:
         - label: Run unit test
           script: npx --no-install test-all-peerdeps --skip-rollback npm run test:ava
           timeoutMin: 60
+      nodeVersions:
+        - 8.3.0
+        - 8.x
+        - 9.0.0
+        - 9.x
+        - 10.0.0
+        - 10.x
+        - 11.0.0
+        - 11.x
+        - 12.0.0
+        - 12.x
+        - 13.0.0
+        - 13.x
