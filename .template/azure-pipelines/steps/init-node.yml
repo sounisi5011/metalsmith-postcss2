@@ -2,6 +2,10 @@ parameters:
   nodeVersion: 12.x
 
 steps:
+  - bash: |
+      echo '##vso[task.setvariable variable=npm_config_cache]$(Pipeline.Workspace)/.npm'
+    displayName: "Set variables: $npm_config_cache"
+
   - script:
       sudo sysctl fs.inotify.max_user_watches=524288
       # see https://github.com/ember-decorators/ember-decorators/commit/8bd65ec0ba4c7bc962434bcc35927f50a47a9db9
