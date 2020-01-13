@@ -44,6 +44,7 @@
     * [#43] - `2.1.0` -> `2.1.3`
 * `sort-package-json`
     * [#43] - `1.22.1` -> `1.38.2`
+    * [#52] - `1.38.2` -> `1.39.0`
 * `ts-node`
     * [#46] - `8.4.1` -> `8.6.1`
 * `typescript`
@@ -68,6 +69,7 @@
 [#30]: https://github.com/sounisi5011/metalsmith-postcss2/pull/30
 [#36]: https://github.com/sounisi5011/metalsmith-postcss2/pull/36
 [#53]: https://github.com/sounisi5011/metalsmith-postcss2/pull/53
+[#52]: https://github.com/sounisi5011/metalsmith-postcss2/pull/52
 
 ## [1.0.0] (2019-10-17 UTC)
 
