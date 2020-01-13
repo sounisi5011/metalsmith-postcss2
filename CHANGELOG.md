@@ -30,6 +30,8 @@
     * [#44] - `3.1.1` -> `3.1.2`
 * `eslint-plugin-simple-import-sort`
     * [#47] - `4.0.0` -> `5.0.0`
+* `git-branch-is`
+    * [#45] - `3.0.0` -> `3.1.0`
 * `husky`
     * [#43] - `3.0.9` -> `3.1.0`
     * [#50] - `3.1.0` -> `4.0.7`
@@ -79,6 +81,7 @@
 [#47]: https://github.com/sounisi5011/metalsmith-postcss2/pull/47
 [#56]: https://github.com/sounisi5011/metalsmith-postcss2/pull/56
 [#50]: https://github.com/sounisi5011/metalsmith-postcss2/pull/50
+[#45]: https://github.com/sounisi5011/metalsmith-postcss2/pull/45
 
 ## [1.0.0] (2019-10-17 UTC)
 
