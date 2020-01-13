@@ -11,6 +11,8 @@
 
 #### devDependencies
 
+* `@types/postcss-load-config`
+    * [#36] - `2.0.0` -> `2.0.1`
 * `@typescript-eslint/eslint-plugin`
     * [#44] - `2.4.0` -> `2.15.0`
 * `@typescript-eslint/parser`
@@ -63,6 +65,7 @@
 [#55]: https://github.com/sounisi5011/metalsmith-postcss2/pull/55
 [#27]: https://github.com/sounisi5011/metalsmith-postcss2/pull/27
 [#30]: https://github.com/sounisi5011/metalsmith-postcss2/pull/30
+[#36]: https://github.com/sounisi5011/metalsmith-postcss2/pull/36
 
 ## [1.0.0] (2019-10-17 UTC)
 
