@@ -24,8 +24,12 @@
 * `eslint-plugin-import`
     * [#44] - `2.18.2` -> `2.19.1`
     * [#53] - `2.19.1` -> `2.20.0`
+* `eslint-plugin-node`
+    * [#47] - `10.0.0` -> `11.0.0`
 * `eslint-plugin-prettier`
     * [#44] - `3.1.1` -> `3.1.2`
+* `eslint-plugin-simple-import-sort`
+    * [#47] - `4.0.0` -> `5.0.0`
 * `husky`
     * [#43] - `3.0.9` -> `3.1.0`
 * `lint-staged`
@@ -70,6 +74,7 @@
 [#36]: https://github.com/sounisi5011/metalsmith-postcss2/pull/36
 [#53]: https://github.com/sounisi5011/metalsmith-postcss2/pull/53
 [#52]: https://github.com/sounisi5011/metalsmith-postcss2/pull/52
+[#47]: https://github.com/sounisi5011/metalsmith-postcss2/pull/47
 
 ## [1.0.0] (2019-10-17 UTC)
 
