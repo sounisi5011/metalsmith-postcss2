@@ -4,8 +4,11 @@ parameters:
 steps:
   - bash: |
       echo '##vso[task.setvariable variable=npm_config_cache]$(Pipeline.Workspace)/.npm'
-      node -p 'Object.entries(process.env).filter(([p]) => /^npm_config_cache$/i.test(p)).reduce((o, [p, v]) => ({...o, [p]:v}), {})'
     displayName: "Set variables: $npm_config_cache"
+
+  - script: |
+      node -p 'Object.entries(process.env).filter(([p]) => /^npm_config_cache$/i.test(p)).reduce((o, [p, v]) => ({...o, [p]:v}), {})'
+    displayName: "Show variables: $npm_config_cache"
 
   - script:
       sudo sysctl fs.inotify.max_user_watches=524288
