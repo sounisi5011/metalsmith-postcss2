@@ -18,7 +18,7 @@ type OptionsGenerator<T> =
     | ((
           files: MetalsmithStrictWritableFiles,
           metalsmith: Metalsmith,
-          defaultOptions: OptionsInterface,
+          defaultOptions: DefaultOptionsInterface,
       ) => T | Promise<T>);
 
 export interface OptionsInterface {
@@ -27,6 +27,11 @@ export interface OptionsInterface {
     readonly options: Omit<postcss.ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
     readonly dependenciesKey: string | false | null;
+}
+
+export interface DefaultOptionsInterface
+    extends Omit<OptionsInterface, 'pattern'> {
+    readonly pattern: ArrayLikeOnly<OptionsInterface['pattern']>;
 }
 
 type PluginsRecord = Readonly<Record<string, unknown>>;
@@ -47,7 +52,7 @@ export type InputOptions = OptionsGenerator<
     | ArrayLikeOnly<InputOptionsInterface['plugins']>
 >;
 
-export const defaultOptions: OptionsInterface = deepFreeze({
+export const defaultOptions: DefaultOptionsInterface = deepFreeze({
     pattern: ['**/*.css'],
     plugins: [],
     options: {},
