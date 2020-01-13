@@ -21,7 +21,7 @@ function importPlugin(pluginName: string): unknown {
 function loadPlugin(
     pluginName: string,
     pluginOptions: unknown,
-    propList: (string | number)[],
+    propList: ReadonlyArray<string | number>,
 ): postcss.AcceptedPlugin {
     const pluginGenerator = importPlugin(pluginName);
 
@@ -69,7 +69,7 @@ function loadPlugin(
  */
 export function loadPlugins(
     plugins: InputOptionsInterface['plugins'] | undefined,
-    propList: (string | number)[] = [],
+    propList: ReadonlyArray<string | number> = [],
 ): ReadonlyArray<postcss.AcceptedPlugin> {
     if (!plugins) return defaultOptions.plugins;
 

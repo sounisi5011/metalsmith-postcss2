@@ -13,7 +13,7 @@ export function hasProp<T extends object, U extends PropertyKey>(
     return Object.prototype.hasOwnProperty.call(value, prop);
 }
 
-export function toJsPath(propList: (string | number)[]): string {
+export function toJsPath(propList: ReadonlyArray<string | number>): string {
     return propList
         .map(prop =>
             typeof prop === 'string' && /^\w+$/.test(prop)
