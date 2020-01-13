@@ -1,6 +1,9 @@
 parameters:
   nodeVersion: 12.x
 
+variables:
+  npm_config_cache: $(Pipeline.Workspace)/.npm
+
 steps:
   - script:
       sudo sysctl fs.inotify.max_user_watches=524288
@@ -22,6 +25,15 @@ steps:
       echo node $(node --version)
       echo npm $(npm --version)
     displayName: Show node and npm version
+
+  - task: Cache@2
+    inputs:
+      key: 'npm | "$(Agent.OS)" | package-lock.json'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+        npm
+      path: $(npm_config_cache)
+    displayName: Cache npm
 
   - script: npm ci || npm install
     displayName: Install dependencies
