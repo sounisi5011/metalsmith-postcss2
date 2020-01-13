@@ -12,6 +12,4 @@ export type ArrayValue<T> = T extends ReadonlyArray<infer U> ? U : never;
 
 export type ArrayLikeOnly<T> = T extends ReadonlyArray<unknown> ? T : never;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface NestedReadonlyArray<T>
-    extends ReadonlyArray<T | NestedReadonlyArray<T>> {}
+export type NestedReadonlyArray<T> = ReadonlyArray<T | NestedReadonlyArray<T>>;

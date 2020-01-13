@@ -6,7 +6,6 @@ import postcss from 'postcss';
 import { loadPlugins } from './plugins';
 import { hasProp } from './utils';
 import { MetalsmithStrictWritableFiles } from './utils/metalsmith';
-import { AcceptedPlugin } from './utils/postcss';
 import {
     ArrayLikeOnly,
     ArrayValue,
@@ -19,15 +18,20 @@ type OptionsGenerator<T> =
     | ((
           files: MetalsmithStrictWritableFiles,
           metalsmith: Metalsmith,
-          defaultOptions: OptionsInterface,
+          defaultOptions: DefaultOptionsInterface,
       ) => T | Promise<T>);
 
 export interface OptionsInterface {
     readonly pattern: string | ReadonlyArray<string>;
-    readonly plugins: ReadonlyArray<AcceptedPlugin>;
+    readonly plugins: ReadonlyArray<postcss.AcceptedPlugin>;
     readonly options: Omit<postcss.ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
     readonly dependenciesKey: string | false | null;
+}
+
+export interface DefaultOptionsInterface
+    extends Omit<OptionsInterface, 'pattern'> {
+    readonly pattern: ArrayLikeOnly<OptionsInterface['pattern']>;
 }
 
 type PluginsRecord = Readonly<Record<string, unknown>>;
@@ -48,7 +52,7 @@ export type InputOptions = OptionsGenerator<
     | ArrayLikeOnly<InputOptionsInterface['plugins']>
 >;
 
-export const defaultOptions: OptionsInterface = deepFreeze({
+export const defaultOptions: DefaultOptionsInterface = deepFreeze({
     pattern: ['**/*.css'],
     plugins: [],
     options: {},

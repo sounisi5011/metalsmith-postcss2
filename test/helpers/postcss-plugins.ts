@@ -1,11 +1,9 @@
 import postcss from 'postcss';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-type TransformerFirstArg = /* Parameters<postcss.Transformer>[0] */ any;
+type TransformerFirstArg = Parameters<postcss.Transformer>[0];
 
 export function doubler(css: TransformerFirstArg): void {
-    css.walkDecls((decl: any) => {
+    css.walkDecls(decl => {
         decl.parent.prepend(decl.clone());
     });
 }
@@ -19,7 +17,7 @@ export function asyncDoubler(css: TransformerFirstArg): Promise<void> {
     });
 }
 
-export function objectDoubler(): /* postcss.Processor */ any {
+export function objectDoubler(): postcss.Processor {
     const processor = postcss();
     processor.use(doubler);
     return processor;

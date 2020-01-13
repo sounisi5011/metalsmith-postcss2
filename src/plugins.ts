@@ -1,8 +1,9 @@
 import importCwd from 'import-cwd';
+import postcss from 'postcss';
 
 import { defaultOptions, InputOptionsInterface } from './options';
 import { isObject, toJsPath } from './utils';
-import { AcceptedPlugin, isAcceptedPlugin } from './utils/postcss';
+import { isAcceptedPlugin } from './utils/postcss';
 import { isReadonlyOrWritableArray } from './utils/types';
 
 function importPlugin(pluginName: string): unknown {
@@ -20,8 +21,8 @@ function importPlugin(pluginName: string): unknown {
 function loadPlugin(
     pluginName: string,
     pluginOptions: unknown,
-    propList: (string | number)[],
-): AcceptedPlugin {
+    propList: ReadonlyArray<string | number>,
+): postcss.AcceptedPlugin {
     const pluginGenerator = importPlugin(pluginName);
 
     /**
@@ -68,8 +69,8 @@ function loadPlugin(
  */
 export function loadPlugins(
     plugins: InputOptionsInterface['plugins'] | undefined,
-    propList: (string | number)[] = [],
-): ReadonlyArray<AcceptedPlugin> {
+    propList: ReadonlyArray<string | number> = [],
+): ReadonlyArray<postcss.AcceptedPlugin> {
     if (!plugins) return defaultOptions.plugins;
 
     return (Array.isArray as isReadonlyOrWritableArray)(plugins)
@@ -83,7 +84,7 @@ export function loadPlugins(
 
                   return loadPlugins(plugin, [...propList, index]);
               })
-              .reduce<AcceptedPlugin[]>(
+              .reduce<postcss.AcceptedPlugin[]>(
                   (list, plugins) => list.concat(plugins),
                   [],
               )
