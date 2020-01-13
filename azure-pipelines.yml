@@ -6,6 +6,9 @@
 # no PR builds
 pr: none
 
+variables:
+  npm_config_cache: $(Pipeline.Workspace)/.npm
+
 stages:
   - stage:
 

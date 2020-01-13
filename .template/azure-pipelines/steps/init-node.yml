@@ -1,9 +1,6 @@
 parameters:
   nodeVersion: 12.x
 
-variables:
-  npm_config_cache: $(Pipeline.Workspace)/.npm
-
 steps:
   - script:
       sudo sysctl fs.inotify.max_user_watches=524288
