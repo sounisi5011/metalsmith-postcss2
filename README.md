@@ -24,7 +24,7 @@
 
 *   Supports the latest PostCSS
 
-    Supported and tested version: [![ ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L146).
+    Supported and tested version: [![ ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L160).
 
 *   Loading [PostCSS config file][npm-postcss-load-config-used]
 
@@ -333,7 +333,7 @@ metalsmith
 
 ## Options
 
-The default value for options are [defined](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L51-L61) like this:
+The default value for options are [defined](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L55-L65) like this:
 
 ```js
 const path = require('path');
@@ -359,13 +359,13 @@ Pattern are verified using [multimatch v4.0.0][npm-multimatch-used].
 
 [npm-multimatch-used]: https://www.npmjs.com/package/multimatch/v/4.0.0
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L52)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L56)):
 
 ```js
 ['**/*.css']
 ```
 
-Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L26)):
+Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L25)):
 
 ```ts
 string | string[]
@@ -414,13 +414,13 @@ In addition to PostCSS plugins, you can also specify the following values:
     ]
     ```
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L53)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L57)):
 
 ```js
 []
 ```
 
-Type definition ([source line 27](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L27) / [source line 37 - 42](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L37-L42)):
+Type definition ([source line 26](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L26) / [source line 41 - 46](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L41-L46)):
 
 ```ts
 // import postcss from 'postcss';
@@ -440,15 +440,15 @@ See the [PostCSS documentation for details on options][PostCSS ProcessOptions].
 [PostCSS ProcessOptions]: http://api.postcss.org/global.html#processOptions
 
 The `from` and `to` properties cannot be specified because the plugin automatically sets them internally.
-If set, [an exception will be thrown](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L63-L83).
+If set, [an exception will be thrown](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L67-L87).
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L54)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L58)):
 
 ```js
 {}
 ```
 
-Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L28)):
+Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L27)):
 
 ```ts
 // import postcss from 'postcss';
@@ -500,7 +500,7 @@ new Date()
 
 By default, a function that replaces file extension with `.css` is setted.
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L55-L59)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L59-L63)):
 
 ```js
 const path = require('path');
@@ -511,7 +511,7 @@ filename => {
 }
 ```
 
-Type definition ([source line 29](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L29) / [source line 43](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L43)):
+Type definition ([source line 28](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L28) / [source line 47](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L47)):
 
 ```ts
 true | false | null | (filename: string) => string
@@ -609,13 +609,13 @@ undefined
 ``
 ```
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L60)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L64)):
 
 ```js
 false
 ```
 
-Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L30)):
+Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L29)):
 
 ```ts
 string | false | null
@@ -640,14 +640,14 @@ postcss([ 'postcss-import' ])
 
 For more advanced usage it's recommend to to use a function in `postcss.config.js`, this gives you access to the CLI context to dynamically apply options and plugins **per file**
 
-| Name          | Type                                                                                                                                                                                                                                       | Description            | Default                                      |
-| :-----------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------- | :------------------------------------------: |
-| `cwd`         | `string`                                                                                                                                                                                                                                   | `process.cwd()`        | `process.cwd()`                              |
-| `env`         | `string`                                                                                                                                                                                                                                   | `process.env.NODE_ENV` | `'development'`                              |
-| `options`     | [`postcss.ProcessOptions`][PostCSS ProcessOptions]                                                                                                                                                                                         | PostCSS Options        | `from, to, parser, stringifier, syntax, map` |
-| `file`        | `{dirname: string, basename: string, extname: string}`                                                                                                                                                                                     | Source File Data       | `dirname, basename, extname`                 |
-| `pluginsList` | <code>(<a href="http://api.postcss.org/global.html#Plugin">Plugin</a> &#x7C; <a href="http://api.postcss.org/global.html#pluginFunction">pluginFunction</a> &#x7C; <a href="http://api.postcss.org/Processor.html">Processor</a>)[]</code> | PostCSS Plugins Array  | `[]`                                         |
-| `metalsmith`  | `Metalsmith`                                                                                                                                                                                                                               | `Metalsmith` instance  | `Metalsmith(...)`                            |
+| Name          | Type                                                                                                                                                                                                                                                               | Description            | Default                                      |
+| :-----------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------- | :------------------------------------------: |
+| `cwd`         | `string`                                                                                                                                                                                                                                                           | `process.cwd()`        | `process.cwd()`                              |
+| `env`         | `string`                                                                                                                                                                                                                                                           | `process.env.NODE_ENV` | `'development'`                              |
+| `options`     | [`postcss.ProcessOptions`][PostCSS ProcessOptions]                                                                                                                                                                                                                 | PostCSS Options        | `from, to, parser, stringifier, syntax, map` |
+| `file`        | `{dirname: string, basename: string, extname: string}`                                                                                                                                                                                                             | Source File Data       | `dirname, basename, extname`                 |
+| `pluginsList` | <code>(<a href="http://api.postcss.org/global.html#Plugin">postcss.Plugin</a> &#x7C; <a href="http://api.postcss.org/global.html#pluginFunction">postcss.pluginFunction</a> &#x7C; <a href="http://api.postcss.org/Processor.html">postcss.Processor</a>)[]</code> | PostCSS Plugins Array  | `[]`                                         |
+| `metalsmith`  | `Metalsmith`                                                                                                                                                                                                                                                       | `Metalsmith` instance  | `Metalsmith(...)`                            |
 
 **postcss.config.js**
 
