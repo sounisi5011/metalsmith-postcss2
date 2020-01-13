@@ -32,6 +32,7 @@
     * [#47] - `4.0.0` -> `5.0.0`
 * `husky`
     * [#43] - `3.0.9` -> `3.1.0`
+    * [#50] - `3.1.0` -> `4.0.7`
 * `lint-staged`
     * [#43] - `9.4.2` -> `9.5.0`
 * `metalsmith-sass`
@@ -77,6 +78,7 @@
 [#52]: https://github.com/sounisi5011/metalsmith-postcss2/pull/52
 [#47]: https://github.com/sounisi5011/metalsmith-postcss2/pull/47
 [#56]: https://github.com/sounisi5011/metalsmith-postcss2/pull/56
+[#50]: https://github.com/sounisi5011/metalsmith-postcss2/pull/50
 
 ## [1.0.0] (2019-10-17 UTC)
 
