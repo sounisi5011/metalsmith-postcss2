@@ -57,6 +57,12 @@
 * `typescript`
     * [#30] - `3.6.4` -> `3.7.4`
 
+### Added Dependencies
+
+#### devDependencies
+
+* [#58] - `@types/node@12.x`
+
 ### Others
 
 * [#42] - Renovate package groups
@@ -84,6 +90,7 @@
 [#50]: https://github.com/sounisi5011/metalsmith-postcss2/pull/50
 [#45]: https://github.com/sounisi5011/metalsmith-postcss2/pull/45
 [#57]: https://github.com/sounisi5011/metalsmith-postcss2/pull/57
+[#58]: https://github.com/sounisi5011/metalsmith-postcss2/pull/58
 
 ## [1.0.0] (2019-10-17 UTC)
 
