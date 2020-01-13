@@ -14,11 +14,6 @@ jobs:
       - template: ../steps/init-node.yml
 
       - ${{ each stepParams in parameters.steps }}:
-          # TODO: Delete later
-          - script: |
-              node -p 'Object.entries(process.env).filter(([p]) => /^npm_config_cache$/i.test(p)).reduce((o, [p, v]) => ({...o, [p]:v}), {})'
-            displayName: Show $npm_config_cache before step
-
           - script: ${{ stepParams.script }}
 
             ${{ if stepParams.label }}:
