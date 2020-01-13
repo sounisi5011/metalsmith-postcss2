@@ -33,6 +33,8 @@
     * [#43] - `3.1.0` -> `3.2.1`
 * `package-version-git-tag`
     * [#48] - `1.1.2` -> `2.0.2`
+* `postcss`
+    * [#27] - `7.0.18` -> `7.0.26`
 * `prettier`
     * [#43] - `1.18.2` -> `1.19.1`
 * `prettier-package-json`
@@ -58,6 +60,7 @@
 [#46]: https://github.com/sounisi5011/metalsmith-postcss2/pull/46
 [#54]: https://github.com/sounisi5011/metalsmith-postcss2/pull/54
 [#55]: https://github.com/sounisi5011/metalsmith-postcss2/pull/55
+[#27]: https://github.com/sounisi5011/metalsmith-postcss2/pull/27
 
 ## [1.0.0] (2019-10-17 UTC)
 
