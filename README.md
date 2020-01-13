@@ -6,7 +6,7 @@
 ![Supported Metalsmith version: ^2.2.0](https://img.shields.io/static/v1?label=metalsmith&message=%5E2.2.0&color=blue)
 ![Supported PostCSS version: ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)
 ![Type Definitions: TypeScript](https://img.shields.io/static/v1?label=types&message=TypeScript&color=blue)
-[![bundle size](https://badgen.net/bundlephobia/min/metalsmith-postcss2@1.0.0)](https://bundlephobia.com/result?p=metalsmith-postcss2@1.0.0)
+[![Minified Bundle Size Details](https://img.shields.io/bundlephobia/min/metalsmith-postcss2/1.0.0)](https://bundlephobia.com/result?p=metalsmith-postcss2@1.0.0)
 [![Install Size Details](https://packagephobia.now.sh/badge?p=metalsmith-postcss2@1.0.0)](https://packagephobia.now.sh/result?p=metalsmith-postcss2@1.0.0)
 [![Dependencies Status](https://david-dm.org/sounisi5011/metalsmith-postcss2/status.svg)](https://david-dm.org/sounisi5011/metalsmith-postcss2)
 [![Build Status](https://dev.azure.com/sounisi5011/metalsmith-postcss2/_apis/build/status/sounisi5011.metalsmith-postcss2?branchName=master)](https://dev.azure.com/sounisi5011/metalsmith-postcss2/_build/latest?definitionId=1&branchName=master)
