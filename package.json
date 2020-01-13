@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-postcss2",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Metalsmith plugin for PostCSS",
   "keywords": [
     "css",
