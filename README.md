@@ -6,14 +6,14 @@
 ![Supported Metalsmith version: ^2.2.0](https://img.shields.io/static/v1?label=metalsmith&message=%5E2.2.0&color=blue)
 ![Supported PostCSS version: ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)
 ![Type Definitions: TypeScript](https://img.shields.io/static/v1?label=types&message=TypeScript&color=blue)
-[![Minified Bundle Size Details](https://img.shields.io/bundlephobia/min/metalsmith-postcss2/1.0.0)](https://bundlephobia.com/result?p=metalsmith-postcss2@1.0.0)
-[![Install Size Details](https://packagephobia.now.sh/badge?p=metalsmith-postcss2@1.0.0)](https://packagephobia.now.sh/result?p=metalsmith-postcss2@1.0.0)
+[![Minified Bundle Size Details](https://img.shields.io/bundlephobia/min/metalsmith-postcss2/2.0.0)](https://bundlephobia.com/result?p=metalsmith-postcss2@2.0.0)
+[![Install Size Details](https://packagephobia.now.sh/badge?p=metalsmith-postcss2@2.0.0)](https://packagephobia.now.sh/result?p=metalsmith-postcss2@2.0.0)
 [![Dependencies Status](https://david-dm.org/sounisi5011/metalsmith-postcss2/status.svg)](https://david-dm.org/sounisi5011/metalsmith-postcss2)
 [![Build Status](https://dev.azure.com/sounisi5011/metalsmith-postcss2/_apis/build/status/sounisi5011.metalsmith-postcss2?branchName=master)](https://dev.azure.com/sounisi5011/metalsmith-postcss2/_build/latest?definitionId=1&branchName=master)
 [![Maintainability Status](https://api.codeclimate.com/v1/badges/dd1dfc5d976b1bce125c/maintainability)](https://codeclimate.com/github/sounisi5011/metalsmith-postcss2/maintainability)
 
 [npm]: https://www.npmjs.com/package/metalsmith-postcss2
-[github-license]: https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/LICENSE
+[github-license]: https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/LICENSE
 
 [Metalsmith] plugin for [PostCSS].
 
@@ -24,7 +24,7 @@
 
 *   Supports the latest PostCSS
 
-    Supported and tested version: [![ ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/package.json#L160).
+    Supported and tested version: [![ ^7.0.8](https://img.shields.io/static/v1?label=postcss&message=%5E7.0.8&color=blue)](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/package.json#L160).
 
 *   Loading [PostCSS config file][npm-postcss-load-config-used]
 
@@ -333,7 +333,7 @@ metalsmith
 
 ## Options
 
-The default value for options are [defined](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L55-L65) like this:
+The default value for options are [defined](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L55-L65) like this:
 
 ```js
 const path = require('path');
@@ -359,13 +359,13 @@ Pattern are verified using [multimatch v4.0.0][npm-multimatch-used].
 
 [npm-multimatch-used]: https://www.npmjs.com/package/multimatch/v/4.0.0
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L56)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L56)):
 
 ```js
 ['**/*.css']
 ```
 
-Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L25)):
+Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L25)):
 
 ```ts
 string | string[]
@@ -414,13 +414,13 @@ In addition to PostCSS plugins, you can also specify the following values:
     ]
     ```
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L57)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L57)):
 
 ```js
 []
 ```
 
-Type definition ([source line 26](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L26) / [source line 41 - 46](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L41-L46)):
+Type definition ([source line 26](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L26) / [source line 41 - 46](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L41-L46)):
 
 ```ts
 // import postcss from 'postcss';
@@ -440,15 +440,15 @@ See the [PostCSS documentation for details on options][PostCSS ProcessOptions].
 [PostCSS ProcessOptions]: http://api.postcss.org/global.html#processOptions
 
 The `from` and `to` properties cannot be specified because the plugin automatically sets them internally.
-If set, [an exception will be thrown](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L67-L87).
+If set, [an exception will be thrown](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L67-L87).
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L58)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L58)):
 
 ```js
 {}
 ```
 
-Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L27)):
+Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L27)):
 
 ```ts
 // import postcss from 'postcss';
@@ -500,7 +500,7 @@ new Date()
 
 By default, a function that replaces file extension with `.css` is setted.
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L59-L63)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L59-L63)):
 
 ```js
 const path = require('path');
@@ -511,7 +511,7 @@ filename => {
 }
 ```
 
-Type definition ([source line 28](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L28) / [source line 47](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L47)):
+Type definition ([source line 28](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L28) / [source line 47](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L47)):
 
 ```ts
 true | false | null | (filename: string) => string
@@ -609,13 +609,13 @@ undefined
 ``
 ```
 
-Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L64)):
+Default value ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L64)):
 
 ```js
 false
 ```
 
-Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v1.0.0/src/options.ts#L29)):
+Type definition ([source](https://github.com/sounisi5011/metalsmith-postcss2/blob/v2.0.0/src/options.ts#L29)):
 
 ```ts
 string | false | null
