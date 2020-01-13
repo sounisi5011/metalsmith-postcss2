@@ -5,8 +5,6 @@ import postcssrc from 'postcss-load-config';
 
 import { isObject } from '.';
 
-export type AcceptedPlugin = Parameters<typeof postcss>[0];
-
 /**
  * When JSON or YAML postcssrc config file is specified, the contents of postcssrc are overwritten with the ctx argument.
  * To prevent the risk of overwriting postcssrc settings, this interface makes the properties expected by postcss-load-config non-overridable.
@@ -42,7 +40,7 @@ interface ProtectPostcssrcCtx
 export interface ConfigResult {
     file: string;
     options: postcss.ProcessOptions;
-    plugins: AcceptedPlugin[];
+    plugins: postcss.AcceptedPlugin[];
 }
 
 export function isCssSyntaxError(
@@ -89,7 +87,9 @@ function isPluginObj(
     );
 }
 
-export function isAcceptedPlugin(value: unknown): value is AcceptedPlugin {
+export function isAcceptedPlugin(
+    value: unknown,
+): value is postcss.AcceptedPlugin {
     if (isTransformerOrProcessor(value)) {
         return true;
     }
@@ -109,7 +109,7 @@ export async function loadConfig({
     sourceFilepath,
     metalsmith,
 }: {
-    plugins: ReadonlyArray<AcceptedPlugin>;
+    plugins: ReadonlyArray<postcss.AcceptedPlugin>;
     options: postcss.ProcessOptions;
     sourceFilepath: string;
     metalsmith: Metalsmith;
@@ -140,7 +140,7 @@ export async function loadConfig({
 }
 
 export async function processCSS(
-    plugins: AcceptedPlugin[],
+    plugins: postcss.AcceptedPlugin[],
     ...[css, opts]: Parameters<postcss.Processor['process']>
 ): Promise<postcss.Result | void> {
     try {

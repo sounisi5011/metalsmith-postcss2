@@ -6,7 +6,6 @@ import postcss from 'postcss';
 import { loadPlugins } from './plugins';
 import { hasProp } from './utils';
 import { MetalsmithStrictWritableFiles } from './utils/metalsmith';
-import { AcceptedPlugin } from './utils/postcss';
 import {
     ArrayLikeOnly,
     ArrayValue,
@@ -24,7 +23,7 @@ type OptionsGenerator<T> =
 
 export interface OptionsInterface {
     readonly pattern: string | ReadonlyArray<string>;
-    readonly plugins: ReadonlyArray<AcceptedPlugin>;
+    readonly plugins: ReadonlyArray<postcss.AcceptedPlugin>;
     readonly options: Omit<postcss.ProcessOptions, 'from' | 'to'>;
     readonly renamer: (filename: string) => string;
     readonly dependenciesKey: string | false | null;
