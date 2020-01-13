@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+[Unreleased]: https://github.com/sounisi5011/metalsmith-postcss2/compare/v2.0.0...master
+
+## [2.0.0] (2020-01-13 UTC)
+
 ### Breaking Changes
 
 * [#51] - Change supported PostCSS version: `^5.2.18 || ^6.0.13 || 7.x` -> `^7.0.8`
@@ -71,7 +75,7 @@
 * [#56] - Cache npm's shared cache directory on CI
 * [#57] - Fix type definitions
 
-[Unreleased]: https://github.com/sounisi5011/metalsmith-postcss2/compare/v1.0.0...HEAD
+[2.0.0]: https://github.com/sounisi5011/metalsmith-postcss2/compare/v1.0.0...v2.0.0
 [#42]: https://github.com/sounisi5011/metalsmith-postcss2/pull/42
 [#51]: https://github.com/sounisi5011/metalsmith-postcss2/pull/51
 [#44]: https://github.com/sounisi5011/metalsmith-postcss2/pull/44
