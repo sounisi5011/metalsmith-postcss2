@@ -153,7 +153,7 @@
     "sort-package-json": "1.38.2",
     "sugarss": "2.0.0",
     "ts-node": "8.6.1",
-    "typescript": "3.6.4"
+    "typescript": "3.7.4"
   },
   "peerDependencies": {
     "metalsmith": "^2.2.0",
