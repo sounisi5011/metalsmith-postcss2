@@ -63,6 +63,7 @@
 * [#51] - Fix peerdeps test
 * [#55] - Exclude renovate/npm-scripts-packages branch from testing on CI
 * [#56] - Cache npm's shared cache directory on CI
+* [#57] - Fix type definitions
 
 [Unreleased]: https://github.com/sounisi5011/metalsmith-postcss2/compare/v1.0.0...HEAD
 [#42]: https://github.com/sounisi5011/metalsmith-postcss2/pull/42
@@ -82,6 +83,7 @@
 [#56]: https://github.com/sounisi5011/metalsmith-postcss2/pull/56
 [#50]: https://github.com/sounisi5011/metalsmith-postcss2/pull/50
 [#45]: https://github.com/sounisi5011/metalsmith-postcss2/pull/45
+[#57]: https://github.com/sounisi5011/metalsmith-postcss2/pull/57
 
 ## [1.0.0] (2019-10-17 UTC)
 
